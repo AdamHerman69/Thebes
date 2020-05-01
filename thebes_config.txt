@@ -1,0 +1,52 @@
+UNIVERSITIES
+# [name]
+
+London
+Paris
+Berlin
+Warsaw
+Moscow
+Rome
+
+DIGSITES
+# [name] [token count]
+
+Greece
+Krete
+Egypt
+Palestine
+Mesopotamia
+
+CARDCHANGEPLACES
+# [name]
+
+DISTRIBUTIONS
+
+# TOKENS [digsite name]
+# dirt
+# specializedKnowledge [value] [digsite name]
+# generalKnowledge [value]
+# artifact [value] [name]
+
+DISTANCEMATRIX
+PLACES [place name] ... [place name]
+[place name] [distance in weeks] ... [distance in weeks]
+. .
+. .
+. .
+[place name] [distance in weeks] ... [distance in weeks]
+
+CARDS
+# specializedKnowledge [place name] [cost in weeks] [value] [digsite name]
+# generalKnowledge [place name] [cost in weeks] [value]
+# rumors [place name] [cost in weeks] [value] [digsite name]
+# zeppelin [place name] [cost in weeks]
+# car [place name] [cost in weeks]
+# assistent [place name] [cost in weeks]
+# shovel [place name] [cost in weeks]
+# specialPermission [place name] [cost in weeks]
+# exhibition [place name] [cost in weeks] [points] [digsite name] ... [digsite name]
+
+
+
+
