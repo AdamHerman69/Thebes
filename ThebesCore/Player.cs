@@ -37,7 +37,8 @@ namespace ThebesCore
         void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace);
         bool UseZeppelin();
     }
-    
+
+    [Serializable]
     public class Player : IComparable<IPlayer>, IPlayerView, IPlayer
     {
         Action notEnoughTimeDialog;
@@ -111,6 +112,7 @@ namespace ThebesCore
             return str;
         }   
 
+        public Player() { }
         public Player(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
         {
             this.Name = name;
@@ -443,6 +445,7 @@ namespace ThebesCore
         void TakeActionWrapper(List<ICard> availableCards, List<IExhibitionCard> availableExhibitions);
     }
 
+    [Serializable]
     public class ConsolePlayer : Player
     {
         public List<IPlace> Places { get; set; }

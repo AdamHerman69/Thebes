@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ThebesCore
 {
+    [Serializable]
     public class Game
     {
         public List<IPlayer> Players { get; set; }
@@ -71,6 +74,7 @@ namespace ThebesCore
         }
     }
 
+    [Serializable]
     public class ConsoleGame : Game
     {
         public ConsoleGame(int playerCount) : base(playerCount) { }
@@ -80,7 +84,7 @@ namespace ThebesCore
             {
                 Players.Sort();
                 PrintState();
-                ((IConsolePlayer)Players[0]).TakeActionWrapper(new List<ICard>(AvailableCards.AvailableCards), ActiveExhibitions.Exhibitions.ToList<IExhibitionCard>().Where(x => x != null).ToList());
+                ((ConsolePlayer)Players[0]).TakeActionWrapper(new List<ICard>(AvailableCards.AvailableCards), ActiveExhibitions.Exhibitions.ToList<IExhibitionCard>().Where(x => x != null).ToList());
                 ResetCardChangeInfos();
             }
 
@@ -113,6 +117,7 @@ namespace ThebesCore
         }
     }
 
+    [Serializable]
     public class UIGame : Game
     {
         public IPlayer activePlayer;
@@ -155,6 +160,19 @@ namespace ThebesCore
                 return @"C:\Users\admhe\source\repos\Thebes\img\card-46.png";
             }
             throw new InvalidOperationException();
+        }
+    }
+
+    [Serializable]
+    public class GameState
+    {
+        public Game game { get; set; }
+        public GameSettingsSerializable settings { get; set; }
+
+        public GameState(Game game)
+        {
+            this.game = game;
+            settings = new GameSettingsSerializable();
         }
     }
 }

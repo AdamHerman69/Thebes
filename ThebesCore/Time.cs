@@ -22,6 +22,7 @@ namespace ThebesCore
         string ToString();
     }
 
+    [Serializable]
     public class Time : IComparable<ITime>, IEquatable<ITime>, ITime
     {
         Func<ITime, int> playersOnWeek;
@@ -73,12 +74,14 @@ namespace ThebesCore
             return $"{CurrentWeek} week, {CurrentYear}";
         }
 
+        public Time() { }
+
         public Time(Func<ITime, int> playersOnWeek, OnNewYear onNewYear)
         {
-            if (startingWeek == 0) // hasn't been configured
-            {
-                throw new InvalidOperationException("Time needs to be configured first");
-            }
+            //if (startingWeek == 0) // hasn't been configured
+            //{
+            //    throw new InvalidOperationException("Time needs to be configured first");
+            //}
 
             this.CurrentWeek = startingWeek;
             this.CurrentYear = firstYear;

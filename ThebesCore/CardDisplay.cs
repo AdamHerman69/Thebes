@@ -12,6 +12,7 @@ namespace ThebesCore
         void GiveCard(ICard card);
     }
 
+    [Serializable]
     public class CardDisplay : ICardDisplay
     {
         public ICard[] AvailableCards { get; private set; }
@@ -64,6 +65,7 @@ namespace ThebesCore
         void GiveExhibition(IExhibitionCard exhibition);
     }
 
+    [Serializable]
     public class AvailableExhibitions : IAvailableExhibitions
     {
         public IExhibitionCard[] Exhibitions { get; set; }

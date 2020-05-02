@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
-
+using System.Runtime.CompilerServices;
 
 namespace ThebesCore
 {
@@ -45,8 +45,8 @@ namespace ThebesCore
         {
             Places = new List<IPlace>();
             Cards = new List<ICard>();
-            
-            
+
+
             Queue<string[]> lines = new Queue<string[]>();
 
             // load lines
@@ -55,7 +55,7 @@ namespace ThebesCore
             string[] line;
             while ((lineString = sr.ReadLine()) != null)
             {
-                line = lineString.Split((char[])null ,options: StringSplitOptions.RemoveEmptyEntries);
+                line = lineString.Split((char[])null, options: StringSplitOptions.RemoveEmptyEntries);
                 if (line.Length != 0 && !line[0].Equals("") && line[0][0] != '#') // is not comment or empty
                 {
                     lines.Enqueue(line);
@@ -132,7 +132,7 @@ namespace ThebesCore
 
             // DISTANCE MATRIX
             if (!line[0].Equals("DISTANCEMATRIX")) throw new FormatException("invalid config file format");
-            
+
             if (!(line = lines.Dequeue())[0].Equals("PLACES")) throw new FormatException("invalid config file format");
             int[] indexMapping = new int[Places.Count + 1];
             for (int i = 1; i < indexMapping.Length; i++)
@@ -192,18 +192,10 @@ namespace ThebesCore
                         break;
 
                     case "exhibition":
-                        Dictionary<IDigSiteSimpleView, int> artifactsRequired = new Dictionary<IDigSiteSimpleView, int>();
+                        List<IDigSiteSimpleView> artifactsRequired = new List<IDigSiteSimpleView>();
                         for (int i = 4; i < line.Length; i++)
                         {
-                            IDigSiteSimpleView digSite = (IDigSiteSimpleView)getPlaceByName(line[i]);
-                            if (artifactsRequired.ContainsKey(digSite))
-                            {
-                                artifactsRequired[digSite]++;
-                            }
-                            else
-                            {
-                                artifactsRequired.Add(digSite, 1);
-                            }
+                            artifactsRequired.Add((IDigSiteSimpleView)getPlaceByName(line[i]));
                         }
                         Cards.Add(new ExhibitionCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2]), int.Parse(line[3]), artifactsRequired));
                         break;
@@ -224,7 +216,7 @@ namespace ThebesCore
                 knowledge = int.Parse(line[0]);
                 TimeWheel.Add(knowledge, new Dictionary<int, int>());
                 for (int i = 1; i < line.Length; i++)
-                {     
+                {
                     TimeWheel[knowledge].Add(i, int.Parse(line[i]));
                 }
             }
@@ -356,12 +348,9 @@ namespace ThebesCore
             foreach (IExhibitionCard card in Cards.Where(x => x is IExhibitionCard))
             {
                 str += $"exhibition {card.Place} {card.Weeks} {card.Points} ";
-                foreach (KeyValuePair<IDigSiteSimpleView, int> kvp in card.ArtifactsRequired)
+                foreach (IDigSiteSimpleView digSite in card.ArtifactsRequired)
                 {
-                    for (int i = 0; i < kvp.Value; i++)
-                    {
-                        str += kvp.Key.Name + " ";
-                    }
+                    str += digSite.Name + " ";
                 }
                 str += "\n";
             }
@@ -380,6 +369,15 @@ namespace ThebesCore
             }
 
             return str;
+        }
+
+        public static void LoadSerializedData(GameSettingsSerializable data)
+        {
+            Places = data.Places;
+            StartingPlace = data.StartingPlace;
+            Distances = data.Distances;
+            TimeWheel = data.TimeWheel;
+            Cards = data.Cards;
         }
 
         public static void Initialize() // temporary, will be replaced with json config file
@@ -443,7 +441,7 @@ namespace ThebesCore
                 return tokenList;
             }
 
-      
+
             // PLACES
             // Universities
             Places = new List<IPlace>();
@@ -860,61 +858,46 @@ namespace ThebesCore
             // EXHIBITIONS
             // small
 
-            Cards.Add(new ExhibitionCard("TODO", london, 3, 4, new Dictionary<IDigSiteSimpleView, int> {
-                { greece, 1},
-                { egypt, 2 }
+            Cards.Add(new ExhibitionCard("TODO", london, 3, 4, new List<IDigSiteSimpleView>{
+                greece, egypt, egypt
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", moscow, 3, 4, new Dictionary<IDigSiteSimpleView, int> {
-                { mesopotamia, 1},
-                { crete, 2 }
+            Cards.Add(new ExhibitionCard("TODO", moscow, 3, 4, new List<IDigSiteSimpleView>{
+                mesopotamia, crete, crete
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", vienna, 3, 4, new Dictionary<IDigSiteSimpleView, int> {
-                { egypt, 1},
-                { palestine, 2 }
+            Cards.Add(new ExhibitionCard("TODO", vienna, 3, 4, new List<IDigSiteSimpleView>{
+                egypt, palestine, palestine
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", paris, 3, 4, new Dictionary<IDigSiteSimpleView, int> {
-                { palestine, 1},
-                { mesopotamia, 2 }
+            Cards.Add(new ExhibitionCard("TODO", paris, 3, 4, new List<IDigSiteSimpleView>{
+                palestine, mesopotamia, mesopotamia
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", berlin, 3, 4, new Dictionary<IDigSiteSimpleView, int> {
-                { crete, 1},
-                { greece, 2 }
+            Cards.Add(new ExhibitionCard("TODO", berlin, 3, 4, new List<IDigSiteSimpleView>{
+                crete, greece, greece
             }));
 
             // large
 
-            Cards.Add(new ExhibitionCard("TODO", berlin, 4, 5, new Dictionary<IDigSiteSimpleView, int> {
-                { palestine, 1},
-                { mesopotamia, 2 },
-                { crete, 3 }
+            Cards.Add(new ExhibitionCard("TODO", berlin, 4, 5, new List<IDigSiteSimpleView>{
+                palestine, mesopotamia, mesopotamia, crete, crete, crete
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", paris, 4, 5, new Dictionary<IDigSiteSimpleView, int> {
-                { greece, 1},
-                { egypt, 2 },
-                { palestine, 3 }
+            Cards.Add(new ExhibitionCard("TODO", paris, 4, 5, new List<IDigSiteSimpleView>{
+                greece, egypt, egypt, palestine, palestine, palestine
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", london, 4, 5, new Dictionary<IDigSiteSimpleView, int> {
-                { crete, 1},
-                { greece, 2 },
-                { egypt, 3 }
+            Cards.Add(new ExhibitionCard("TODO", london, 4, 5, new List<IDigSiteSimpleView>{
+                crete, greece, greece, egypt, egypt, egypt
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", vienna, 4, 5, new Dictionary<IDigSiteSimpleView, int> {
-                { mesopotamia, 1},
-                { crete, 2 },
-                { greece, 3 }
+            Cards.Add(new ExhibitionCard("TODO", vienna, 4, 5, new List<IDigSiteSimpleView>{
+                mesopotamia, crete, crete, greece, greece, greece
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", moscow, 4, 5, new Dictionary<IDigSiteSimpleView, int> {
-                { egypt, 1},
-                { palestine, 2 },
-                { mesopotamia, 3 }
+            Cards.Add(new ExhibitionCard("TODO", moscow, 4, 5, new List<IDigSiteSimpleView>{
+                egypt, palestine, palestine, mesopotamia, mesopotamia, mesopotamia
             }));
 
 
@@ -977,11 +960,11 @@ namespace ThebesCore
             Cards.Add(new SpecializedKnowledgeCard("TODO", moscow, 1, 1, mesopotamia));
             Cards.Add(new SpecializedKnowledgeCard("TODO", moscow, 1, 1, mesopotamia));
             Cards.Add(new SpecializedKnowledgeCard("TODO", rome, 1, 1, mesopotamia));
-          
+
             Cards.Add(new SpecializedKnowledgeCard("TODO", vienna, 2, 2, mesopotamia));
             Cards.Add(new SpecializedKnowledgeCard("TODO", vienna, 2, 2, mesopotamia));
             Cards.Add(new SpecializedKnowledgeCard("TODO", london, 2, 2, mesopotamia));
-                    
+
             Cards.Add(new SpecializedKnowledgeCard("TODO", moscow, 4, 3, mesopotamia));
             Cards.Add(new SpecializedKnowledgeCard("TODO", london, 4, 3, mesopotamia));
 
@@ -1049,26 +1032,22 @@ namespace ThebesCore
         }
     }
 
-    //public class GameSettingsSerializable
-    //{
-    //    public List<IPlace> Places { get; set; }
-    //    public IPlace StartingPlace { get; set; }
-    //    public int[][] Distances { get; set; }
-    //    public Dictionary<int, Dictionary<int, int>> TimeWheel { get; set; }
-    //    public List<ICard> Cards { get; set; }
+    [Serializable]
+    public class GameSettingsSerializable
+    {
+        public List<IPlace> Places { get; set; }
+        public IPlace StartingPlace { get; set; }
+        public int[,] Distances { get; set; }
+        public Dictionary<int, Dictionary<int, int>> TimeWheel { get; set; }
+        public List<ICard> Cards { get; set; }
 
-    //    public GameSettingsSerializable()
-    //    {
-    //        Places = GameSettings.Places;
-    //        StartingPlace = GameSettings.StartingPlace;
-    //        Distances = GameSettings.Distances;
-    //        TimeWheel = GameSettings.TimeWheel;
-    //        Cards = GameSettings.Cards;
-    //    }
-        
-    //    public void Serialize(string path)
-    //    {
-    //        File.WriteAllText(path, JsonConvert.SerializeObject(this, Formatting.Indented));
-    //    }
-    //}
+        public GameSettingsSerializable()
+        {
+            Places = GameSettings.Places;
+            StartingPlace = GameSettings.StartingPlace;
+            Distances = GameSettings.Distances;
+            TimeWheel = GameSettings.TimeWheel;
+            Cards = GameSettings.Cards;
+        }
+    }
 }

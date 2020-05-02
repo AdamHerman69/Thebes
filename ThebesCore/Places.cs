@@ -10,6 +10,7 @@ namespace ThebesCore
         string Name { get; }
     }
 
+    [Serializable]
     public abstract class Place : IPlace
     {
         public string Name { get; private set; }
@@ -37,6 +38,7 @@ namespace ThebesCore
         List<IToken> DrawTokens(int tokenAmount);
     }
 
+    [Serializable]
     public class DigSite : Place, IDigSiteFullView
     {
         public List<IToken> Tokens { get; set; }
@@ -68,6 +70,7 @@ namespace ThebesCore
 
     }
 
+    [Serializable]
     public class CardChangePlace : Place, ICardChangePlace
     {
         public CardChangePlace(string name, int index) : base(name, index) { }
@@ -78,6 +81,7 @@ namespace ThebesCore
 
     }
 
+    [Serializable]
     public class University : Place, IUniversity
     {
         public University(string name, int index) : base(name, index) { }

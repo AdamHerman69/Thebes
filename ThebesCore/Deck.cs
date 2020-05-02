@@ -11,6 +11,7 @@ namespace ThebesCore
         void recycleDeck();
     }
 
+    [Serializable]
     public class Deck : IDeck
     {
         private Queue<ICard> CardDeck { get; set; }

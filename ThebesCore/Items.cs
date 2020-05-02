@@ -12,6 +12,7 @@ namespace ThebesCore
         void UpdateStats(IPlayer player);
     }
 
+    [Serializable]
     public abstract class Item : IItem
     {
         public string Id { get; set; }
@@ -32,6 +33,7 @@ namespace ThebesCore
         string Description { get; }
     }
 
+    [Serializable]
     public abstract class Card : Item, ICard
     {
         public IUniversity Place { get; }
@@ -51,6 +53,7 @@ namespace ThebesCore
         int KnowledgeAmount { get; }
     }
 
+    [Serializable]
     public class SpecializedKnowledgeCard : Card, ISpecializedKnowledgeCard
     {
         public int KnowledgeAmount { get; set; }
@@ -78,6 +81,7 @@ namespace ThebesCore
         int KnowledgeAmount { get; set; }
     }
 
+    [Serializable]
     public class GeneralKnowledgeCard : Card, IGeneralKnowledgeCard
     {
         public int KnowledgeAmount { get; set; }
@@ -104,6 +108,7 @@ namespace ThebesCore
         int KnowledgeAmount { get; set; }
     }
 
+    [Serializable]
     public class RumorsCard : Card, IRumorsCard
     {
         public int KnowledgeAmount { get; set; }
@@ -130,6 +135,7 @@ namespace ThebesCore
     {
     }
 
+    [Serializable]
     public class ZeppelinCard : Card, IZeppelinCard
     {
         public ZeppelinCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
@@ -148,6 +154,7 @@ namespace ThebesCore
     {
     }
 
+    [Serializable]
     public class CarCard : Card, ICarCard
     {
         public CarCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
@@ -167,6 +174,7 @@ namespace ThebesCore
     {
     }
 
+    [Serializable]
     public class AssistentCard : Card, IAssistentCard
     {
         public AssistentCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
@@ -185,6 +193,7 @@ namespace ThebesCore
     {
     }
 
+    [Serializable]
     public class ShovelCard : Card, IShovelCard
     {
         public ShovelCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
@@ -204,6 +213,7 @@ namespace ThebesCore
     {
     }
 
+    [Serializable]
     public class SpecialPermissionCard : Card, ISpecialPermissionCard
     {
         public SpecialPermissionCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
@@ -223,6 +233,7 @@ namespace ThebesCore
     {
     }
 
+    [Serializable]
     public class CongressCard : Card, ICongressCard
     {
         public CongressCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
@@ -240,19 +251,20 @@ namespace ThebesCore
 
     public interface IExhibitionCard : ICard
     {
-        Dictionary<IDigSiteSimpleView, int> ArtifactsRequired { get; }
+        List<IDigSiteSimpleView> ArtifactsRequired { get; }
 
         bool CheckRequiredArtifacts(Dictionary<IDigSiteSimpleView, List<IToken>> tokensObtained);
         bool IsSmallExhibition();
         int Points { get; }
     }
 
+    [Serializable]
     public class ExhibitionCard : Card, IExhibitionCard
     {
         public int Points { get; private set; }
-        public Dictionary<IDigSiteSimpleView, int> ArtifactsRequired { get; private set; }
+        public List<IDigSiteSimpleView> ArtifactsRequired { get; private set; }
 
-        public ExhibitionCard(string id, IUniversity place, int weeks, int points, Dictionary<IDigSiteSimpleView, int> artifactsRequired) : base(id, place, weeks)
+        public ExhibitionCard(string id, IUniversity place, int weeks, int points, List<IDigSiteSimpleView> artifactsRequired) : base(id, place, weeks)
         {
             this.Points = points;
             this.ArtifactsRequired = artifactsRequired;
@@ -270,10 +282,9 @@ namespace ThebesCore
 
         public bool CheckRequiredArtifacts(Dictionary<IDigSiteSimpleView, List<IToken>> tokensObtained)
         {
-
-            foreach (KeyValuePair<IDigSiteSimpleView, int> requirement in ArtifactsRequired)
+            foreach (IDigSiteSimpleView requirement in ArtifactsRequired)
             {
-                if (requirement.Value > tokensObtained[requirement.Key].Where(x => x is IArtifactToken).Count())
+                if (ArtifactsRequired.Where(x => x == requirement).Count() > tokensObtained[requirement].Where(y => y is IArtifactToken).Count())
                 {
                     return false;
                 }
@@ -284,12 +295,10 @@ namespace ThebesCore
         public override string ToString()
         {
             string str = $"Exhibition +{Points} at {Place} for {Weeks} requiring: ";
-            foreach (KeyValuePair<IDigSiteSimpleView, int> kvp in ArtifactsRequired)
+            foreach (IDigSiteSimpleView digSite in ArtifactsRequired)
             {
-                if (kvp.Value > 0)
-                {
-                    str += $"{kvp.Value} {kvp.Key}, ";
-                }
+                str += $"{digSite.Name}, ";
+
             }
             return str;
         }
@@ -318,6 +327,7 @@ namespace ThebesCore
     }
 
 
+    [Serializable]
     public abstract class Token : Item, IToken
     {
         public IDigSiteSimpleView DigSite { get; private set; }
@@ -328,6 +338,7 @@ namespace ThebesCore
         }
     }
 
+    [Serializable]
     public class SpecializedKnowledgeToken : Token, ISpecializedKnowledgeToken
     {
         public int KnowledgeAmount { get; set; }
@@ -350,6 +361,7 @@ namespace ThebesCore
         }
     }
 
+    [Serializable]
     public class GeneralKnowledgeToken : Token, IGeneralKnowledgeToken
     {
         public int KnowledgeAmount { get; set; }
@@ -370,6 +382,7 @@ namespace ThebesCore
         }
     }
 
+    [Serializable]
     public class ArtifactToken : Token, IArtifactToken
     {
         public int Points { get; set; }
@@ -397,6 +410,7 @@ namespace ThebesCore
         void UpdateStats(IPlayer player);
     }
 
+    [Serializable]
     public class DirtToken : Token, IDirtToken
     {
         public DirtToken(string id, IDigSiteSimpleView digSite) : base(id, digSite) { }
