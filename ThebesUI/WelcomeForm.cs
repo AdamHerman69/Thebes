@@ -13,6 +13,8 @@ namespace ThebesUI
 {
     public partial class WelcomeForm : Form
     {
+        OpenFileDialog ofd = new OpenFileDialog() { Filter = "THB|*.thb" };
+
         public WelcomeForm()
         {
             InitializeComponent();
@@ -23,7 +25,7 @@ namespace ThebesUI
             MessageBox.Show("You don't have enough time for that action");
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void bStartNew_Click(object sender, EventArgs e)
         {
             GameSettings.Initialize();
 
@@ -66,6 +68,21 @@ namespace ThebesUI
             GameForm gameForm = new GameForm(game);
             gameForm.ShowDialog();
             this.Close();
+        }
+
+        private void bBrowse_Click(object sender, EventArgs e)
+        {
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                tbFileName.Text = ofd.SafeFileName;
+                tbFilePath.Text = ofd.FileName;
+            }
+        }
+
+        private void bStartLoaded_Click(object sender, EventArgs e)
+        {
+            string filePath = tbFilePath.Text;
+            // TODO start game from serialized file
         }
     }
 }

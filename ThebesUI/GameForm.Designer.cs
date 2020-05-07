@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.playerDisplay1 = new ThebesUI.PlayerDisplay();
-            this.playerDisplay2 = new ThebesUI.PlayerDisplay();
-            this.playerDisplay3 = new ThebesUI.PlayerDisplay();
-            this.playerDisplay4 = new ThebesUI.PlayerDisplay();
+            //this.playerDisplay1 = new ThebesUI.PlayerDisplay();
+            //this.playerDisplay2 = new ThebesUI.PlayerDisplay();
+            //this.playerDisplay3 = new ThebesUI.PlayerDisplay();
+            //this.playerDisplay4 = new ThebesUI.PlayerDisplay();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.bSaveGame = new System.Windows.Forms.Button();
             this.bExitGame = new System.Windows.Forms.Button();

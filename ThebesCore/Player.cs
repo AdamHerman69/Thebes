@@ -23,13 +23,13 @@ namespace ThebesCore
         int Congresses { get; set; }
         int Cars { get; set; }
         int Zeppelins { get; set; }
+        int GetAssistentKnowledge();
+        List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite);
+        void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
     }
 
     public interface IPlayer : IPlayerView, IComparable<IPlayer>
     {
-        int GetAssistentKnowledge();
-        List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite);
-        void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
         List<IToken> Dig(IDigSiteFullView digSite, int weeks, List<ICard> singleUseCards);
         void ResetCardChnageInfo();
         void MoveAndTakeCard(ICard card);
@@ -72,7 +72,7 @@ namespace ThebesCore
         {
             // general
             string str = $"{Name} is at {CurrentPlace} time: {Time} points: {Points}\n";
-            
+
             // permissions
             str += "PERMISSIONS: ";
             foreach (KeyValuePair<IDigSiteSimpleView, bool> kvp in Permissions)
@@ -110,7 +110,7 @@ namespace ThebesCore
             }
 
             return str;
-        }   
+        }
 
         public Player() { }
         public Player(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
@@ -130,7 +130,7 @@ namespace ThebesCore
             SpecializedKnowledge = new Dictionary<IDigSiteSimpleView, int>();
             SingleUseKnowledge = new Dictionary<IDigSiteSimpleView, int>();
 
-            this.Time = new Time( playersOnWeek , ResetPermissions);
+            this.Time = new Time(playersOnWeek, ResetPermissions);
 
             // add all valid permissions
             Permissions = new Dictionary<IDigSiteSimpleView, bool>();
@@ -233,7 +233,7 @@ namespace ThebesCore
             knowledge += SpecializedKnowledge[digSite];
             knowledge += GeneralKnowledge;
             knowledge += GetAssistentKnowledge();
-            
+
             AddSingleUseCardsStats(digSite, singleUseCards, ref knowledge, ref tokenBonus);
 
             return;
@@ -355,12 +355,13 @@ namespace ThebesCore
             foreach (IToken token in dugTokens)
             {
                 token.UpdateStats(this);
-                if (! (token is IDirtToken))
+                if (!(token is IDirtToken))
                 {
                     Tokens[digSite].Add(token);
                 }
             }
 
+            // TODO change player stats
             // discard single-use cards used
             foreach (ICard card in singleUseCards)
             {
@@ -387,7 +388,7 @@ namespace ThebesCore
                 notEnoughTimeDialog();
                 return;
             }
-            
+
             MoveTo(card.Place);
             TakeCard(card);
         }
@@ -412,7 +413,7 @@ namespace ThebesCore
                 return;
             }
 
-            
+
 
             MoveTo(cardChangePlace);
             Time.SpendWeeks(CardChangeCost);
@@ -449,7 +450,7 @@ namespace ThebesCore
     public class ConsolePlayer : Player
     {
         public List<IPlace> Places { get; set; }
-        public ConsolePlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, notEnoughTimeDialog, changeDisplayCards, takeCard,discardCard , executeExhibition, playersOnWeek)
+        public ConsolePlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, notEnoughTimeDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
         {
             Places = places;
         }
@@ -622,7 +623,7 @@ namespace ThebesCore
                             {
                                 Console.WriteLine(card);
                             }
-                            
+
                             string[] response = Console.ReadLine().Split();
 
                             if (response.Length == 1 && response[0].Equals("none"))
@@ -667,6 +668,27 @@ namespace ThebesCore
                     Console.WriteLine("Unknown command, type 'help' to display options");
                     break;
             }
+        }
+    }
+
+    public interface IAI
+    {
+        IAction TakeAction(IUIGame gameState);
+    }
+
+    public interface IAIPlayer : IPlayer
+    {
+        IAI AI { get; }
+    }
+
+    [Serializable]
+    public class AIPlayer : Player, IAIPlayer
+    {
+        public IAI AI { get; private set; }
+
+        public AIPlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek, IAI ai) : base(name, digSites, startingPlace, notEnoughTimeDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
+        {
+            this.AI = ai;
         }
     }
 }

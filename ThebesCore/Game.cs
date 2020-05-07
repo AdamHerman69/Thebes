@@ -1,26 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.AccessControl;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace ThebesCore
-{
+{   
     [Serializable]
     public class Game
     {
         public List<IPlayer> Players { get; set; }
         public IDeck Deck { get; set; }
         public ICardDisplay AvailableCards { get; set; }
-        public IAvailableExhibitions ActiveExhibitions { get; set; }
+        public IExhibitionDisplay ActiveExhibitions { get; set; }
                 
         public Game(int playerCount)
         {
             this.Deck = new Deck(GameSettings.Cards, playerCount);
 
             AvailableCards = new CardDisplay(DrawCard, Deck.Discard);
-            ActiveExhibitions = new AvailableExhibitions(Deck.Discard);
+            ActiveExhibitions = new ExhibitionDisplay(Deck.Discard);
 
             Time.Configure(playerCount);
         }
@@ -117,10 +121,22 @@ namespace ThebesCore
         }
     }
 
-    [Serializable]
-    public class UIGame : Game
+    public interface IUIGame
     {
-        public IPlayer activePlayer;
+        List<IPlayer> Players { get; }
+        IPlayer ActivePlayer { get; }
+        ICard[] DisplayedCards { get; }
+        ICard[] DisplayedExhibitions { get; }
+        void Initialize(List<IPlayer> players);
+    }
+
+    [Serializable]
+    public class UIGame : Game, IUIGame
+    {
+        public IPlayer ActivePlayer { get; private set; }
+
+        public ICard[] DisplayedCards { get { return AvailableCards.AvailableCards; } }
+        public ICard[] DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
 
         public UIGame(int playerCount) : base(playerCount) { }
 
@@ -128,51 +144,72 @@ namespace ThebesCore
         {
             this.Players = players;
             Players.Sort();
-            activePlayer = Players[0];
+            ActivePlayer = Players[0];
         }
 
-        public void NextMove()
+        private void NextMove()
         {
+            ResetCardChangeInfos();
+            Players.Sort();
+            ActivePlayer = Players[0];
+        }
+        
+        public void ExecuteAction(IAction action)
+        {
+            action.Execute(ActivePlayer);
+
             if (!AreAllPlayersDone())
             {
-                ResetCardChangeInfos();
-                Players.Sort();
-                activePlayer = Players[0];
-                // TODO if active player is AI do his turn and NextMove
+                NextMove();
+
+                while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
+                {
+                    action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
+                    action.Execute(ActivePlayer);
+                    NextMove();
+                }
             }
-            else
+
+            if (AreAllPlayersDone())
             {
                 //end game
                 throw new NotImplementedException();
             }
             
         }
-
-        public string GetImgFilePath (IItem item)
-        {
-            // TODO actual file path
-            if (item is IToken)
-            {
-                return @"C:\Users\admhe\source\repos\Thebes\img\one_token_sample.png";
-            }
-            if (item is ICard)
-            {
-                return @"C:\Users\admhe\source\repos\Thebes\img\card-46.png";
-            }
-            throw new InvalidOperationException();
-        }
     }
 
     [Serializable]
     public class GameState
     {
-        public Game game { get; set; }
+        public IUIGame game { get; set; }
         public GameSettingsSerializable settings { get; set; }
 
-        public GameState(Game game)
+        public GameState(IUIGame game)
         {
             this.game = game;
             settings = new GameSettingsSerializable();
+        }
+
+        public static void Serialize(IUIGame game, string filePath)
+        {
+            GameState state = new GameState(game);
+
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            formatter.Serialize(stream, state);
+            stream.Close();
+        }
+
+        public static IUIGame Deserialize(string filePath)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            GameState gameState = (GameState)formatter.Deserialize(stream);
+            IUIGame game = gameState.game;
+            GameSettings.LoadSerializedData(gameState.settings);
+            Time.Configure(game.Players.Count);
+            return game;
         }
     }
 }

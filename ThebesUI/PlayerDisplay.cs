@@ -13,23 +13,45 @@ namespace ThebesUI
 {
     public partial class PlayerDisplay : UserControl
     {
+        // Data
         IPlayerView player;
 
-        public PlayerDisplay()
+        // Data display
+        Dictionary<IDigSiteSimpleView, Label> specializedKnowledgeDisplay;
+        Dictionary<IDigSiteSimpleView, Label> singleUseKnowledgeDisplay;
+
+
+        public PlayerDisplay(IPlayerView player, Layout layout)
         {
             InitializeComponent();
+
+
+            this.player = player;
+
+            // TODO RELATIVE positioning wtr. background.png
+            // knowledge display
+            specializedKnowledgeDisplay = new Dictionary<IDigSiteSimpleView, Label>();
+            singleUseKnowledgeDisplay = new Dictionary<IDigSiteSimpleView, Label>();
+            foreach (KeyValuePair<IDigSiteSimpleView, int> digSite_knowledge in player.SpecializedKnowledge)
+            {
+                Label label = new Label();
+                label.Name = $"lSpecializedKnowledge{digSite_knowledge.Key}";
+                label.Text = "0";
+
+                Rectangle labelDims = layout.SpecializedKnowledgeLs[digSite_knowledge.Key.Name];
+                label.Size = new Size(labelDims.Width, labelDims.Height);
+                // TODO
+            }
+
+            UpdateInfo();
+            this.Show();
         }
 
         public void Initialize(IPlayerView player)
         {
-            this.player = player;
-            UpdateInfo();
-            this.Show();
+            
+            
 
-            // DATA BINDS
-            lPlayerName.DataBindings.Add(new Binding("Text", player, "Name"));
-            lTime.DataBindings.Add(new Binding("Text", player, "Time"));
-            lPointsAmount.DataBindings.Add(new Binding("Text", player, "Points"));
         }
 
         public void UpdateInfo()
@@ -38,7 +60,19 @@ namespace ThebesUI
             lTime.Text = player.Time.ToString();
             lPointsAmount.Text = player.Points.ToString();
 
-            //knowledgeStats1.UpdateInfo(player.SpecializedKnowledge, player.SingleUseKnowledge, player.Permissions);
+            // specialized knowledge
+            foreach (KeyValuePair<IDigSiteSimpleView, Label> digSite_label in specializedKnowledgeDisplay)
+            {
+                digSite_label.Value.Text = player.SpecializedKnowledge[digSite_label.Key].ToString();
+            }
+
+            // single-use knowledge
+            foreach (KeyValuePair<IDigSiteSimpleView, Label> digSite_label in singleUseKnowledgeDisplay)
+            {
+                digSite_label.Value.Text = player.SingleUseKnowledge[digSite_label.Key].ToString();
+            }
+
+
 
             lGeneralKnowledgeAmount.Text = player.GeneralKnowledge.ToString();
             lShovelsAmount.Text = player.Shovels.ToString();

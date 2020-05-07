@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesUI", "ThebesUI\Thebes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesConsole", "ThebesConsole\ThebesConsole.csproj", "{23976FE6-7877-4A38-86F8-75D5105AB7B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesAI", "ThebesAI\ThebesAI.csproj", "{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

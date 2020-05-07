@@ -57,7 +57,7 @@ namespace ThebesCore
         }
     }
 
-    public interface IAvailableExhibitions
+    public interface IExhibitionDisplay
     {
         IExhibitionCard[] Exhibitions { get; set; }
 
@@ -66,12 +66,12 @@ namespace ThebesCore
     }
 
     [Serializable]
-    public class AvailableExhibitions : IAvailableExhibitions
+    public class ExhibitionDisplay : IExhibitionDisplay
     {
         public IExhibitionCard[] Exhibitions { get; set; }
         Action<ICard> DiscardCard;
 
-        public AvailableExhibitions(Action<ICard> DiscardCardMethod)
+        public ExhibitionDisplay(Action<ICard> DiscardCardMethod)
         {
             Exhibitions = new IExhibitionCard[3];
             DiscardCard = DiscardCardMethod;

@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlayerDisplay));
             this.lPlayerName = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -47,8 +46,6 @@
             this.lZeppelinAmount = new System.Windows.Forms.Label();
             this.lPointsAmount = new System.Windows.Forms.Label();
             this.lTime = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // lPlayerName
@@ -57,7 +54,7 @@
             this.lPlayerName.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             this.lPlayerName.Location = new System.Drawing.Point(3, 0);
             this.lPlayerName.Name = "lPlayerName";
-            this.lPlayerName.Size = new System.Drawing.Size(153, 29);
+            this.lPlayerName.Size = new System.Drawing.Size(119, 25);
             this.lPlayerName.TabIndex = 0;
             this.lPlayerName.Text = "PlayerName";
             // 
@@ -67,7 +64,7 @@
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             this.label9.Location = new System.Drawing.Point(259, 7);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(84, 29);
+            this.label9.Size = new System.Drawing.Size(66, 25);
             this.label9.TabIndex = 9;
             this.label9.Text = "Points";
             // 
@@ -77,7 +74,7 @@
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label10.Location = new System.Drawing.Point(259, 53);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(35, 26);
+            this.label10.Size = new System.Drawing.Size(29, 22);
             this.label10.TabIndex = 10;
             this.label10.Text = "gk";
             // 
@@ -87,7 +84,7 @@
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label11.Location = new System.Drawing.Point(408, 131);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(47, 26);
+            this.label11.Size = new System.Drawing.Size(38, 22);
             this.label11.TabIndex = 11;
             this.label11.Text = "zep";
             // 
@@ -97,7 +94,7 @@
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label12.Location = new System.Drawing.Point(408, 53);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(35, 26);
+            this.label12.Size = new System.Drawing.Size(29, 22);
             this.label12.TabIndex = 12;
             this.label12.Text = "sp";
             // 
@@ -107,7 +104,7 @@
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label13.Location = new System.Drawing.Point(408, 79);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(35, 26);
+            this.label13.Size = new System.Drawing.Size(29, 22);
             this.label13.TabIndex = 13;
             this.label13.Text = "cg";
             // 
@@ -117,7 +114,7 @@
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label14.Location = new System.Drawing.Point(260, 105);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(46, 26);
+            this.label14.Size = new System.Drawing.Size(38, 22);
             this.label14.TabIndex = 14;
             this.label14.Text = "ass";
             // 
@@ -127,7 +124,7 @@
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label15.Location = new System.Drawing.Point(259, 79);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(35, 26);
+            this.label15.Size = new System.Drawing.Size(29, 22);
             this.label15.TabIndex = 15;
             this.label15.Text = "sh";
             // 
@@ -137,7 +134,7 @@
             this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label16.Location = new System.Drawing.Point(408, 105);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(42, 26);
+            this.label16.Size = new System.Drawing.Size(35, 22);
             this.label16.TabIndex = 16;
             this.label16.Text = "car";
             // 
@@ -147,7 +144,7 @@
             this.lGeneralKnowledgeAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lGeneralKnowledgeAmount.Location = new System.Drawing.Point(229, 53);
             this.lGeneralKnowledgeAmount.Name = "lGeneralKnowledgeAmount";
-            this.lGeneralKnowledgeAmount.Size = new System.Drawing.Size(24, 26);
+            this.lGeneralKnowledgeAmount.Size = new System.Drawing.Size(20, 22);
             this.lGeneralKnowledgeAmount.TabIndex = 18;
             this.lGeneralKnowledgeAmount.Text = "0";
             // 
@@ -157,7 +154,7 @@
             this.lShovelsAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lShovelsAmount.Location = new System.Drawing.Point(229, 79);
             this.lShovelsAmount.Name = "lShovelsAmount";
-            this.lShovelsAmount.Size = new System.Drawing.Size(24, 26);
+            this.lShovelsAmount.Size = new System.Drawing.Size(20, 22);
             this.lShovelsAmount.TabIndex = 19;
             this.lShovelsAmount.Text = "0";
             // 
@@ -167,7 +164,7 @@
             this.lAssistentsAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lAssistentsAmount.Location = new System.Drawing.Point(229, 105);
             this.lAssistentsAmount.Name = "lAssistentsAmount";
-            this.lAssistentsAmount.Size = new System.Drawing.Size(24, 26);
+            this.lAssistentsAmount.Size = new System.Drawing.Size(20, 22);
             this.lAssistentsAmount.TabIndex = 20;
             this.lAssistentsAmount.Text = "0";
             // 
@@ -177,7 +174,7 @@
             this.lSpecialPermissionAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lSpecialPermissionAmount.Location = new System.Drawing.Point(378, 53);
             this.lSpecialPermissionAmount.Name = "lSpecialPermissionAmount";
-            this.lSpecialPermissionAmount.Size = new System.Drawing.Size(24, 26);
+            this.lSpecialPermissionAmount.Size = new System.Drawing.Size(20, 22);
             this.lSpecialPermissionAmount.TabIndex = 21;
             this.lSpecialPermissionAmount.Text = "0";
             // 
@@ -187,7 +184,7 @@
             this.lCongressAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lCongressAmount.Location = new System.Drawing.Point(378, 79);
             this.lCongressAmount.Name = "lCongressAmount";
-            this.lCongressAmount.Size = new System.Drawing.Size(24, 26);
+            this.lCongressAmount.Size = new System.Drawing.Size(20, 22);
             this.lCongressAmount.TabIndex = 22;
             this.lCongressAmount.Text = "0";
             // 
@@ -197,7 +194,7 @@
             this.lCarAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lCarAmount.Location = new System.Drawing.Point(378, 105);
             this.lCarAmount.Name = "lCarAmount";
-            this.lCarAmount.Size = new System.Drawing.Size(24, 26);
+            this.lCarAmount.Size = new System.Drawing.Size(20, 22);
             this.lCarAmount.TabIndex = 23;
             this.lCarAmount.Text = "0";
             // 
@@ -207,7 +204,7 @@
             this.lZeppelinAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lZeppelinAmount.Location = new System.Drawing.Point(378, 131);
             this.lZeppelinAmount.Name = "lZeppelinAmount";
-            this.lZeppelinAmount.Size = new System.Drawing.Size(24, 26);
+            this.lZeppelinAmount.Size = new System.Drawing.Size(20, 22);
             this.lZeppelinAmount.TabIndex = 24;
             this.lZeppelinAmount.Text = "0";
             // 
@@ -217,7 +214,7 @@
             this.lPointsAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
             this.lPointsAmount.Location = new System.Drawing.Point(226, 7);
             this.lPointsAmount.Name = "lPointsAmount";
-            this.lPointsAmount.Size = new System.Drawing.Size(27, 29);
+            this.lPointsAmount.Size = new System.Drawing.Size(23, 25);
             this.lPointsAmount.TabIndex = 25;
             this.lPointsAmount.Text = "0";
             // 
@@ -227,24 +224,14 @@
             this.lTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lTime.Location = new System.Drawing.Point(340, 10);
             this.lTime.Name = "lTime";
-            this.lTime.Size = new System.Drawing.Size(141, 26);
+            this.lTime.Size = new System.Drawing.Size(117, 22);
             this.lTime.TabIndex = 26;
             this.lTime.Text = "1 week, 1901";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(20, 44);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(148, 140);
-            this.pictureBox1.TabIndex = 27;
-            this.pictureBox1.TabStop = false;
             // 
             // PlayerDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.lTime);
             this.Controls.Add(this.lPointsAmount);
             this.Controls.Add(this.lZeppelinAmount);
@@ -265,7 +252,6 @@
             this.Controls.Add(this.lPlayerName);
             this.Name = "PlayerDisplay";
             this.Size = new System.Drawing.Size(491, 187);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -291,6 +277,5 @@
         private System.Windows.Forms.Label lZeppelinAmount;
         private System.Windows.Forms.Label lPointsAmount;
         private System.Windows.Forms.Label lTime;
-        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }

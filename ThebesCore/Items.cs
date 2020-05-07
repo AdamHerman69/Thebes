@@ -26,11 +26,22 @@ namespace ThebesCore
         public abstract override string ToString();
     }
 
+
+
+
+
+
+    // ----------------------------------CARDS------------------------------------------------
+
+
+
+
+
+
     public interface ICard : IItem
     {
         IUniversity Place { get; }
         int Weeks { get; }
-        string Description { get; }
     }
 
     [Serializable]
@@ -38,7 +49,6 @@ namespace ThebesCore
     {
         public IUniversity Place { get; }
         public int Weeks { get; }
-        public string Description { get { return ToString(); } }
 
         public Card(string id, IUniversity place, int weeks) : base(id)
         {
@@ -241,6 +251,7 @@ namespace ThebesCore
         public override void UpdateStats(IPlayer player)
         {
             player.Congresses++;
+            // TODO add points
         }
 
         public override string ToString()
@@ -303,6 +314,18 @@ namespace ThebesCore
             return str;
         }
     }
+
+
+
+
+
+
+    // ----------------------------------TOKENS------------------------------------------------
+
+
+
+
+
 
     public interface IToken : IItem
     {

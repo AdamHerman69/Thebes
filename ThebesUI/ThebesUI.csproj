@@ -95,12 +95,14 @@
     <Compile Include="GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ItemViews.cs" />
     <Compile Include="KnowledgeStats.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="KnowledgeStats.Designer.cs">
       <DependentUpon>KnowledgeStats.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layout.cs" />
     <Compile Include="PlayerDisplay.cs">
       <SubType>UserControl</SubType>
     </Compile>
