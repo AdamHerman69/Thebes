@@ -179,8 +179,8 @@ namespace ThebesCore
                         Cards.Add(new CarCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2])));
                         break;
 
-                    case "assistent":
-                        Cards.Add(new AssistentCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2])));
+                    case "assistant":
+                        Cards.Add(new AssistantCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2])));
                         break;
 
                     case "shovel":
@@ -330,9 +330,9 @@ namespace ThebesCore
                 str += $"car {card.Place} {card.Weeks}\n";
             }
 
-            foreach (IAssistentCard card in Cards.Where(x => x is IAssistentCard))
+            foreach (IAssistantCard card in Cards.Where(x => x is IAssistantCard))
             {
-                str += $"assistent {card.Place} {card.Weeks}\n";
+                str += $"assistant {card.Place} {card.Weeks}\n";
             }
 
             foreach (IShovelCard card in Cards.Where(x => x is IShovelCard))
@@ -905,12 +905,12 @@ namespace ThebesCore
             // Special cards
             //
 
-            // Assistents
-            Cards.Add(new AssistentCard("TODO", berlin, 2));
-            Cards.Add(new AssistentCard("TODO", paris, 2));
-            Cards.Add(new AssistentCard("TODO", paris, 2));
-            Cards.Add(new AssistentCard("TODO", rome, 2));
-            Cards.Add(new AssistentCard("TODO", vienna, 2));
+            // Assistants
+            Cards.Add(new AssistantCard("TODO", berlin, 2));
+            Cards.Add(new AssistantCard("TODO", paris, 2));
+            Cards.Add(new AssistantCard("TODO", paris, 2));
+            Cards.Add(new AssistantCard("TODO", rome, 2));
+            Cards.Add(new AssistantCard("TODO", vienna, 2));
 
             // Shovels
             Cards.Add(new ShovelCard("TODO", london, 3));

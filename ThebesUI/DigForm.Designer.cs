@@ -32,10 +32,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.lSpecializedKnowledgeAmount = new System.Windows.Forms.Label();
             this.lGeneralKnowledgeAmount = new System.Windows.Forms.Label();
-            this.lAssistentKnowledgeAmount = new System.Windows.Forms.Label();
+            this.lAssistantKnowledgeAmount = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.lAssistentsLabel = new System.Windows.Forms.Label();
+            this.lAssistantsLabel = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.lDrawAmount = new System.Windows.Forms.Label();
@@ -89,15 +89,15 @@
             this.lGeneralKnowledgeAmount.TabIndex = 3;
             this.lGeneralKnowledgeAmount.Text = "0";
             // 
-            // lAssistentKnowledgeAmount
+            // lAssistantKnowledgeAmount
             // 
-            this.lAssistentKnowledgeAmount.AutoSize = true;
-            this.lAssistentKnowledgeAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
-            this.lAssistentKnowledgeAmount.Location = new System.Drawing.Point(15, 221);
-            this.lAssistentKnowledgeAmount.Name = "lAssistentKnowledgeAmount";
-            this.lAssistentKnowledgeAmount.Size = new System.Drawing.Size(24, 26);
-            this.lAssistentKnowledgeAmount.TabIndex = 4;
-            this.lAssistentKnowledgeAmount.Text = "0";
+            this.lAssistantKnowledgeAmount.AutoSize = true;
+            this.lAssistantKnowledgeAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
+            this.lAssistantKnowledgeAmount.Location = new System.Drawing.Point(15, 221);
+            this.lAssistantKnowledgeAmount.Name = "lAssistantKnowledgeAmount";
+            this.lAssistantKnowledgeAmount.Size = new System.Drawing.Size(24, 26);
+            this.lAssistantKnowledgeAmount.TabIndex = 4;
+            this.lAssistantKnowledgeAmount.Text = "0";
             // 
             // label5
             // 
@@ -119,15 +119,15 @@
             this.label6.TabIndex = 6;
             this.label6.Text = "General knowledge";
             // 
-            // lAssistentsLabel
+            // lAssistantsLabel
             // 
-            this.lAssistentsLabel.AutoSize = true;
-            this.lAssistentsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
-            this.lAssistentsLabel.Location = new System.Drawing.Point(61, 221);
-            this.lAssistentsLabel.Name = "lAssistentsLabel";
-            this.lAssistentsLabel.Size = new System.Drawing.Size(159, 26);
-            this.lAssistentsLabel.TabIndex = 7;
-            this.lAssistentsLabel.Text = "from assistents";
+            this.lAssistantsLabel.AutoSize = true;
+            this.lAssistantsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
+            this.lAssistantsLabel.Location = new System.Drawing.Point(61, 221);
+            this.lAssistantsLabel.Name = "lAssistantsLabel";
+            this.lAssistantsLabel.Size = new System.Drawing.Size(159, 26);
+            this.lAssistantsLabel.TabIndex = 7;
+            this.lAssistantsLabel.Text = "from assistants";
             // 
             // label7
             // 
@@ -242,10 +242,10 @@
             this.Controls.Add(this.lDrawAmount);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.lAssistentsLabel);
+            this.Controls.Add(this.lAssistantsLabel);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.lAssistentKnowledgeAmount);
+            this.Controls.Add(this.lAssistantKnowledgeAmount);
             this.Controls.Add(this.lGeneralKnowledgeAmount);
             this.Controls.Add(this.lSpecializedKnowledgeAmount);
             this.Controls.Add(this.label2);
@@ -264,10 +264,10 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lSpecializedKnowledgeAmount;
         private System.Windows.Forms.Label lGeneralKnowledgeAmount;
-        private System.Windows.Forms.Label lAssistentKnowledgeAmount;
+        private System.Windows.Forms.Label lAssistantKnowledgeAmount;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label lAssistentsLabel;
+        private System.Windows.Forms.Label lAssistantsLabel;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label lDrawAmount;

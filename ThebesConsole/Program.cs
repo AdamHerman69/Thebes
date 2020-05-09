@@ -20,14 +20,14 @@ namespace ThebesConsole
 
 
             //GameSettings.Initialize();
-            GameSettings.LoadFromFile(@"C:\Users\admhe\source\repos\Thebes\ThebesConsole\bin\Debug\thebes_config_auto.txt");
+            //GameSettings.LoadFromFile(@"C:\Users\admhe\source\repos\Thebes\ThebesConsole\bin\Debug\thebes_config_auto.txt");
 
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream("game_state.bn", FileMode.Open, FileAccess.Read);
-            GameState gameState = (GameState)formatter.Deserialize(stream);
-            ConsoleGame game = (ConsoleGame)gameState.game;
-            GameSettings.LoadSerializedData(gameState.settings);
-            Time.Configure(game.Players.Count);
+            //IFormatter formatter = new BinaryFormatter();
+            //Stream stream = new FileStream("game_state.bn", FileMode.Open, FileAccess.Read);
+            //GameState gameState = (GameState)formatter.Deserialize(stream);
+            //ConsoleGame game = (ConsoleGame)gameState.game;
+            //GameSettings.LoadSerializedData(gameState.settings);
+            //Time.Configure(game.Players.Count);
 
 
             //ConsoleGame game = (ConsoleGame)JsonConvert.DeserializeObject<ConsoleGame>(File.ReadAllText("game_state.json"), new JsonSerializerSettings
@@ -64,7 +64,7 @@ namespace ThebesConsole
 
             //game.Players = new List<IPlayer>() { adam, vitek };
 
-            game.Play();
+            //game.Play();
 
             //File.WriteAllText("game_state2.json", game.Serialize());
 

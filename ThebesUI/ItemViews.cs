@@ -13,87 +13,136 @@ namespace ThebesUI
         string FileName { get; }
     }
 
-    public class SpecializedKnowledgeCardView : SpecializedKnowledgeCard, ItemView
+    public interface ICardView : ItemView
     {
-        public SpecializedKnowledgeCardView(string id, IUniversity place, int weeks, int knowledgeAmount, IDigSiteSimpleView digSite)
-            : base(id, place, weeks, knowledgeAmount, digSite) { }
+        ICard Card { get; }
+    }
+    public interface ITokenView : ItemView
+    {
+        IToken Token { get; }
+    }
+
+    public class SpecializedKnowledgeCardView : ICardView
+    {
+        public ISpecializedKnowledgeCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public SpecializedKnowledgeCardView(ISpecializedKnowledgeCard card)
+        {
+            this._Card = card;
+        }
         
-        public string FileName { get { return $"c_{Place}_sp_knowledge_{digSite}_{KnowledgeAmount}.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_sp_knowledge_{_Card.digSite}_{_Card.KnowledgeAmount}.png"; } }
     }
 
-    public class GeneralKnowledgeCardView : GeneralKnowledgeCard, ItemView
+    public class GeneralKnowledgeCardView : ICardView
     {
-        public GeneralKnowledgeCardView(string id, IUniversity place, int weeks, int knowledgeAmount)
-            : base(id, place, weeks, knowledgeAmount) { }
+        public IGeneralKnowledgeCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public GeneralKnowledgeCardView(IGeneralKnowledgeCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_g_knowledge_{KnowledgeAmount}.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_g_knowledge_{_Card.KnowledgeAmount}.png"; } }
     }
 
-    public class RumorsCardView : RumorsCard, ItemView
+    public class RumorsCardView : ICardView
     {
-        public RumorsCardView(string id, IUniversity place, int weeks, int knowledgeAmount, IDigSiteSimpleView digSite)
-            : base(id, place, weeks, knowledgeAmount, digSite) { }
+        public IRumorsCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public RumorsCardView(IRumorsCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_rumors_{digSite}_{KnowledgeAmount}.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_rumors_{_Card.digSite}_{_Card.KnowledgeAmount}.png"; } }
     }
 
-    public class ZeppelinCardView : ZeppelinCard, ItemView
+    public class ZeppelinCardView : ICardView
     {
-        public ZeppelinCardView(string id, IUniversity place, int weeks)
-            : base(id, place, weeks) { }
+        public IZeppelinCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public ZeppelinCardView(IZeppelinCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_zeppelin.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_zeppelin.png"; } }
     }
 
-    public class CarCardView : CarCard, ItemView
+    public class CarCardView : ICardView
     {
-        public CarCardView(string id, IUniversity place, int weeks)
-            : base(id, place, weeks) { }
+        public ICarCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public CarCardView(ICarCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_car.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_car.png"; } }
     }
 
-    public class AssistentCardView : AssistentCard, ItemView
+    public class AssistantCardView : ICardView
     {
-        public AssistentCardView(string id, IUniversity place, int weeks)
-            : base(id, place, weeks) { }
+        public IAssistantCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public AssistantCardView(IAssistantCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_assistent.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_assistant.png"; } }
     }
 
-    public class ShovelCardView : ShovelCard, ItemView
+    public class ShovelCardView : ICardView
     {
-        public ShovelCardView(string id, IUniversity place, int weeks)
-            : base(id, place, weeks) { }
+        public IShovelCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public ShovelCardView(IShovelCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_shovel.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_shovel.png"; } }
     }
 
-    public class SpecialPermissionCardView : SpecialPermissionCard, ItemView
+    public class SpecialPermissionCardView : ICardView
     {
-        public SpecialPermissionCardView(string id, IUniversity place, int weeks)
-            : base(id, place, weeks) { }
+        public ISpecialPermissionCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public SpecialPermissionCardView(ISpecialPermissionCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_sp_permission.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_sp_permission.png"; } }
     }
 
-    public class CongressCardView : CongressCard, ItemView
+    public class CongressCardView : ICardView
     {
-        public CongressCardView(string id, IUniversity place, int weeks)
-            : base(id, place, weeks) { }
+        public ICongressCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public CongressCardView(ICongressCard card)
+        {
+            this._Card = card;
+        }
 
-        public string FileName { get { return $"c_{Place}_congress.png"; } }
+        public string FileName { get { return $"c_{_Card.Place}_congress.png"; } }
     }
 
-    public class ExhibitionCardView : ExhibitionCard, ItemView
+    public class ExhibitionCardView : ICardView
     {
-        public ExhibitionCardView(string id, IUniversity place, int weeks, int points, List<IDigSiteSimpleView>artifactsRequired)
-            : base(id, place, weeks, points, artifactsRequired) { }
+        public IExhibitionCard _Card { get; private set; }
+        public ICard Card { get { return _Card; } }
+        public ExhibitionCardView(IExhibitionCard card)
+        {
+            this._Card = card;
+        }
 
         public string FileName { get 
             {
-                string fileName = $"c_{Place}_exhibition_{Points}";
-                foreach (IDigSiteSimpleView requirement in ArtifactsRequired)
+                string fileName = $"c_{_Card.Place}_exhibition_{_Card.Points}";
+                foreach (IDigSiteSimpleView requirement in _Card.ArtifactsRequired)
                 {
                     fileName += "_" + requirement;
                 }
@@ -114,35 +163,51 @@ namespace ThebesUI
 
 
 
-    public class SpecializedKnowledgeTokenView : SpecializedKnowledgeToken, ItemView
+    public class SpecializedKnowledgeTokenView : ITokenView
     {
-        public SpecializedKnowledgeTokenView(string id, IDigSiteSimpleView digSite, int knowledgeAmount, IDigSiteSimpleView knowledgeDigSite)
-            : base(id, digSite, knowledgeAmount, knowledgeDigSite) { }
+        public ISpecializedKnowledgeToken _Token { get; private set; }
+        public IToken Token { get { return _Token; } }
+        public SpecializedKnowledgeTokenView(ISpecializedKnowledgeToken token)
+        {
+            this._Token = token;
+        }
 
-        public string FileName { get { return $"t_{DigSite}_sp_knowledge_{KnowledgeDigSite}_{KnowledgeAmount}.png"; } }
+        public string FileName { get { return $"t_{_Token.DigSite}_sp_knowledge_{_Token.KnowledgeDigSite}_{_Token.KnowledgeAmount}.png"; } }
     }
 
-    public class GeneralKnowledgeTokenView : GeneralKnowledgeToken, ItemView
+    public class GeneralKnowledgeTokenView : ITokenView
     {
-        public GeneralKnowledgeTokenView(string id, IDigSiteSimpleView digSite, int knowledgeAmount)
-            : base(id, digSite, knowledgeAmount) { }
+        public IGeneralKnowledgeToken _Token { get; private set; }
+        public IToken Token { get { return _Token; } }
+        public GeneralKnowledgeTokenView(IGeneralKnowledgeToken token)
+        {
+            this._Token = token;
+        }
 
-        public string FileName { get { return $"t_{DigSite}_g_knowledge.png"; } }
+        public string FileName { get { return $"t_{_Token.DigSite}_g_knowledge.png"; } }
     }
 
-    public class ArtifactTokenView : ArtifactToken, ItemView
+    public class ArtifactTokenView : ITokenView
     {
-        public ArtifactTokenView(string id, IDigSiteSimpleView digSite, int points, string name)
-            : base(id, digSite, points, name) { }
+        public IArtifactToken _Token { get; private set; }
+        public IToken Token { get { return _Token; } }
+        public ArtifactTokenView(IArtifactToken token)
+        {
+            this._Token = token;
+        }
 
-        public string FileName { get { return $"t_{DigSite}_artifact_{Points}_{Name}.png"; } }
+        public string FileName { get { return $"t_{_Token.DigSite}_artifact_{_Token.Points}_{_Token.Name}.png"; } }
     }
 
-    public class DirtTokenView : DirtToken, ItemView
+    public class DirtTokenView : ITokenView
     {
-        public DirtTokenView(string id, IDigSiteSimpleView digSite)
-            : base(id, digSite) { }
+        public IDirtToken _Token { get; private set; }
+        public IToken Token { get { return _Token; } }
+        public DirtTokenView(IDirtToken token)
+        {
+            this._Token = token;
+        }
 
-        public string FileName { get { return $"t_{DigSite}_dirt.png"; } }
+        public string FileName { get { return $"t_{_Token.DigSite}_dirt.png"; } }
     }
 }

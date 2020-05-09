@@ -1,72 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThebesCore;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace ThebesUI
 {
+    public static class UIConfig
+    {
+        public const string IMG_FOLDER = @"C:\Users\admhe\source\repos\Thebes\img\";
+    }
+
     public struct Rectangle
     {
-        int XtopLeft, YtopLeft, XbottomRight, YbottomRight;
-        public int Width { get { return XbottomRight - XtopLeft; } }
-        public int Height { get { return YbottomRight - YtopLeft; } }
+        public Point topLeft, bottomRight;
+        [JsonIgnore]
+        public int Width { get { return bottomRight.X - topLeft.X; } }
+        [JsonIgnore]
+        public int Height { get { return bottomRight.Y - topLeft.Y; } }
 
-        public Rectangle(int value)
+        public Rectangle(Point topLeft, Point bottomRight)
         {
-            XtopLeft = 69;
-            YtopLeft = 420;
-
-            XbottomRight = 20;
-            YbottomRight = 30;
+            this.topLeft = topLeft;
+            this.bottomRight = bottomRight;
         }
     }
 
     public class Layout
     {
+        [JsonProperty]
         public Rectangle[] WeekCounter { get; private set; } = new Rectangle[52];
+        [JsonProperty]
         public Rectangle[] YearCounter { get; private set; } = new Rectangle[3];
+        [JsonProperty]
         public Rectangle[] DisplayedCards { get; private set; } = new Rectangle[4];
+        [JsonProperty]
         public Rectangle[] DisplayedExhibitions { get; private set; } = new Rectangle[3];
+        [JsonProperty]
         public Dictionary<string, Rectangle> Places;
 
         // player display, relative to player_display_background.png
+        [JsonProperty]
         public Rectangle PlayerName { get; private set; }
+        [JsonProperty]
         public Rectangle Points { get; private set; }
+        [JsonProperty]
         public Rectangle Time { get; private set; }
+        [JsonProperty]
         public Rectangle GeneralKnowledge { get; private set; }
+        [JsonProperty]
         public Rectangle Shovel { get; private set; }
-        public Rectangle Assistent { get; private set; }
+        [JsonProperty]
+        public Rectangle Assistant { get; private set; }
+        [JsonProperty]
         public Rectangle SpecialPermission { get; private set; }
+        [JsonProperty]
         public Rectangle Congress { get; private set; }
+        [JsonProperty]
         public Rectangle Car { get; private set; }
+        [JsonProperty]
         public Rectangle Zeppelin { get; private set; }
 
+        [JsonProperty]
         public Dictionary<string, Rectangle> SpecializedKnowledgeLs { get; private set; }
-        public Dictionary<string, Rectangle> SingleUseKnowledgeTLs { get; private set; }
+        [JsonProperty]
+        public Dictionary<string, Rectangle> SingleUseKnowledgeLs { get; private set; }
 
 
         public Layout()
         {
-            for (int i = 0; i < WeekCounter.Length; i++)
-            {
-                WeekCounter[i] = new Rectangle(10);
-            }
-            for (int i = 0; i < YearCounter.Length; i++)
-            {
-                YearCounter[i] = new Rectangle(10);
-            }
-            for (int i = 0; i < DisplayedCards.Length; i++)
-            {
-                DisplayedCards[i] = new Rectangle(10);
-            }
-            for (int i = 0; i < DisplayedExhibitions.Length; i++)
-            {
-                DisplayedExhibitions[i] = new Rectangle(10);
-            }
-            Places = new Dictionary<string, Rectangle>();
-            Places.Add("London",new Rectangle(5));
+            
+        }
+
+
+
+        public static Layout ParseLayout(string jsonFilePath)
+        {
+            string jsonString = File.ReadAllText(jsonFilePath);
+            Layout layout =  JsonConvert.DeserializeObject<Layout>(jsonString);
+            return layout;
         }
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,100 +16,149 @@ namespace ThebesUI
     {
         UIGame game;
         PictureBox[] displayCards = new PictureBox[4];
+        PictureBox[] exhibitions = new PictureBox[3];
+        List<PlayerDisplay> playerDisplays;
+
         public GameForm(UIGame game)
         {
             InitializeComponent();
-            //Initialize(game);
+            Initialize(game);
         }
 
-        //public void Initialize(UIGame game)
-        //{
-        //    this.game = game;
+        public void Initialize(UIGame game)
+        {
+            this.SuspendLayout();
+            this.game = game;
+            playerDisplays = new List<PlayerDisplay>();
 
-        //    // initialize player displays
-        //    playerDisplay1.Initialize(game.Players[0]);
-        //    playerDisplay2.Initialize(game.Players[1]);
-        //    if (game.Players.Count >= 3)
-        //    {
-        //        playerDisplay3.Initialize(game.Players[2]);
-        //    }
-        //    if (game.Players.Count >= 4)
-        //    {
-        //        playerDisplay4.Initialize(game.Players[3]);
-        //    }
+            ThebesUI.Layout layout = ThebesUI.Layout.ParseLayout("layout.json");
 
-        //    // display cards events
-        //    pbCard1.Click += pbCard_Click;
-        //    pbCard2.Click += pbCard_Click;
-        //    pbCard3.Click += pbCard_Click;
-        //    pbCard4.Click += pbCard_Click;
+            // initialize player displays
+            playerDisplay1.Initialize(game.Players[0], layout);
+            playerDisplays.Add(playerDisplay1);
+            playerDisplay2.Initialize(game.Players[1], layout);
+            playerDisplays.Add(playerDisplay2);
+            if (game.Players.Count >= 3)
+            {
+                playerDisplay3.Initialize(game.Players[2], layout);
+                playerDisplays.Add(playerDisplay3);
+            }
+            if (game.Players.Count >= 4)
+            {
+                playerDisplay4.Initialize(game.Players[3], layout);
+                playerDisplays.Add(playerDisplay4);
+            }
+            foreach (PlayerDisplay playerDisplay in playerDisplays)
+            {
+                Controls.Add(playerDisplay);
+            }
 
-        //    // exhibition events
-        //    pbExhibition1.Click += pbExhibition_Click;
-        //    pbExhibition2.Click += pbExhibition_Click;
-        //    pbExhibition3.Click += pbExhibition_Click;
+            // background
+            pbBoard.Image = Image.FromFile(UIConfig.IMG_FOLDER + "board.jpg");
+            pbBoard.SendToBack();
+            Controls.Add(pbBoard);
 
+            // display cards
+            Rectangle pbDims;
+            for (int i = 0; i < displayCards.Length; i++)
+            {
+                pbDims = BoardToForm(layout.DisplayedCards[i]);
+                displayCards[i] = new PictureBox()
+                {
+                    Location = pbDims.topLeft,
+                    Width = pbDims.Width,
+                    Height = pbDims.Height,
+                    Visible = true,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    BackColor = Color.Transparent
+                };
+                displayCards[i].Click += pbCard_Click;
+                Controls.Add(displayCards[i]);
+            }
 
-        //    UpdateBoard();
-        //}
+            // exhibitions
+            for (int i = 0; i < exhibitions.Length; i++)
+            {
+                pbDims = BoardToForm(layout.DisplayedExhibitions[i]);
+                exhibitions[i] = new PictureBox()
+                {
+                    Location = pbDims.topLeft,
+                    Width = pbDims.Width,
+                    Height = pbDims.Height,
+                    Visible = true,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    BackColor = Color.Transparent
+                };
+                exhibitions[i].Click += pbExhibition_Click;
+                Controls.Add(exhibitions[i]);
+            }
 
-        //public void UpdateBoard()
-        //{
-        //    // display cards
-        //    //pbCard1.Image = Image.FromFile(game.GetImgFilePath(game.AvailableCards.AvailableCards[0]));
-        //    //pbCard2.Image = Image.FromFile(game.GetImgFilePath(game.AvailableCards.AvailableCards[1]));
-        //    //pbCard3.Image = Image.FromFile(game.GetImgFilePath(game.AvailableCards.AvailableCards[2]));
-        //    //pbCard4.Image = Image.FromFile(game.GetImgFilePath(game.AvailableCards.AvailableCards[3]));
+            UpdateBoard();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ResumeLayout(false);
+        }
 
-        //    // exhibitions
-        //    if (game.ActiveExhibitions.Exhibitions[0] != null)
-        //    {
-        //        pbExhibition1.Image = Image.FromFile(game.GetImgFilePath(game.ActiveExhibitions.Exhibitions[0]));
-        //    }
-        //    else
-        //    {
-        //        pbExhibition1.Image = null;
-        //    }
+        private Rectangle BoardToForm(Rectangle rec)
+        {
+            Point boardTopLeft = pbBoard.Location;
+            return new Rectangle(new Point(boardTopLeft.X + rec.topLeft.X, boardTopLeft.Y + rec.topLeft.Y), new Point(boardTopLeft.X + rec.bottomRight.X, boardTopLeft.Y + rec.bottomRight.Y));
+        }
 
-        //    if (game.ActiveExhibitions.Exhibitions[0] != null)
-        //    {
-        //        pbExhibition2.Image = Image.FromFile(game.GetImgFilePath(game.ActiveExhibitions.Exhibitions[1]));
-        //    }
-        //    else
-        //    {
-        //        pbExhibition2.Image = null;
-        //    }
+        public void UpdateBoard()
+        {
+            // player displays
+            foreach (PlayerDisplay playerDisplay in playerDisplays)
+            {
+                playerDisplay.UpdateInfo();
+            }
 
-        //    if (game.ActiveExhibitions.Exhibitions[0] != null)
-        //    {
-        //        pbExhibition3.Image = Image.FromFile(game.GetImgFilePath(game.ActiveExhibitions.Exhibitions[2]));
-        //    }
-        //    else
-        //    {
-        //        pbExhibition3.Image = null;
-        //    }
+            // display cards
+            for (int i = 0; i < displayCards.Length; i++)
+            {
+                displayCards[i].Image = GetImage(game.DisplayedCards[i]);
+            }
 
-        //}
+            // exhibitions
+            for (int i = 0; i < exhibitions.Length; i++)
+            {
+                if (game.DisplayedExhibitions[i] != null)
+                {
+                    exhibitions[i].Image = GetImage(game.DisplayedExhibitions[i]);
+                }
+            }
+            pbBoard.SendToBack();
+
+            // TODO move player pieces etc
+        }
+
+        private Image GetImage(ICardView card)
+        {
+            try
+            {
+                return Image.FromFile(UIConfig.IMG_FOLDER + card.FileName);
+            }
+            catch (FileNotFoundException e)
+            {
+                return Image.FromFile(UIConfig.IMG_FOLDER + "c_not_found.png");
+            }
+        }
 
         private void pbCard_Click(object sender, EventArgs e)
         {
-            //int index = int.Parse(((PictureBox)sender).AccessibleDescription);
-            //game.activePlayer.MoveAndTakeCard(game.AvailableCards.AvailableCards[index]);
-            //game.ExecuteAction();
-            //this.UpdateBoard();
+            game.ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
+            UpdateBoard();
         }
 
         private void pbExhibition_Click(object sender, EventArgs e)
         {
-            //int index = int.Parse(((PictureBox)sender).AccessibleDescription);
-            //game.activePlayer.MoveAndTakeCard(game.ActiveExhibitions.Exhibitions[index]);
-            //game.ExecuteAction();
-            //this.UpdateBoard();
+            game.ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
+            UpdateBoard();
         }
 
         private void bUseZeppelin_Click(object sender, EventArgs e)
         {
-            //    game.activePlayer.UseZeppelin();
+            game.ExecuteAction(new ZeppelinAction());
+            UpdateBoard();
         }
     }
 }

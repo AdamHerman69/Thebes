@@ -11,7 +11,7 @@ namespace ThebesAI
 
     public class TestAI : IAI
     {
-        public IAction TakeAction(IUIGame gameState)
+        public IAction TakeAction(IGame gameState)
         {
             return new TakeCardAction(gameState.DisplayedCards[0]);
         }

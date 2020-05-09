@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ThebesCore
 {
-    public interface IPlayerView
+    public interface IPlayerData
     {
         string Name { get; }
         ITime Time { get; }
@@ -18,17 +18,17 @@ namespace ThebesCore
 
         int GeneralKnowledge { get; set; }
         int Shovels { get; set; }
-        int Assistents { get; set; }
+        int Assistants { get; set; }
         int SpecialPermissions { get; set; }
         int Congresses { get; set; }
         int Cars { get; set; }
         int Zeppelins { get; set; }
-        int GetAssistentKnowledge();
+        int GetAssistantKnowledge();
         List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite);
         void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
     }
 
-    public interface IPlayer : IPlayerView, IComparable<IPlayer>
+    public interface IPlayer : IPlayerData, IComparable<IPlayer>
     {
         List<IToken> Dig(IDigSiteFullView digSite, int weeks, List<ICard> singleUseCards);
         void ResetCardChnageInfo();
@@ -39,7 +39,7 @@ namespace ThebesCore
     }
 
     [Serializable]
-    public class Player : IComparable<IPlayer>, IPlayerView, IPlayer
+    public class Player : IComparable<IPlayer>, IPlayerData, IPlayer
     {
         Action notEnoughTimeDialog;
         Action changeDisplayCards;
@@ -57,7 +57,7 @@ namespace ThebesCore
         private bool useZappelin;
         public int SpecialPermissions { get; set; }
         public int Congresses { get; set; }
-        public int Assistents { get; set; }
+        public int Assistants { get; set; }
         public int Shovels { get; set; }
         public int Cars { get; set; }
         public int Points { get; set; }
@@ -92,7 +92,7 @@ namespace ThebesCore
             }
 
             // other cards
-            str += $"OTHER: genknow: {GeneralKnowledge} zep: {Zeppelins} spPrmsns: {SpecialPermissions} cngrs: {Congresses} ass: {Assistents} shovels: {Shovels} car: {Cars}";
+            str += $"OTHER: genknow: {GeneralKnowledge} zep: {Zeppelins} spPrmsns: {SpecialPermissions} cngrs: {Congresses} ass: {Assistants} shovels: {Shovels} car: {Cars}";
 
             // tokens
             str += "TOKENS: \n";
@@ -170,13 +170,13 @@ namespace ThebesCore
             return Time.CompareTo(other.Time);
         }
 
-        public int GetAssistentKnowledge()
+        public int GetAssistantKnowledge()
         {
-            if (Assistents >= 3)
+            if (Assistants >= 3)
             {
                 return 2;
             }
-            else if (Assistents >= 2)
+            else if (Assistants >= 2)
             {
                 return 1;
             }
@@ -210,7 +210,7 @@ namespace ThebesCore
                 {
                     knowledge += ((IRumorsCard)card).KnowledgeAmount;
                 }
-                if (card is IAssistentCard)
+                if (card is IAssistantCard)
                 {
                     knowledge += 1;
                 }
@@ -232,7 +232,7 @@ namespace ThebesCore
 
             knowledge += SpecializedKnowledge[digSite];
             knowledge += GeneralKnowledge;
-            knowledge += GetAssistentKnowledge();
+            knowledge += GetAssistantKnowledge();
 
             AddSingleUseCardsStats(digSite, singleUseCards, ref knowledge, ref tokenBonus);
 
@@ -316,7 +316,7 @@ namespace ThebesCore
             foreach (ICard card in Cards)
             {
                 if ((card is IRumorsCard && ((IRumorsCard)card).digSite == digSite) ||
-                    (Assistents == 1 && card is IAssistentCard) ||
+                    (Assistants == 1 && card is IAssistantCard) ||
                     (Shovels == 1 && card is IShovelCard)
                     )
                 {
@@ -673,7 +673,7 @@ namespace ThebesCore
 
     public interface IAI
     {
-        IAction TakeAction(IUIGame gameState);
+        IAction TakeAction(IGame gameState);
     }
 
     public interface IAIPlayer : IPlayer

@@ -180,22 +180,22 @@ namespace ThebesCore
         }
     }
 
-    public interface IAssistentCard : ICard
+    public interface IAssistantCard : ICard
     {
     }
 
     [Serializable]
-    public class AssistentCard : Card, IAssistentCard
+    public class AssistantCard : Card, IAssistantCard
     {
-        public AssistentCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
+        public AssistantCard(string id, IUniversity place, int weeks) : base(id, place, weeks) { }
         public override void UpdateStats(IPlayer player)
         {
-            player.Assistents++;
+            player.Assistants++;
         }
 
         public override string ToString()
         {
-            return "assistent at " + this.Place + " for " + this.Weeks + " weeks";
+            return "assistant at " + this.Place + " for " + this.Weeks + " weeks";
         }
     }
 
@@ -428,9 +428,8 @@ namespace ThebesCore
         }
     }
 
-    public interface IDirtToken
+    public interface IDirtToken : IToken
     {
-        void UpdateStats(IPlayer player);
     }
 
     [Serializable]

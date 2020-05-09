@@ -36,7 +36,7 @@ namespace ThebesUI
             // display knowledge points
             lSpecializedKnowledgeAmount.Text = player.SpecializedKnowledge[digSite].ToString();
             lGeneralKnowledgeAmount.Text = player.GeneralKnowledge.ToString();
-            lAssistentKnowledgeAmount.Text = player.GetAssistentKnowledge().ToString();
+            lAssistantKnowledgeAmount.Text = player.GetAssistantKnowledge().ToString();
 
             // display single use cards
             List<ICard> singleUseCards = player.GetUsableSingleUseCards(digSite);
