@@ -41,7 +41,7 @@ namespace ThebesCore
     [Serializable]
     public class Player : IComparable<IPlayer>, IPlayerData, IPlayer
     {
-        Action notEnoughTimeDialog;
+        Action<string> errorDialog;
         Action changeDisplayCards;
         Action<ICard> takeCard;
         Action<ICard> discardCard;
@@ -113,12 +113,12 @@ namespace ThebesCore
         }
 
         public Player() { }
-        public Player(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
+        public Player(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
         {
             this.Name = name;
             this.CurrentPlace = startingPlace;
 
-            this.notEnoughTimeDialog = notEnoughTimeDialog;
+            this.errorDialog = errorDialog;
             this.changeDisplayCards = changeDisplayCards;
             this.takeCard = takeCard;
             this.discardCard = discardCard;
@@ -335,9 +335,19 @@ namespace ThebesCore
         public List<IToken> Dig(IDigSiteFullView digSite, int weeks, List<ICard> singleUseCards)
         {
             // TODO different dialog for invalid permission and no specialized knowledge
-            if (Time.RemainingWeeks() < weeks + GameSettings.GetDistance(CurrentPlace, digSite) || !Permissions[digSite] || SpecializedKnowledge[digSite] < 1)
+            if (Time.RemainingWeeks() < weeks + GameSettings.GetDistance(CurrentPlace, digSite))
             {
-                notEnoughTimeDialog();
+                errorDialog("You don't have enough time!");
+                return null;
+            }
+            if (!Permissions[digSite])
+            {
+                errorDialog("You don't have a valid permisssion!");
+                return null;
+            }
+            if (SpecializedKnowledge[digSite] < 1)
+            {
+                errorDialog("You need at least one specialized knowledge!");
                 return null;
             }
 
@@ -380,12 +390,12 @@ namespace ThebesCore
         {
             if (card is IExhibitionCard && !((IExhibitionCard)card).CheckRequiredArtifacts(Tokens))
             {
-                notEnoughTimeDialog(); // TODO can't execute exhibition dialog
+                errorDialog("You don't have the required artifacts!"); // TODO can't execute exhibition dialog
                 return;
             }
             if (Time.RemainingWeeks() < card.Weeks + GameSettings.GetDistance(CurrentPlace, card.Place))
             {
-                notEnoughTimeDialog();
+                errorDialog("You don't have enought time for that!");
                 return;
             }
 
@@ -409,7 +419,7 @@ namespace ThebesCore
         {
             if (Time.RemainingWeeks() < GameSettings.GetDistance(CurrentPlace, cardChangePlace) + CardDisplay.timeToChangeCards)
             {
-                notEnoughTimeDialog();
+                errorDialog("You don't have enough time to change the display cards");
                 return;
             }
 
@@ -450,7 +460,7 @@ namespace ThebesCore
     public class ConsolePlayer : Player
     {
         public List<IPlace> Places { get; set; }
-        public ConsolePlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, notEnoughTimeDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
+        public ConsolePlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
         {
             Places = places;
         }
@@ -686,7 +696,7 @@ namespace ThebesCore
     {
         public IAI AI { get; private set; }
 
-        public AIPlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action notEnoughTimeDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek, IAI ai) : base(name, digSites, startingPlace, notEnoughTimeDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
+        public AIPlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek, IAI ai) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
         {
             this.AI = ai;
         }

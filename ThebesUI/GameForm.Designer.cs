@@ -32,12 +32,11 @@
             this.bSaveGame = new System.Windows.Forms.Button();
             this.bExitGame = new System.Windows.Forms.Button();
             this.bUseZeppelin = new System.Windows.Forms.Button();
-            this.pbBoard = new System.Windows.Forms.PictureBox();
+            this.pBoard = new System.Windows.Forms.Panel();
             this.playerDisplay4 = new ThebesUI.PlayerDisplay();
             this.playerDisplay3 = new ThebesUI.PlayerDisplay();
             this.playerDisplay2 = new ThebesUI.PlayerDisplay();
             this.playerDisplay1 = new ThebesUI.PlayerDisplay();
-            ((System.ComponentModel.ISupportInitialize)(this.pbBoard)).BeginInit();
             this.SuspendLayout();
             // 
             // splitter1
@@ -56,6 +55,7 @@
             this.bSaveGame.TabIndex = 46;
             this.bSaveGame.Text = "Save game";
             this.bSaveGame.UseVisualStyleBackColor = true;
+            this.bSaveGame.Click += new System.EventHandler(this.bSaveGame_Click);
             // 
             // bExitGame
             // 
@@ -65,10 +65,11 @@
             this.bExitGame.TabIndex = 47;
             this.bExitGame.Text = "Exit game";
             this.bExitGame.UseVisualStyleBackColor = true;
+            this.bExitGame.Click += new System.EventHandler(this.bExitGame_Click);
             // 
             // bUseZeppelin
             // 
-            this.bUseZeppelin.Location = new System.Drawing.Point(1661, 784);
+            this.bUseZeppelin.Location = new System.Drawing.Point(1484, 784);
             this.bUseZeppelin.Name = "bUseZeppelin";
             this.bUseZeppelin.Size = new System.Drawing.Size(131, 35);
             this.bUseZeppelin.TabIndex = 48;
@@ -76,14 +77,13 @@
             this.bUseZeppelin.UseVisualStyleBackColor = true;
             this.bUseZeppelin.Click += new System.EventHandler(this.bUseZeppelin_Click);
             // 
-            // pbBoard
+            // pBoard
             // 
-            this.pbBoard.Location = new System.Drawing.Point(551, 12);
-            this.pbBoard.Name = "pbBoard";
-            this.pbBoard.Size = new System.Drawing.Size(1241, 766);
-            this.pbBoard.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbBoard.TabIndex = 49;
-            this.pbBoard.TabStop = false;
+            this.pBoard.Location = new System.Drawing.Point(551, 12);
+            this.pBoard.Name = "pBoard";
+            this.pBoard.Size = new System.Drawing.Size(1064, 766);
+            this.pBoard.TabIndex = 49;
+            this.pBoard.Click += new System.EventHandler(this.pBoard_Click);
             // 
             // playerDisplay4
             // 
@@ -123,10 +123,8 @@
             // 
             // GameForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            //this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;   
             this.ClientSize = new System.Drawing.Size(1828, 907);
-            this.Controls.Add(this.pbBoard);
+            this.Controls.Add(this.pBoard);
             this.Controls.Add(this.bUseZeppelin);
             this.Controls.Add(this.bExitGame);
             this.Controls.Add(this.bSaveGame);
@@ -137,7 +135,6 @@
             this.Controls.Add(this.playerDisplay1);
             this.Name = "GameForm";
             this.Text = "GameForm";
-            ((System.ComponentModel.ISupportInitialize)(this.pbBoard)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -152,6 +149,6 @@
         private System.Windows.Forms.Button bSaveGame;
         private System.Windows.Forms.Button bExitGame;
         private System.Windows.Forms.Button bUseZeppelin;
-        private System.Windows.Forms.PictureBox pbBoard;
+        private System.Windows.Forms.Panel pBoard;
     }
 }

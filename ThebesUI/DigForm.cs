@@ -21,9 +21,10 @@ namespace ThebesUI
         int totalKnowledge;
         List<ICard> singleUseCards;
 
-        public DigForm()
+        public DigForm(IDigSiteFullView digSite, IPlayer player)
         {
             InitializeComponent();
+            Initialize(digSite, player);
         }
 
         public void Initialize(IDigSiteFullView digSite, IPlayer player)
@@ -40,20 +41,21 @@ namespace ThebesUI
 
             // display single use cards
             List<ICard> singleUseCards = player.GetUsableSingleUseCards(digSite);
-            foreach (ICard card in singleUseCards)
-            {
-                ListViewItem lvItem = new ListViewItem();
-                lvItem.Tag = card;
-                lvItem.Text = card.ToString();
-                lvSingleUseCards.Items.Add(lvItem);
-            }
+            clSingleUseCards.Initialize(singleUseCards.ConvertAll(UIGame.ToView), UpdateInfo);
 
             // display tokens
-            foreach (IToken token in digSite.Tokens)
+            foreach (ITokenView token in digSite.Tokens.ConvertAll(UIGame.ToView))
             {
-                if (! (token is DirtToken))
+                if (! (token is DirtTokenView))
                 {
-                    lvTokens.Items.Add(new ListViewItem(token.ToString()));
+                    flpTokens.Controls.Add(new PictureBox()
+                    {
+                        Width = 50,
+                        Height = 50,
+                        SizeMode = PictureBoxSizeMode.StretchImage,
+                        Tag = token,
+                        Image = Image.FromFile(UIConfig.IMG_FOLDER + token.FileName)
+                    });
                 }
             }
 
@@ -68,12 +70,9 @@ namespace ThebesUI
                
             // get chosen single-use cards
             singleUseCards = new List<ICard>();
-            foreach (ListViewItem item in lvSingleUseCards.Items)
+            foreach (ICardView card in clSingleUseCards.Selected)
             {
-                if (item.Checked)
-                {
-                    singleUseCards.Add((ICard)item.Tag);
-                }
+                singleUseCards.Add(card.Card);
             }
 
 
@@ -98,14 +97,20 @@ namespace ThebesUI
         private void bDigButton_Click(object sender, EventArgs e)
         {
             List<IToken> tokens = player.Dig(digSite, weeksToDig, singleUseCards);
-            string resultStriing = $"Congratulations! You found these artifacts:\n";
-            foreach (IToken token in tokens)
+            if (tokens == null)
             {
-                resultStriing += token.ToString() + "\n";
+                return;
             }
 
-            MessageBox.Show(resultStriing);
-            // TODO close form
+            DigResult gameForm = new DigResult(tokens);
+            gameForm.ShowDialog();
+            this.Close();
+        }
+
+        private void bCancel_Click(object sender, EventArgs e)
+        {
+            // Close form
+            this.Close();
         }
     }
 }

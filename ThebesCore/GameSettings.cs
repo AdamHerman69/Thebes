@@ -23,6 +23,10 @@ namespace ThebesCore
         public static int DugTokenCount(int knowledge, int weeks)
         {
             if (weeks > 12) throw new InvalidOperationException("You can't dig for more than 12 weeks");
+            if (weeks < 1 || knowledge < 1)
+            {
+                return 0;
+            }
             if (knowledge >= 12)
             {
                 knowledge = 12;
@@ -227,7 +231,7 @@ namespace ThebesCore
             File.WriteAllText(path, getSettingsString());
         }
 
-        public static string getSettingsString()
+        private static string getSettingsString()
         {
             string str = "UNIVERSITIES\n";
 
@@ -382,6 +386,7 @@ namespace ThebesCore
 
         public static void Initialize() // temporary, will be replaced with json config file
         {
+            throw new Exception();
             List<IToken> CreateTokenList(IDigSiteSimpleView digSite, int one, int two, int three, int four, int five, int six, int seven, IDigSiteSimpleView knowledgeDigSite)
             {
                 List<IToken> tokenList = new List<IToken>();

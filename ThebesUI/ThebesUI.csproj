@@ -77,11 +77,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CardList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CardList.Designer.cs">
+      <DependentUpon>CardList.cs</DependentUpon>
+    </Compile>
     <Compile Include="DigForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DigForm.Designer.cs">
       <DependentUpon>DigForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DigResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DigResult.Designer.cs">
+      <DependentUpon>DigResult.cs</DependentUpon>
     </Compile>
     <Compile Include="DigSiteKnowledge.cs">
       <SubType>UserControl</SubType>
@@ -124,8 +136,14 @@
     <Compile Include="WelcomeForm.Designer.cs">
       <DependentUpon>WelcomeForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="CardList.resx">
+      <DependentUpon>CardList.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DigForm.resx">
       <DependentUpon>DigForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DigResult.resx">
+      <DependentUpon>DigResult.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DigSiteKnowledge.resx">
       <DependentUpon>DigSiteKnowledge.cs</DependentUpon>

@@ -17,6 +17,7 @@ namespace ThebesUI
         void Initialize(List<IPlayer> players);
         new ICardView[] DisplayedCards { get; }
         new ICardView[] DisplayedExhibitions { get; }
+        void ExecuteAction(IAction action);
     }
 
     [Serializable]
@@ -71,7 +72,7 @@ namespace ThebesUI
 
         }
 
-        private ICardView ToView(ICard card)
+        public static ICardView ToView(ICard card)
         {
             if (card is null)
             {
@@ -116,6 +117,26 @@ namespace ThebesUI
             else if (card is IExhibitionCard)
             {
                 return new ExhibitionCardView((IExhibitionCard)card);
+            }
+            throw new InvalidCastException();
+        }
+        public static ITokenView ToView(IToken token)
+        {
+            if (token is IDirtToken)
+            {
+                return new DirtTokenView((IDirtToken)token);
+            }
+            else if (token is IArtifactToken)
+            {
+                return new ArtifactTokenView((IArtifactToken)token);
+            }
+            else if (token is ISpecializedKnowledgeToken)
+            {
+                return new SpecializedKnowledgeTokenView((ISpecializedKnowledgeToken)token);
+            }
+            else if (token is IGeneralKnowledgeToken)
+            {
+                return new GeneralKnowledgeTokenView((IGeneralKnowledgeToken)token);
             }
             throw new InvalidCastException();
         }

@@ -41,7 +41,7 @@
             this.cbSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.cbSelected.Location = new System.Drawing.Point(10, 7);
             this.cbSelected.Name = "cbSelected";
-            this.cbSelected.Size = new System.Drawing.Size(18, 17);
+            this.cbSelected.Size = new System.Drawing.Size(15, 14);
             this.cbSelected.TabIndex = 9;
             this.cbSelected.UseVisualStyleBackColor = true;
             // 
@@ -64,15 +64,16 @@
             this.tbName.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.tbName.Location = new System.Drawing.Point(34, 3);
             this.tbName.Name = "tbName";
-            this.tbName.Size = new System.Drawing.Size(111, 24);
+            this.tbName.Size = new System.Drawing.Size(111, 20);
             this.tbName.TabIndex = 8;
+            this.tbName.TextChanged += new System.EventHandler(this.tbName_TextChanged);
             // 
             // rbAI
             // 
             this.rbAI.AutoSize = true;
             this.rbAI.Location = new System.Drawing.Point(306, 5);
             this.rbAI.Name = "rbAI";
-            this.rbAI.Size = new System.Drawing.Size(41, 21);
+            this.rbAI.Size = new System.Drawing.Size(38, 20);
             this.rbAI.TabIndex = 7;
             this.rbAI.TabStop = true;
             this.rbAI.Text = "AI";
@@ -83,7 +84,7 @@
             this.rbHuman.AutoSize = true;
             this.rbHuman.Location = new System.Drawing.Point(228, 5);
             this.rbHuman.Name = "rbHuman";
-            this.rbHuman.Size = new System.Drawing.Size(72, 21);
+            this.rbHuman.Size = new System.Drawing.Size(66, 20);
             this.rbHuman.TabIndex = 6;
             this.rbHuman.TabStop = true;
             this.rbHuman.Text = "human";

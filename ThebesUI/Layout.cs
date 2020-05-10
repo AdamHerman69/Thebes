@@ -28,6 +28,11 @@ namespace ThebesUI
             this.topLeft = topLeft;
             this.bottomRight = bottomRight;
         }
+
+        public bool IsInside(Point point)
+        {
+            return (point.X >= topLeft.X && point.X <= bottomRight.X && point.Y >= topLeft.Y && point.Y <= bottomRight.Y);
+        }
     }
 
     public class Layout

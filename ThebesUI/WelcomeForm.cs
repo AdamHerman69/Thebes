@@ -20,14 +20,14 @@ namespace ThebesUI
             InitializeComponent();
         }
 
-        public static void NotEnoughTimeDialog()
+        public static void NotEnoughTimeDialog(string message)
         {
-            MessageBox.Show("You don't have enough time for that action");
+            MessageBox.Show(message);
         }
 
         private void bStartNew_Click(object sender, EventArgs e)
         {
-            GameSettings.Initialize();
+            GameSettings.LoadFromFile(@"C:\Users\admhe\source\repos\Thebes\ThebesConsole\bin\Debug\thebes_config_auto.txt");
 
             // get player count
             int playerCount = 0;
@@ -82,7 +82,12 @@ namespace ThebesUI
         private void bStartLoaded_Click(object sender, EventArgs e)
         {
             string filePath = tbFilePath.Text;
-            // TODO start game from serialized file
+            IUIGame game = GameState.Deserialize(filePath);
+
+            this.Hide();
+            GameForm gameForm = new GameForm(game);
+            gameForm.ShowDialog();
+            this.Close();
         }
     }
 }

@@ -14,24 +14,25 @@ namespace ThebesUI
 {
     public partial class GameForm : Form
     {
-        UIGame game;
+        IUIGame game;
         PictureBox[] displayCards = new PictureBox[4];
         PictureBox[] exhibitions = new PictureBox[3];
         List<PlayerDisplay> playerDisplays;
+        Layout layout;
 
-        public GameForm(UIGame game)
+        public GameForm(IUIGame game)
         {
             InitializeComponent();
             Initialize(game);
         }
 
-        public void Initialize(UIGame game)
+        public void Initialize(IUIGame game)
         {
             this.SuspendLayout();
             this.game = game;
             playerDisplays = new List<PlayerDisplay>();
 
-            ThebesUI.Layout layout = ThebesUI.Layout.ParseLayout("layout.json");
+            layout = ThebesUI.Layout.ParseLayout("layout.json");
 
             // initialize player displays
             playerDisplay1.Initialize(game.Players[0], layout);
@@ -54,15 +55,14 @@ namespace ThebesUI
             }
 
             // background
-            pbBoard.Image = Image.FromFile(UIConfig.IMG_FOLDER + "board.jpg");
-            pbBoard.SendToBack();
-            Controls.Add(pbBoard);
+            pBoard.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + "board.jpg");
+            Controls.Add(pBoard);
 
             // display cards
             Rectangle pbDims;
             for (int i = 0; i < displayCards.Length; i++)
             {
-                pbDims = BoardToForm(layout.DisplayedCards[i]);
+                pbDims = layout.DisplayedCards[i];
                 displayCards[i] = new PictureBox()
                 {
                     Location = pbDims.topLeft,
@@ -73,13 +73,13 @@ namespace ThebesUI
                     BackColor = Color.Transparent
                 };
                 displayCards[i].Click += pbCard_Click;
-                Controls.Add(displayCards[i]);
+                pBoard.Controls.Add(displayCards[i]);
             }
 
             // exhibitions
             for (int i = 0; i < exhibitions.Length; i++)
             {
-                pbDims = BoardToForm(layout.DisplayedExhibitions[i]);
+                pbDims = layout.DisplayedExhibitions[i];
                 exhibitions[i] = new PictureBox()
                 {
                     Location = pbDims.topLeft,
@@ -90,7 +90,7 @@ namespace ThebesUI
                     BackColor = Color.Transparent
                 };
                 exhibitions[i].Click += pbExhibition_Click;
-                Controls.Add(exhibitions[i]);
+                pBoard.Controls.Add(exhibitions[i]);
             }
 
             UpdateBoard();
@@ -98,11 +98,6 @@ namespace ThebesUI
             this.ResumeLayout(false);
         }
 
-        private Rectangle BoardToForm(Rectangle rec)
-        {
-            Point boardTopLeft = pbBoard.Location;
-            return new Rectangle(new Point(boardTopLeft.X + rec.topLeft.X, boardTopLeft.Y + rec.topLeft.Y), new Point(boardTopLeft.X + rec.bottomRight.X, boardTopLeft.Y + rec.bottomRight.Y));
-        }
 
         public void UpdateBoard()
         {
@@ -126,7 +121,7 @@ namespace ThebesUI
                     exhibitions[i].Image = GetImage(game.DisplayedExhibitions[i]);
                 }
             }
-            pbBoard.SendToBack();
+            //pbBoard.SendToBack();
 
             // TODO move player pieces etc
         }
@@ -151,14 +146,83 @@ namespace ThebesUI
 
         private void pbExhibition_Click(object sender, EventArgs e)
         {
-            game.ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
-            UpdateBoard();
+            if(game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)] != null)
+            {
+                game.ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
+                UpdateBoard();
+            }
         }
 
         private void bUseZeppelin_Click(object sender, EventArgs e)
         {
             game.ExecuteAction(new ZeppelinAction());
             UpdateBoard();
+        }
+
+        private void ChangeCards(ICardChangePlace place)
+        {
+            game.ExecuteAction(new ChangeCardsAction(place));
+            UpdateBoard();
+        }
+
+        private void OpenDigForm(IDigSiteSimpleView digSite)
+        {
+            DigForm digForm = new DigForm((IDigSiteFullView)digSite, game.ActivePlayer);
+            digForm.ShowDialog();
+        }
+
+        private void pBoard_Click(object sender, EventArgs e)
+        {
+            Point clickPosition = pBoard.PointToClient(MousePosition);
+            foreach (KeyValuePair<string, Rectangle> placeName_rec in layout.Places)
+            {
+                if (placeName_rec.Value.IsInside(clickPosition))
+                {
+                    IPlace place = GameSettings.getPlaceByName(placeName_rec.Key);
+                    if (place is IDigSiteSimpleView)
+                    {
+                        OpenDigForm((IDigSiteSimpleView)place);
+                    }
+                    else if (place is ICardChangePlace)
+                    {
+                        ChangeCards((ICardChangePlace)place);
+                    }
+                    else if (place is IUniversity)
+                    {
+                        MessageBox.Show($"uni: {place}");
+                    }
+                }
+            }
+        }
+
+        private void bSaveGame_Click(object sender, EventArgs e)
+        {
+            //open file browser
+            SaveFileDialog sfd = new SaveFileDialog()
+            {
+                Filter = "THB | *.thb",
+                RestoreDirectory = true
+            };
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                GameState.Serialize(game, sfd.FileName);
+            }
+        }
+
+        private void bExitGame_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Do you want to save the game before quitting?",
+                                     "Save game?",
+                                     MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                bSaveGame_Click(null, null);
+            }
+            else
+            {
+                this.Close();
+            }
         }
     }
 }

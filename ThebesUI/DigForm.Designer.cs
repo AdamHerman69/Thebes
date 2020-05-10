@@ -40,12 +40,12 @@
             this.label8 = new System.Windows.Forms.Label();
             this.lDrawAmount = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.lvTokens = new System.Windows.Forms.ListView();
-            this.lvSingleUseCards = new System.Windows.Forms.ListView();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bCancel = new System.Windows.Forms.Button();
             this.bDigButton = new System.Windows.Forms.Button();
             this.nudWeeks = new System.Windows.Forms.NumericUpDown();
             this.lTotalKnowledge = new System.Windows.Forms.Label();
+            this.flpTokens = new System.Windows.Forms.FlowLayoutPanel();
+            this.clSingleUseCards = new ThebesUI.CardList();
             ((System.ComponentModel.ISupportInitialize)(this.nudWeeks)).BeginInit();
             this.SuspendLayout();
             // 
@@ -55,7 +55,7 @@
             this.lDigSiteName.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
             this.lDigSiteName.Location = new System.Drawing.Point(12, 19);
             this.lDigSiteName.Name = "lDigSiteName";
-            this.lDigSiteName.Size = new System.Drawing.Size(278, 48);
+            this.lDigSiteName.Size = new System.Drawing.Size(228, 39);
             this.lDigSiteName.TabIndex = 0;
             this.lDigSiteName.Text = "DigSite Name";
             // 
@@ -65,7 +65,7 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold);
             this.label2.Location = new System.Drawing.Point(15, 91);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(297, 29);
+            this.label2.Size = new System.Drawing.Size(237, 25);
             this.label2.TabIndex = 1;
             this.label2.Text = "Your knowledge points:";
             // 
@@ -75,7 +75,7 @@
             this.lSpecializedKnowledgeAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lSpecializedKnowledgeAmount.Location = new System.Drawing.Point(15, 132);
             this.lSpecializedKnowledgeAmount.Name = "lSpecializedKnowledgeAmount";
-            this.lSpecializedKnowledgeAmount.Size = new System.Drawing.Size(24, 26);
+            this.lSpecializedKnowledgeAmount.Size = new System.Drawing.Size(20, 22);
             this.lSpecializedKnowledgeAmount.TabIndex = 2;
             this.lSpecializedKnowledgeAmount.Text = "0";
             // 
@@ -85,7 +85,7 @@
             this.lGeneralKnowledgeAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lGeneralKnowledgeAmount.Location = new System.Drawing.Point(15, 178);
             this.lGeneralKnowledgeAmount.Name = "lGeneralKnowledgeAmount";
-            this.lGeneralKnowledgeAmount.Size = new System.Drawing.Size(24, 26);
+            this.lGeneralKnowledgeAmount.Size = new System.Drawing.Size(20, 22);
             this.lGeneralKnowledgeAmount.TabIndex = 3;
             this.lGeneralKnowledgeAmount.Text = "0";
             // 
@@ -95,7 +95,7 @@
             this.lAssistantKnowledgeAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lAssistantKnowledgeAmount.Location = new System.Drawing.Point(15, 221);
             this.lAssistantKnowledgeAmount.Name = "lAssistantKnowledgeAmount";
-            this.lAssistantKnowledgeAmount.Size = new System.Drawing.Size(24, 26);
+            this.lAssistantKnowledgeAmount.Size = new System.Drawing.Size(20, 22);
             this.lAssistantKnowledgeAmount.TabIndex = 4;
             this.lAssistantKnowledgeAmount.Text = "0";
             // 
@@ -105,7 +105,7 @@
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label5.Location = new System.Drawing.Point(61, 132);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(234, 26);
+            this.label5.Size = new System.Drawing.Size(192, 22);
             this.label5.TabIndex = 5;
             this.label5.Text = "Specialized knowledge";
             // 
@@ -115,7 +115,7 @@
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label6.Location = new System.Drawing.Point(61, 178);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(199, 26);
+            this.label6.Size = new System.Drawing.Size(165, 22);
             this.label6.TabIndex = 6;
             this.label6.Text = "General knowledge";
             // 
@@ -125,7 +125,7 @@
             this.lAssistantsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lAssistantsLabel.Location = new System.Drawing.Point(61, 221);
             this.lAssistantsLabel.Name = "lAssistantsLabel";
-            this.lAssistantsLabel.Size = new System.Drawing.Size(159, 26);
+            this.lAssistantsLabel.Size = new System.Drawing.Size(130, 22);
             this.lAssistantsLabel.TabIndex = 7;
             this.lAssistantsLabel.Text = "from assistants";
             // 
@@ -135,7 +135,7 @@
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold);
             this.label7.Location = new System.Drawing.Point(15, 265);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(343, 29);
+            this.label7.Size = new System.Drawing.Size(272, 25);
             this.label7.TabIndex = 8;
             this.label7.Text = "Single use cards available:";
             // 
@@ -145,7 +145,7 @@
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.label8.Location = new System.Drawing.Point(12, 479);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(144, 26);
+            this.label8.Size = new System.Drawing.Size(119, 22);
             this.label8.TabIndex = 9;
             this.label8.Text = "Weeks to dig:";
             // 
@@ -155,7 +155,7 @@
             this.lDrawAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lDrawAmount.Location = new System.Drawing.Point(241, 479);
             this.lDrawAmount.Name = "lDrawAmount";
-            this.lDrawAmount.Size = new System.Drawing.Size(210, 26);
+            this.lDrawAmount.Size = new System.Drawing.Size(173, 22);
             this.lDrawAmount.TabIndex = 11;
             this.lDrawAmount.Text = "You\'ll draw X tokens";
             this.lDrawAmount.Visible = false;
@@ -164,40 +164,21 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold);
-            this.label10.Location = new System.Drawing.Point(823, 91);
+            this.label10.Location = new System.Drawing.Point(678, 81);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(172, 29);
+            this.label10.Size = new System.Drawing.Size(140, 25);
             this.label10.TabIndex = 12;
             this.label10.Text = "Tokens here:";
             // 
-            // lvTokens
+            // bCancel
             // 
-            this.lvTokens.HideSelection = false;
-            this.lvTokens.Location = new System.Drawing.Point(828, 132);
-            this.lvTokens.Name = "lvTokens";
-            this.lvTokens.Size = new System.Drawing.Size(201, 302);
-            this.lvTokens.TabIndex = 13;
-            this.lvTokens.UseCompatibleStateImageBehavior = false;
-            // 
-            // lvSingleUseCards
-            // 
-            this.lvSingleUseCards.CheckBoxes = true;
-            this.lvSingleUseCards.HideSelection = false;
-            this.lvSingleUseCards.Location = new System.Drawing.Point(20, 309);
-            this.lvSingleUseCards.Name = "lvSingleUseCards";
-            this.lvSingleUseCards.Size = new System.Drawing.Size(338, 125);
-            this.lvSingleUseCards.TabIndex = 14;
-            this.lvSingleUseCards.UseCompatibleStateImageBehavior = false;
-            this.lvSingleUseCards.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lvSingleUseCards_ItemCheck);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(783, 479);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(114, 33);
-            this.button1.TabIndex = 15;
-            this.button1.Text = "Cancel";
-            this.button1.UseVisualStyleBackColor = true;
+            this.bCancel.Location = new System.Drawing.Point(783, 479);
+            this.bCancel.Name = "bCancel";
+            this.bCancel.Size = new System.Drawing.Size(114, 33);
+            this.bCancel.TabIndex = 15;
+            this.bCancel.Text = "Cancel";
+            this.bCancel.UseVisualStyleBackColor = true;
+            this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
             // 
             // bDigButton
             // 
@@ -212,9 +193,24 @@
             // nudWeeks
             // 
             this.nudWeeks.Location = new System.Drawing.Point(158, 485);
+            this.nudWeeks.Maximum = new decimal(new int[] {
+            12,
+            0,
+            0,
+            0});
+            this.nudWeeks.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.nudWeeks.Name = "nudWeeks";
             this.nudWeeks.Size = new System.Drawing.Size(77, 22);
             this.nudWeeks.TabIndex = 17;
+            this.nudWeeks.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.nudWeeks.ValueChanged += new System.EventHandler(this.nudWeeks_ValueChanged);
             // 
             // lTotalKnowledge
@@ -223,21 +219,35 @@
             this.lTotalKnowledge.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F);
             this.lTotalKnowledge.Location = new System.Drawing.Point(12, 444);
             this.lTotalKnowledge.Name = "lTotalKnowledge";
-            this.lTotalKnowledge.Size = new System.Drawing.Size(193, 26);
+            this.lTotalKnowledge.Size = new System.Drawing.Size(162, 22);
             this.lTotalKnowledge.TabIndex = 18;
             this.lTotalKnowledge.Text = "Total knowledge: 0";
+            // 
+            // flpTokens
+            // 
+            this.flpTokens.Location = new System.Drawing.Point(683, 132);
+            this.flpTokens.Name = "flpTokens";
+            this.flpTokens.Size = new System.Drawing.Size(336, 334);
+            this.flpTokens.TabIndex = 20;
+            // 
+            // clSingleUseCards
+            // 
+            this.clSingleUseCards.Location = new System.Drawing.Point(20, 307);
+            this.clSingleUseCards.Name = "clSingleUseCards";
+            this.clSingleUseCards.Size = new System.Drawing.Size(611, 127);
+            this.clSingleUseCards.TabIndex = 19;
             // 
             // DigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1057, 532);
+            this.Controls.Add(this.flpTokens);
+            this.Controls.Add(this.clSingleUseCards);
             this.Controls.Add(this.lTotalKnowledge);
             this.Controls.Add(this.nudWeeks);
             this.Controls.Add(this.bDigButton);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.lvSingleUseCards);
-            this.Controls.Add(this.lvTokens);
+            this.Controls.Add(this.bCancel);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.lDrawAmount);
             this.Controls.Add(this.label8);
@@ -272,11 +282,11 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label lDrawAmount;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.ListView lvTokens;
-        private System.Windows.Forms.ListView lvSingleUseCards;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bCancel;
         private System.Windows.Forms.Button bDigButton;
         private System.Windows.Forms.NumericUpDown nudWeeks;
         private System.Windows.Forms.Label lTotalKnowledge;
+        private CardList clSingleUseCards;
+        private System.Windows.Forms.FlowLayoutPanel flpTokens;
     }
 }
