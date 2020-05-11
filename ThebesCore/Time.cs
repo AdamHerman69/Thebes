@@ -45,7 +45,7 @@ namespace ThebesCore
                 throw new ArgumentException("Supportig only 2-4 players atm");
             }
 
-            initialOrderCounter = playerCount - 1;
+            initialOrderCounter = playerCount;
             finalYear = 1903;
 
             if (playerCount == 2)
@@ -134,6 +134,10 @@ namespace ThebesCore
 
         public int CompareTo(ITime other)
         {
+            if (other == this)
+            {
+                return 0;
+            }
             int result;
             result = this.CurrentYear.CompareTo(other.CurrentYear);
             if (result == 0)

@@ -1,22 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ThebesCore;
 
 namespace ThebesUI
 {
+    class TransparentPictureBox : PictureBox
+    {
+        public TransparentPictureBox()
+        {
+            this.BackColor = Color.Transparent;
+        }
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (Parent != null && this.BackColor == Color.Transparent)
+            {
+                using (var bmp = new Bitmap(Parent.Width, Parent.Height))
+                {
+                    Parent.Controls.Cast<Control>()
+                          .Where(c => Parent.Controls.GetChildIndex(c) > Parent.Controls.GetChildIndex(this))
+                          .Where(c => c.Bounds.IntersectsWith(this.Bounds))
+                          .OrderByDescending(c => Parent.Controls.GetChildIndex(c))
+                          .ToList()
+                          .ForEach(c => c.DrawToBitmap(bmp, c.Bounds));
+
+                    e.Graphics.DrawImage(bmp, -Left, -Top);
+
+                }
+            }
+            base.OnPaint(e);
+        }
+    }
+
     public partial class GameForm : Form
     {
         IUIGame game;
         PictureBox[] displayCards = new PictureBox[4];
         PictureBox[] exhibitions = new PictureBox[3];
+        Dictionary<IPlayer, TransparentPictureBox> smallPieces;
+        Dictionary<IPlayer, TransparentPictureBox> bigPieces;
+        TransparentPictureBox yearCounter;
         List<PlayerDisplay> playerDisplays;
         Layout layout;
 
@@ -93,6 +119,56 @@ namespace ThebesUI
                 pBoard.Controls.Add(exhibitions[i]);
             }
 
+            // week counter
+            smallPieces = new Dictionary<IPlayer, TransparentPictureBox>();
+            foreach (IPlayer player in game.Players)
+            {
+                pbDims = layout.WeekCounter[0];
+                smallPieces.Add(player, new TransparentPictureBox()
+                {
+                    Location = pbDims.RectanglePositionCenter(34, 30),
+                    Width = 34,
+                    Height = 30,
+                    Visible = true,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    BackColor = Color.Transparent,
+                    Image = Image.FromFile(UIConfig.IMG_FOLDER + $"p_small_{game.Colors[player]}.png")
+                });
+                pBoard.Controls.Add(smallPieces[player]);
+            }
+
+            // player pieces
+            bigPieces = new Dictionary<IPlayer, TransparentPictureBox>();
+            foreach (IPlayer player in game.Players)
+            {
+                pbDims = layout.Places[player.CurrentPlace.Name];
+                bigPieces.Add(player, new TransparentPictureBox()
+                {
+                    Location = pbDims.RectanglePositionCenter(35, 71),
+                    Width = 35,
+                    Height = 71,
+                    Visible = true,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    BackColor = Color.Transparent,
+                    Image = Image.FromFile(UIConfig.IMG_FOLDER + $"p_big_{game.Colors[player]}.png")
+                });
+                pBoard.Controls.Add(bigPieces[player]);
+            }
+
+            // year counter
+            pbDims = layout.YearCounter[(game.ActivePlayer.Time.CurrentYear % 10) - 1];
+            yearCounter = new TransparentPictureBox()
+            {
+                Location = pbDims.RectanglePositionCenter(34, 30),
+                Width = 34,
+                Height = 30,
+                Visible = true,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                BackColor = Color.Transparent,
+                Image = Image.FromFile(UIConfig.IMG_FOLDER + $"p_small_black.png")
+            };
+            pBoard.Controls.Add(yearCounter);
+
             UpdateBoard();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ResumeLayout(false);
@@ -101,6 +177,7 @@ namespace ThebesUI
 
         public void UpdateBoard()
         {
+
             // player displays
             foreach (PlayerDisplay playerDisplay in playerDisplays)
             {
@@ -121,9 +198,27 @@ namespace ThebesUI
                     exhibitions[i].Image = GetImage(game.DisplayedExhibitions[i]);
                 }
             }
-            //pbBoard.SendToBack();
 
-            // TODO move player pieces etc
+            // week counter
+            foreach (KeyValuePair<IPlayer, TransparentPictureBox> player_pb in smallPieces.OrderByDescending(kvp => kvp.Key))
+            {
+                player_pb.Value.Location = layout.WeekCounter[player_pb.Key.Time.CurrentWeek - 1].RectanglePositionCenter(player_pb.Value.Width, player_pb.Value.Height);
+                player_pb.Value.Top -= 10 * (player_pb.Key.Time.SameWeekOrder - 1);
+                player_pb.Value.BringToFront();
+            }
+
+            // player pieces
+            int offset = 0;
+            foreach (KeyValuePair<IPlayer, TransparentPictureBox> player_pb in bigPieces)
+            {
+                player_pb.Value.Location = layout.Places[player_pb.Key.CurrentPlace.Name].RectanglePositionCenter(player_pb.Value.Width, player_pb.Value.Height);
+                player_pb.Value.Left += offset;
+                offset += 20;
+            }
+
+            // year counter
+            yearCounter.Location = layout.YearCounter[(game.ActivePlayer.Time.CurrentYear % 10) - 1].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
+
         }
 
         private Image GetImage(ICardView card)
@@ -167,8 +262,10 @@ namespace ThebesUI
 
         private void OpenDigForm(IDigSiteSimpleView digSite)
         {
-            DigForm digForm = new DigForm((IDigSiteFullView)digSite, game.ActivePlayer);
-            digForm.ShowDialog();
+            DigForm digForm = new DigForm((IDigSiteFullView)digSite, game.ActivePlayer, game);
+            DialogResult result = digForm.ShowDialog();
+
+            UpdateBoard();
         }
 
         private void pBoard_Click(object sender, EventArgs e)

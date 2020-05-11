@@ -20,17 +20,19 @@ namespace ThebesUI
         int tokenAmount;
         int totalKnowledge;
         List<ICard> singleUseCards;
+        IUIGame game;
 
-        public DigForm(IDigSiteFullView digSite, IPlayer player)
+        public DigForm(IDigSiteFullView digSite, IPlayer player, IUIGame game)
         {
             InitializeComponent();
-            Initialize(digSite, player);
+            Initialize(digSite, player, game);
         }
 
-        public void Initialize(IDigSiteFullView digSite, IPlayer player)
+        public void Initialize(IDigSiteFullView digSite, IPlayer player, IUIGame game)
         {
             this.digSite = digSite;
             this.player = player;
+            this.game = game;
 
             lDigSiteName.Text = digSite.Name;
 
@@ -96,7 +98,8 @@ namespace ThebesUI
 
         private void bDigButton_Click(object sender, EventArgs e)
         {
-            List<IToken> tokens = player.Dig(digSite, weeksToDig, singleUseCards);
+            List<IToken> tokens = new List<IToken>();
+            game.ExecuteAction(new DigAction(digSite, weeksToDig, singleUseCards, tokens));
             if (tokens == null)
             {
                 return;

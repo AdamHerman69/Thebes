@@ -39,10 +39,11 @@ namespace ThebesUI
                 }
             }
 
+
             UIGame game = new UIGame(playerCount);
-            
+
             // Create Players
-            List<IPlayer> players = new List<IPlayer>();
+            Dictionary<IPlayer, PlayerColor> players = new Dictionary<IPlayer, PlayerColor>();
             foreach (Control control in newGameBox.Controls)
             {
                 if (control is PlayerInput && ((PlayerInput)control).Selected())
@@ -59,7 +60,7 @@ namespace ThebesUI
                         game.ActiveExhibitions.GiveExhibition,
                         game.PlayersOnWeek
                         );
-                    players.Add(player);
+                    players.Add(player, pi.Color());
                 }
             }
             game.Initialize(players);
@@ -87,6 +88,7 @@ namespace ThebesUI
             this.Hide();
             GameForm gameForm = new GameForm(game);
             gameForm.ShowDialog();
+
             this.Close();
         }
     }

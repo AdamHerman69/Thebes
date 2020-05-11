@@ -33,6 +33,12 @@ namespace ThebesUI
         {
             return (point.X >= topLeft.X && point.X <= bottomRight.X && point.Y >= topLeft.Y && point.Y <= bottomRight.Y);
         }
+
+        public Point Center { get { return new Point(topLeft.X + Width / 2, topLeft.Y + Height / 2); } }
+        public Point RectanglePositionCenter(int width, int height)
+        {
+            return new Point(Center.X - width / 2, Center.Y - height / 2);
+        }
     }
 
     public class Layout

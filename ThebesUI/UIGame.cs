@@ -14,10 +14,11 @@ namespace ThebesUI
     public interface IUIGame : IGame
     {
         IPlayer ActivePlayer { get; }
-        void Initialize(List<IPlayer> players);
+        void Initialize(Dictionary<IPlayer, PlayerColor> playerColors);
         new ICardView[] DisplayedCards { get; }
         new ICardView[] DisplayedExhibitions { get; }
         void ExecuteAction(IAction action);
+        Dictionary<IPlayer, PlayerColor> Colors { get; }
     }
 
     [Serializable]
@@ -31,12 +32,14 @@ namespace ThebesUI
         ICard[] IGame.DisplayedCards { get { return AvailableCards.AvailableCards; } }
 
         ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
+        public Dictionary<IPlayer, PlayerColor> Colors { get; private set; }
 
-        public UIGame(int playerCount) : base(playerCount) { }
+        public UIGame(int playerCount) : base(playerCount) {}
 
-        public void Initialize(List<IPlayer> players)
+        public void Initialize(Dictionary<IPlayer, PlayerColor> playerColors)
         {
-            this.Players = players;
+            this.Players = playerColors.Keys.ToList();
+            this.Colors = playerColors;
             Players.Sort();
             ActivePlayer = Players[0];
         }

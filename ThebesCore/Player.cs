@@ -26,6 +26,7 @@ namespace ThebesCore
         int GetAssistantKnowledge();
         List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite);
         void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
+        IPlace CurrentPlace { get; set; }
     }
 
     public interface IPlayer : IPlayerData, IComparable<IPlayer>

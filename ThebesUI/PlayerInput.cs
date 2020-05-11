@@ -11,10 +11,10 @@ using System.Windows.Forms;
 namespace ThebesUI
 {
     public enum PlayerColor {
-        Red,
-        Green,
-        Blue,
-        Yellow
+        red,
+        green,
+        blue,
+        yellow
     }
     
     public partial class PlayerInput : UserControl

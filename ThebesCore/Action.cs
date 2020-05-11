@@ -81,17 +81,23 @@ namespace ThebesCore
         IDigSiteSimpleView digSite;
         int weeks;
         List<ICard> singleUseCards;
+        List<IToken> tokens;
 
-        public DigAction(IDigSiteSimpleView digSite, int weeks, List<ICard> singleUseCards)
+        public DigAction(IDigSiteSimpleView digSite, int weeks, List<ICard> singleUseCards, List<IToken> tokens)
         {
             this.digSite = digSite;
             this.weeks = weeks;
             this.singleUseCards = singleUseCards;
+            this.tokens = tokens;
         }
 
         public void Execute(IPlayer player)
         {
-            player.Dig((IDigSiteFullView)digSite, weeks, singleUseCards);
+            List<IToken> dugTokens = player.Dig((IDigSiteFullView)digSite, weeks, singleUseCards);
+            foreach (IToken token in dugTokens)
+            {
+                tokens.Add(token);
+            }
         }
     }
 

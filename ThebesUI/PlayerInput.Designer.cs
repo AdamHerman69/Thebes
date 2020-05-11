@@ -50,8 +50,8 @@
             this.cbColor.FormattingEnabled = true;
             this.cbColor.Items.AddRange(new object[] {
             "Red",
-            "Blue",
             "Green",
+            "Blue",
             "Yellow"});
             this.cbColor.Location = new System.Drawing.Point(151, 3);
             this.cbColor.Name = "cbColor";
