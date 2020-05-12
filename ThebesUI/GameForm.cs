@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ThebesCore;
 
@@ -23,6 +24,7 @@ namespace ThebesUI
         {
             InitializeComponent();
             Initialize(game);
+
             game.ExecuteAction(null);
             UpdateBoard();
         }
@@ -35,25 +37,36 @@ namespace ThebesUI
 
             layout = ThebesUI.Layout.ParseLayout("layout.json");
 
-            // initialize player displays
-            playerDisplay1.Initialize(game.Players[0], layout, game.Colors[game.Players[0]]);
-            playerDisplays.Add(playerDisplay1);
-            playerDisplay2.Initialize(game.Players[1], layout, game.Colors[game.Players[1]]);
-            playerDisplays.Add(playerDisplay2);
-            if (game.Players.Count >= 3)
+            // player displays
+            foreach (IPlayer player in game.Players)
             {
-                playerDisplay3.Initialize(game.Players[2], layout, game.Colors[game.Players[2]]);
-                playerDisplays.Add(playerDisplay3);
+                PlayerDisplay pd = new PlayerDisplay();
+                pd.Width = 368;
+                pd.Height = 152;
+                pd.Initialize(player, layout, game.Colors[player]);
+                playerDisplays.Add(pd);
+                flpPlayerDisplay.Controls.Add(pd);
             }
-            if (game.Players.Count >= 4)
-            {
-                playerDisplay4.Initialize(game.Players[3], layout, game.Colors[game.Players[3]]);
-                playerDisplays.Add(playerDisplay4);
-            }
-            foreach (PlayerDisplay playerDisplay in playerDisplays)
-            {
-                Controls.Add(playerDisplay);
-            }
+
+            //// initialize player displays
+            //playerDisplay1.Initialize(game.Players[0], layout, game.Colors[game.Players[0]]);
+            //playerDisplays.Add(playerDisplay1);
+            //playerDisplay2.Initialize(game.Players[1], layout, game.Colors[game.Players[1]]);
+            //playerDisplays.Add(playerDisplay2);
+            //if (game.Players.Count >= 3)
+            //{
+            //    playerDisplay3.Initialize(game.Players[2], layout, game.Colors[game.Players[2]]);
+            //    playerDisplays.Add(playerDisplay3);
+            //}
+            //if (game.Players.Count >= 4)
+            //{
+            //    playerDisplay4.Initialize(game.Players[3], layout, game.Colors[game.Players[3]]);
+            //    playerDisplays.Add(playerDisplay4);
+            //}
+            //foreach (PlayerDisplay playerDisplay in playerDisplays)
+            //{
+            //    Controls.Add(playerDisplay);
+            //}
 
             // background
             pBoard.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + "board.jpg");
@@ -152,6 +165,8 @@ namespace ThebesUI
 
         public void UpdateBoard()
         {
+            this.SuspendLayout();
+            SuspendDrawing(this);
 
             // player displays
             foreach (PlayerDisplay playerDisplay in playerDisplays)
@@ -198,6 +213,8 @@ namespace ThebesUI
             // year counter
             yearCounter.Location = layout.YearCounter[(game.ActivePlayer.Time.CurrentYear % 10) - 1].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
 
+            this.ResumeLayout();
+            ResumeDrawing(this);
         }
 
         private Image GetImage(ICardView card)
@@ -317,6 +334,26 @@ namespace ThebesUI
         {
             ExecuteAction(new EndYearAction());
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
+
+        private const int WM_SETREDRAW = 11;
+
+        public static void SuspendDrawing(Control parent)
+        {
+            SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
+        }
+
+        public static void ResumeDrawing(Control parent)
+        {
+            SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
+            parent.Refresh();
+        }
+
     }
 
     class TransparentPictureBox : PictureBox

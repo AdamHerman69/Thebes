@@ -58,7 +58,7 @@
             this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "PlayerDisplay";
-            this.Size = new System.Drawing.Size(368, 334);
+            this.Size = new System.Drawing.Size(368, 332);
             this.ResumeLayout(false);
 
         }

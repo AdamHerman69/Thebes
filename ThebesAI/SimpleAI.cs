@@ -23,12 +23,18 @@ namespace ThebesAI
         public IAction TakeAction(IGame gameState)
         {
             IDigSiteSimpleView digSite;
-            if ((digSite = CanIDig()) != null)
+            if (player.Time.RemainingWeeks() >= 11 && (digSite = CanIDig()) != null)
             {
                 return new DigAction(digSite, 7, null, null);
             }
 
-            return new TakeCardAction(ChooseCard());
+            ICard card = ChooseCard();
+            if (player.Time.RemainingWeeks() >= card.Weeks + GameSettings.GetDistance(player.CurrentPlace, card.Place))
+            {
+                return new TakeCardAction(card);
+            }
+            return new EndYearAction();
+            
         }
 
         private IDigSiteSimpleView CanIDig()

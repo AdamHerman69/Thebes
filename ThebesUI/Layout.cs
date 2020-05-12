@@ -80,6 +80,8 @@ namespace ThebesUI
         public Dictionary<string, Rectangle> SpecializedKnowledgeLs { get; private set; }
         [JsonProperty]
         public Dictionary<string, Rectangle> SingleUseKnowledgeLs { get; private set; }
+        [JsonProperty]
+        public Dictionary<string, Rectangle> Permissions { get; private set; }
 
 
         public Layout()

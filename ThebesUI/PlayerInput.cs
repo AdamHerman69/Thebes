@@ -43,8 +43,11 @@ namespace ThebesUI
 
         private void tbName_TextChanged(object sender, EventArgs e)
         {
+            if (!rbHuman.Checked && !rbAI.Checked)
+            {
+                rbHuman.Checked = true;
+            }
             cbSelected.Checked = true;
-            rbHuman.Checked = true;
         }
     }
 }

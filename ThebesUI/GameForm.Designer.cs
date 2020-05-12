@@ -28,25 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitter1 = new System.Windows.Forms.Splitter();
             this.bSaveGame = new System.Windows.Forms.Button();
             this.bExitGame = new System.Windows.Forms.Button();
             this.bUseZeppelin = new System.Windows.Forms.Button();
             this.pBoard = new System.Windows.Forms.Panel();
-            this.playerDisplay4 = new ThebesUI.PlayerDisplay();
-            this.playerDisplay3 = new ThebesUI.PlayerDisplay();
-            this.playerDisplay2 = new ThebesUI.PlayerDisplay();
-            this.playerDisplay1 = new ThebesUI.PlayerDisplay();
             this.bEndYear = new System.Windows.Forms.Button();
+            this.flpPlayerDisplay = new System.Windows.Forms.FlowLayoutPanel();
             this.SuspendLayout();
-            // 
-            // splitter1
-            // 
-            this.splitter1.Location = new System.Drawing.Point(0, 0);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 907);
-            this.splitter1.TabIndex = 15;
-            this.splitter1.TabStop = false;
             // 
             // bSaveGame
             // 
@@ -86,46 +74,6 @@
             this.pBoard.TabIndex = 49;
             this.pBoard.Click += new System.EventHandler(this.pBoard_Click);
             // 
-            // playerDisplay4
-            // 
-            this.playerDisplay4.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.playerDisplay4.Location = new System.Drawing.Point(12, 632);
-            this.playerDisplay4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.playerDisplay4.Name = "playerDisplay4";
-            this.playerDisplay4.Size = new System.Drawing.Size(491, 187);
-            this.playerDisplay4.TabIndex = 3;
-            this.playerDisplay4.Visible = false;
-            // 
-            // playerDisplay3
-            // 
-            this.playerDisplay3.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.playerDisplay3.Location = new System.Drawing.Point(12, 418);
-            this.playerDisplay3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.playerDisplay3.Name = "playerDisplay3";
-            this.playerDisplay3.Size = new System.Drawing.Size(491, 187);
-            this.playerDisplay3.TabIndex = 2;
-            this.playerDisplay3.Visible = false;
-            // 
-            // playerDisplay2
-            // 
-            this.playerDisplay2.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.playerDisplay2.Location = new System.Drawing.Point(12, 214);
-            this.playerDisplay2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.playerDisplay2.Name = "playerDisplay2";
-            this.playerDisplay2.Size = new System.Drawing.Size(491, 187);
-            this.playerDisplay2.TabIndex = 1;
-            this.playerDisplay2.Visible = false;
-            // 
-            // playerDisplay1
-            // 
-            this.playerDisplay1.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.playerDisplay1.Location = new System.Drawing.Point(12, 12);
-            this.playerDisplay1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.playerDisplay1.Name = "playerDisplay1";
-            this.playerDisplay1.Size = new System.Drawing.Size(491, 187);
-            this.playerDisplay1.TabIndex = 0;
-            this.playerDisplay1.Visible = false;
-            // 
             // bEndYear
             // 
             this.bEndYear.Location = new System.Drawing.Point(1347, 784);
@@ -136,19 +84,23 @@
             this.bEndYear.UseVisualStyleBackColor = true;
             this.bEndYear.Click += new System.EventHandler(this.bEndYear_Click);
             // 
+            // flpPlayerDisplay
+            // 
+            this.flpPlayerDisplay.Location = new System.Drawing.Point(12, 12);
+            this.flpPlayerDisplay.Name = "flpPlayerDisplay";
+            this.flpPlayerDisplay.Size = new System.Drawing.Size(533, 883);
+            this.flpPlayerDisplay.TabIndex = 51;
+            // 
             // GameForm
             // 
             this.ClientSize = new System.Drawing.Size(1828, 907);
+            this.Controls.Add(this.flpPlayerDisplay);
             this.Controls.Add(this.bEndYear);
             this.Controls.Add(this.pBoard);
             this.Controls.Add(this.bUseZeppelin);
             this.Controls.Add(this.bExitGame);
             this.Controls.Add(this.bSaveGame);
-            this.Controls.Add(this.splitter1);
-            this.Controls.Add(this.playerDisplay4);
-            this.Controls.Add(this.playerDisplay3);
-            this.Controls.Add(this.playerDisplay2);
-            this.Controls.Add(this.playerDisplay1);
+            this.DoubleBuffered = true;
             this.Name = "GameForm";
             this.Text = "GameForm";
             this.ResumeLayout(false);
@@ -156,16 +108,11 @@
         }
 
         #endregion
-
-        private PlayerDisplay playerDisplay1;
-        private PlayerDisplay playerDisplay2;
-        private PlayerDisplay playerDisplay3;
-        private PlayerDisplay playerDisplay4;
-        private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.Button bSaveGame;
         private System.Windows.Forms.Button bExitGame;
         private System.Windows.Forms.Button bUseZeppelin;
         private System.Windows.Forms.Panel pBoard;
         private System.Windows.Forms.Button bEndYear;
+        private System.Windows.Forms.FlowLayoutPanel flpPlayerDisplay;
     }
 }

@@ -19,6 +19,7 @@ namespace ThebesUI
         // Data display
         Dictionary<IDigSiteSimpleView, Label> specializedKnowledgeDisplay;
         Dictionary<IDigSiteSimpleView, Label> singleUseKnowledgeDisplay;
+        Dictionary<IDigSiteSimpleView, PictureBox> permissionDisplay;
 
         Label lPlayerName, lTime, lPoints, lGeneralKnowledge, lShovels, lAssistants, lSpecialPermissions, lCongress, lCar, lZeppelin;
 
@@ -38,8 +39,10 @@ namespace ThebesUI
             // TODO maybe add relative positioning wtr. background.png
             specializedKnowledgeDisplay = new Dictionary<IDigSiteSimpleView, Label>();
             singleUseKnowledgeDisplay = new Dictionary<IDigSiteSimpleView, Label>();
+            permissionDisplay = new Dictionary<IDigSiteSimpleView, PictureBox>();
             Label label = new Label();
             Rectangle labelDims;
+            PictureBox pb;
             foreach (KeyValuePair<IDigSiteSimpleView, int> digSite_knowledge in player.SpecializedKnowledge)
             {
                 // specialized knowledge
@@ -69,6 +72,18 @@ namespace ThebesUI
                 label.Show();
                 panel.Controls.Add(label);
                 singleUseKnowledgeDisplay.Add(digSite_knowledge.Key, label);
+
+                // permissions
+                labelDims = layout.Permissions[digSite_knowledge.Key.Name];
+                pb = new PictureBox
+                    {
+                        Location = labelDims.topLeft,
+                        Size = new Size(labelDims.Width, labelDims.Height),
+                        SizeMode = PictureBoxSizeMode.StretchImage
+                    };
+                panel.Controls.Add(pb);
+                permissionDisplay.Add(digSite_knowledge.Key, pb);
+                
             }
 
             // player name
@@ -210,6 +225,8 @@ namespace ThebesUI
             };
             panel.Controls.Add(lZeppelin);
 
+            
+
             UpdateInfo();
             this.Show();
         }
@@ -254,6 +271,27 @@ namespace ThebesUI
                     Tag = token,
                     Image = Image.FromFile(UIConfig.IMG_FOLDER + token.FileName)
                 });
+            }
+
+            // permissions
+            foreach (KeyValuePair<IDigSiteSimpleView, bool> digSite_bool in player.Permissions)
+            {
+                if (digSite_bool.Value)
+                {
+                    permissionDisplay[digSite_bool.Key].Image = null;
+                }
+                else
+                {
+                    permissionDisplay[digSite_bool.Key].Image = Image.FromFile(UIConfig.IMG_FOLDER + $"p_no_{digSite_bool.Key.Name}.png");
+                }
+                
+            }
+
+            // height
+            this.Height = 152 + 45 * (flpTokens.Controls.Count / 10);
+            if (flpTokens.Controls.Count % 10 > 0)
+            {
+                this.Height += 45;
             }
 
         }
