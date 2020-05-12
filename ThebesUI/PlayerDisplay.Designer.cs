@@ -28,20 +28,44 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.panel = new System.Windows.Forms.Panel();
+            this.flpTokens = new System.Windows.Forms.FlowLayoutPanel();
             this.SuspendLayout();
+            // 
+            // panel
+            // 
+            this.panel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.panel.Location = new System.Drawing.Point(0, 0);
+            this.panel.Name = "panel";
+            this.panel.Size = new System.Drawing.Size(368, 152);
+            this.panel.TabIndex = 0;
+            // 
+            // flpTokens
+            // 
+            this.flpTokens.Location = new System.Drawing.Point(4, 159);
+            this.flpTokens.Name = "flpTokens";
+            this.flpTokens.Size = new System.Drawing.Size(364, 167);
+            this.flpTokens.TabIndex = 1;
             // 
             // PlayerDisplay
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.BackColor = System.Drawing.Color.Transparent;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Controls.Add(this.flpTokens);
+            this.Controls.Add(this.panel);
+            this.DoubleBuffered = true;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "PlayerDisplay";
-            this.Size = new System.Drawing.Size(491, 187);
+            this.Size = new System.Drawing.Size(368, 334);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
+        private System.Windows.Forms.Panel panel;
+        private System.Windows.Forms.FlowLayoutPanel flpTokens;
     }
 }

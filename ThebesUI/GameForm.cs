@@ -8,33 +8,6 @@ using ThebesCore;
 
 namespace ThebesUI
 {
-    class TransparentPictureBox : PictureBox
-    {
-        public TransparentPictureBox()
-        {
-            this.BackColor = Color.Transparent;
-        }
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            if (Parent != null && this.BackColor == Color.Transparent)
-            {
-                using (var bmp = new Bitmap(Parent.Width, Parent.Height))
-                {
-                    Parent.Controls.Cast<Control>()
-                          .Where(c => Parent.Controls.GetChildIndex(c) > Parent.Controls.GetChildIndex(this))
-                          .Where(c => c.Bounds.IntersectsWith(this.Bounds))
-                          .OrderByDescending(c => Parent.Controls.GetChildIndex(c))
-                          .ToList()
-                          .ForEach(c => c.DrawToBitmap(bmp, c.Bounds));
-
-                    e.Graphics.DrawImage(bmp, -Left, -Top);
-
-                }
-            }
-            base.OnPaint(e);
-        }
-    }
-
     public partial class GameForm : Form
     {
         IUIGame game;
@@ -50,6 +23,8 @@ namespace ThebesUI
         {
             InitializeComponent();
             Initialize(game);
+            game.ExecuteAction(null);
+            UpdateBoard();
         }
 
         public void Initialize(IUIGame game)
@@ -61,18 +36,18 @@ namespace ThebesUI
             layout = ThebesUI.Layout.ParseLayout("layout.json");
 
             // initialize player displays
-            playerDisplay1.Initialize(game.Players[0], layout);
+            playerDisplay1.Initialize(game.Players[0], layout, game.Colors[game.Players[0]]);
             playerDisplays.Add(playerDisplay1);
-            playerDisplay2.Initialize(game.Players[1], layout);
+            playerDisplay2.Initialize(game.Players[1], layout, game.Colors[game.Players[1]]);
             playerDisplays.Add(playerDisplay2);
             if (game.Players.Count >= 3)
             {
-                playerDisplay3.Initialize(game.Players[2], layout);
+                playerDisplay3.Initialize(game.Players[2], layout, game.Colors[game.Players[2]]);
                 playerDisplays.Add(playerDisplay3);
             }
             if (game.Players.Count >= 4)
             {
-                playerDisplay4.Initialize(game.Players[3], layout);
+                playerDisplay4.Initialize(game.Players[3], layout, game.Colors[game.Players[3]]);
                 playerDisplays.Add(playerDisplay4);
             }
             foreach (PlayerDisplay playerDisplay in playerDisplays)
@@ -197,6 +172,10 @@ namespace ThebesUI
                 {
                     exhibitions[i].Image = GetImage(game.DisplayedExhibitions[i]);
                 }
+                else
+                {
+                    exhibitions[i].Image = null;
+                }
             }
 
             // week counter
@@ -235,34 +214,32 @@ namespace ThebesUI
 
         private void pbCard_Click(object sender, EventArgs e)
         {
-            game.ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
-            UpdateBoard();
+            ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
+
         }
 
         private void pbExhibition_Click(object sender, EventArgs e)
         {
             if(game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)] != null)
             {
-                game.ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
-                UpdateBoard();
+                ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
+
             }
         }
 
         private void bUseZeppelin_Click(object sender, EventArgs e)
         {
-            game.ExecuteAction(new ZeppelinAction());
-            UpdateBoard();
+            ExecuteAction(new ZeppelinAction());
         }
 
         private void ChangeCards(ICardChangePlace place)
         {
-            game.ExecuteAction(new ChangeCardsAction(place));
-            UpdateBoard();
+            ExecuteAction(new ChangeCardsAction(place));
         }
 
         private void OpenDigForm(IDigSiteSimpleView digSite)
         {
-            DigForm digForm = new DigForm((IDigSiteFullView)digSite, game.ActivePlayer, game);
+            DigForm digForm = new DigForm((IDigSiteFullView)digSite, game.ActivePlayer, ExecuteAction);
             DialogResult result = digForm.ShowDialog();
 
             UpdateBoard();
@@ -320,6 +297,61 @@ namespace ThebesUI
             {
                 this.Close();
             }
+        }
+
+        public void ExecuteAction(IAction action)
+        {
+            if (!game.ExecuteAction(action))
+            {
+                UpdateBoard();
+            }
+            else
+            {
+                ResultsForm resultsForm = new ResultsForm(game.Players);
+                resultsForm.ShowDialog();
+                this.Close();
+            }
+        }
+
+        private void bEndYear_Click(object sender, EventArgs e)
+        {
+            ExecuteAction(new EndYearAction());
+        }
+    }
+
+    class TransparentPictureBox : PictureBox
+    {
+        public TransparentPictureBox()
+        {
+            this.BackColor = Color.Transparent;
+        }
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (Parent != null && this.BackColor == Color.Transparent)
+            {
+                using (var bmp = new Bitmap(Parent.Width, Parent.Height))
+                {
+                    Parent.Controls.Cast<Control>()
+                          .Where(c => Parent.Controls.GetChildIndex(c) > Parent.Controls.GetChildIndex(this))
+                          .Where(c => c.Bounds.IntersectsWith(this.Bounds))
+                          .OrderByDescending(c => Parent.Controls.GetChildIndex(c))
+                          .ToList()
+                          .ForEach(c => c.DrawToBitmap(bmp, c.Bounds));
+
+                    e.Graphics.DrawImage(bmp, -Left, -Top);
+
+                }
+            }
+            base.OnPaint(e);
+        }
+
+        private void InitializeComponent()
+        {
+            ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
+            this.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
+            this.ResumeLayout(false);
+
         }
     }
 }

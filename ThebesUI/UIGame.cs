@@ -17,7 +17,7 @@ namespace ThebesUI
         void Initialize(Dictionary<IPlayer, PlayerColor> playerColors);
         new ICardView[] DisplayedCards { get; }
         new ICardView[] DisplayedExhibitions { get; }
-        void ExecuteAction(IAction action);
+        bool ExecuteAction(IAction action);
         Dictionary<IPlayer, PlayerColor> Colors { get; }
     }
 
@@ -51,9 +51,12 @@ namespace ThebesUI
             ActivePlayer = Players[0];
         }
 
-        public void ExecuteAction(IAction action)
+        public bool ExecuteAction(IAction action)
         {
-            action.Execute(ActivePlayer);
+            if (action != null)
+            {
+                action.Execute(ActivePlayer);
+            }
 
             if (!AreAllPlayersDone())
             {
@@ -69,10 +72,9 @@ namespace ThebesUI
 
             if (AreAllPlayersDone())
             {
-                //end game
-                throw new NotImplementedException();
+                return true;
             }
-
+            return false;
         }
 
         public static ICardView ToView(ICard card)

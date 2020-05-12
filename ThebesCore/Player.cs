@@ -27,6 +27,7 @@ namespace ThebesCore
         List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite);
         void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
         IPlace CurrentPlace { get; set; }
+        Dictionary<IDigSiteSimpleView, List<IToken>> Tokens { get; }
     }
 
     public interface IPlayer : IPlayerData, IComparable<IPlayer>
@@ -205,6 +206,11 @@ namespace ThebesCore
 
         private void AddSingleUseCardsStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, ref int knowledge, ref int tokenBonus)
         {
+            if (singleUseCards == null)
+            {
+                return;
+            }
+
             foreach (ICard card in singleUseCards)
             {
                 if (card is IRumorsCard && ((IRumorsCard)card).digSite == digSite)
@@ -311,6 +317,20 @@ namespace ThebesCore
             card.UpdateStats(this);
         }
 
+        private void UpdateStats()
+        {
+            // zero all necessary fields 
+            SingleUseKnowledge.Keys.ToList().ForEach(x => SingleUseKnowledge[x] = 0);
+            this.Zeppelins = 0;
+            this.Shovels = 0;
+            this.Assistants = 0;
+
+            foreach (ICard card in this.Cards.Where(c => c is IRumorsCard || c is IAssistantCard || c is IShovelCard || c is IZeppelinCard))
+            {
+                card.UpdateStats(this);
+            }
+        }
+
         public List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite)
         {
             List<ICard> singleUseCards = new List<ICard>();
@@ -374,11 +394,15 @@ namespace ThebesCore
 
             // TODO change player stats
             // discard single-use cards used
-            foreach (ICard card in singleUseCards)
+            if (singleUseCards != null)
             {
-                Cards.Remove(card);
-                discardCard(card);
+                foreach (ICard card in singleUseCards)
+                {
+                    Cards.Remove(card);
+                    discardCard(card);
+                }
             }
+            UpdateStats();
 
             return dugTokens;
         }
@@ -697,7 +721,11 @@ namespace ThebesCore
     {
         public IAI AI { get; private set; }
 
-        public AIPlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek, IAI ai) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
+        public AIPlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
+        {
+        }
+
+        public void Init(IAI ai)
         {
             this.AI = ai;
         }

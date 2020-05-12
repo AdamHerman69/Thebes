@@ -27,9 +27,12 @@ namespace ThebesUI
             InitializeComponent();
         }
 
-        public void Initialize(IPlayerData player, Layout layout)
+        public void Initialize(IPlayerData player, Layout layout, PlayerColor color)
         {
             this.player = player;
+            this.BackColor = Color.Transparent;
+            //this.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + $"playerDisplay_{color}.png");
+            panel.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + $"playerDisplay_{color}.png");
 
             // knowledge display
             // TODO maybe add relative positioning wtr. background.png
@@ -43,24 +46,28 @@ namespace ThebesUI
                 label = new Label();
                 label.Name = $"lSpecializedKnowledge{digSite_knowledge.Key}";
                 label.Text = "0";
+                label.Font = new Font("Arial", 12, FontStyle.Bold);
 
                 labelDims = layout.SpecializedKnowledgeLs[digSite_knowledge.Key.Name];
                 label.Size = new Size(labelDims.Width, labelDims.Height);
                 label.Location = labelDims.topLeft;
+                label.BackColor = Color.Transparent;
                 label.Show();
-                Controls.Add(label);
+                panel.Controls.Add(label);
                 specializedKnowledgeDisplay.Add(digSite_knowledge.Key, label);
 
                 // rumors
                 label = new Label();
                 label.Name = $"lRumors{digSite_knowledge.Key}";
                 label.Text = "0";
+                label.Font = new Font("Arial", 12, FontStyle.Bold);
 
                 labelDims = layout.SingleUseKnowledgeLs[digSite_knowledge.Key.Name];
                 label.Size = new Size(labelDims.Width, labelDims.Height);
                 label.Location = labelDims.topLeft;
+                label.BackColor = Color.Transparent;
                 label.Show();
-                Controls.Add(label);
+                panel.Controls.Add(label);
                 singleUseKnowledgeDisplay.Add(digSite_knowledge.Key, label);
             }
 
@@ -70,35 +77,40 @@ namespace ThebesUI
             {
                 Name = $"lPlayerName",
                 Text = "0",
+                Font = new Font("Arial", 11, FontStyle.Bold),
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
-                Visible = true
+                BackColor = Color.Transparent,
+            Visible = true
             };
-            Controls.Add(lPlayerName);
+            panel.Controls.Add(lPlayerName);
 
-            // time
-            labelDims = layout.Time;
-            lTime = new Label()
-            {
-                Name = $"lTime",
-                Text = "0",
-                Size = new Size(labelDims.Width, labelDims.Height),
-                Location = labelDims.topLeft,
-                Visible = true
-            };
-            Controls.Add(lTime);
+            //// time
+            //labelDims = layout.Time;
+            //lTime = new Label()
+            //{
+            //    Name = $"lTime",
+            //    Text = "0",
+            //    BackColor = Color.Transparent,
+            //    Size = new Size(labelDims.Width, labelDims.Height),
+            //    Location = labelDims.topLeft,
+            //    Visible = true
+            //};
+            //panel.Controls.Add(lTime);
 
             // points
-            labelDims = layout.Time;
+            labelDims = layout.Points;
             lPoints = new Label()
             {
-                Name = $"lTime",
+                Name = $"lPoints",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lPoints);
+            panel.Controls.Add(lPoints);
 
             // general knowledge
             labelDims = layout.GeneralKnowledge;
@@ -106,11 +118,13 @@ namespace ThebesUI
             {
                 Name = $"lGeneralKnowledge",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lGeneralKnowledge);
+            panel.Controls.Add(lGeneralKnowledge);
 
             // shovels
             labelDims = layout.Shovel;
@@ -118,11 +132,13 @@ namespace ThebesUI
             {
                 Name = $"lShovels",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lShovels);
+            panel.Controls.Add(lShovels);
 
             // assistants
             labelDims = layout.Assistant;
@@ -130,11 +146,13 @@ namespace ThebesUI
             {
                 Name = $"lAssistants",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lAssistants);
+            panel.Controls.Add(lAssistants);
 
             // special permissions
             labelDims = layout.SpecialPermission;
@@ -142,11 +160,13 @@ namespace ThebesUI
             {
                 Name = $"lSpecialPermissions",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lSpecialPermissions);
+            panel.Controls.Add(lSpecialPermissions);
 
             // congress
             labelDims = layout.Congress;
@@ -154,11 +174,13 @@ namespace ThebesUI
             {
                 Name = $"lCongress",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lCongress);
+            panel.Controls.Add(lCongress);
 
             // car
             labelDims = layout.Car;
@@ -166,11 +188,13 @@ namespace ThebesUI
             {
                 Name = $"lCar",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lCar);
+            panel.Controls.Add(lCar);
 
             // zeppelin
             labelDims = layout.Zeppelin;
@@ -178,11 +202,13 @@ namespace ThebesUI
             {
                 Name = $"lZeppelin",
                 Text = "0",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.Transparent,
                 Size = new Size(labelDims.Width, labelDims.Height),
                 Location = labelDims.topLeft,
                 Visible = true
             };
-            Controls.Add(lZeppelin);
+            panel.Controls.Add(lZeppelin);
 
             UpdateInfo();
             this.Show();
@@ -191,7 +217,7 @@ namespace ThebesUI
         public void UpdateInfo()
         {
             lPlayerName.Text = player.Name;
-            lTime.Text = player.Time.ToString();
+            //lTime.Text = player.Time.ToString();
             lPoints.Text = player.Points.ToString();
 
             lGeneralKnowledge.Text = player.GeneralKnowledge.ToString();
@@ -213,6 +239,21 @@ namespace ThebesUI
             foreach (KeyValuePair<IDigSiteSimpleView, Label> digSite_label in singleUseKnowledgeDisplay)
             {
                 digSite_label.Value.Text = player.SingleUseKnowledge[digSite_label.Key].ToString();
+            }
+
+            // tokens
+            List<ITokenView> tokens = player.Tokens.SelectMany(t => t.Value).ToList().ConvertAll(UIGame.ToView);
+            flpTokens.Controls.Clear();
+            foreach (ITokenView token in tokens)
+            {
+                flpTokens.Controls.Add(new PictureBox
+                {
+                    Width = 30,
+                    Height = 30,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Tag = token,
+                    Image = Image.FromFile(UIConfig.IMG_FOLDER + token.FileName)
+                });
             }
 
         }

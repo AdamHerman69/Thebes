@@ -19,6 +19,8 @@ namespace ThebesUI
     
     public partial class PlayerInput : UserControl
     {
+        public PlayerColor Color { get { return (PlayerColor)cbColor.SelectedIndex; } set { cbColor.SelectedIndex = (int)value; } }
+        
         public PlayerInput()
         {
             InitializeComponent();
@@ -32,11 +34,6 @@ namespace ThebesUI
         public string PlayerName()
         {
             return tbName.Text;
-        }
-
-        public PlayerColor Color()
-        {
-            return (PlayerColor)cbColor.SelectedIndex;
         }
 
         public bool IsHuman()

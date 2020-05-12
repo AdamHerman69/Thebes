@@ -94,10 +94,14 @@ namespace ThebesCore
         public void Execute(IPlayer player)
         {
             List<IToken> dugTokens = player.Dig((IDigSiteFullView)digSite, weeks, singleUseCards);
-            foreach (IToken token in dugTokens)
+            if (dugTokens != null && tokens != null)
             {
-                tokens.Add(token);
+                foreach (IToken token in dugTokens)
+                {
+                    tokens.Add(token);
+                }
             }
+            
         }
     }
 
