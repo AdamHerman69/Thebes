@@ -143,7 +143,7 @@ namespace ThebesUI
         public string FileName { get 
             {
                 string fileName = $"c_{_Card.Place}_exhibition_{_Card.Points}";
-                foreach (IDigSiteSimpleView requirement in _Card.ArtifactsRequired)
+                foreach (IDigSite requirement in _Card.ArtifactsRequired)
                 {
                     fileName += "_" + requirement;
                 }

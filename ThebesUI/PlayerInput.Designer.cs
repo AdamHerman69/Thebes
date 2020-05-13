@@ -39,7 +39,8 @@
             // 
             this.cbSelected.AutoSize = true;
             this.cbSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.cbSelected.Location = new System.Drawing.Point(10, 7);
+            this.cbSelected.Location = new System.Drawing.Point(8, 6);
+            this.cbSelected.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.cbSelected.Name = "cbSelected";
             this.cbSelected.Size = new System.Drawing.Size(15, 14);
             this.cbSelected.TabIndex = 9;
@@ -53,27 +54,31 @@
             "Green",
             "Blue",
             "Yellow"});
-            this.cbColor.Location = new System.Drawing.Point(151, 3);
+            this.cbColor.Location = new System.Drawing.Point(113, 2);
+            this.cbColor.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.cbColor.Name = "cbColor";
-            this.cbColor.Size = new System.Drawing.Size(71, 24);
+            this.cbColor.Size = new System.Drawing.Size(54, 21);
             this.cbColor.TabIndex = 10;
             // 
             // tbName
             // 
             this.tbName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F);
             this.tbName.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.tbName.Location = new System.Drawing.Point(34, 3);
+            this.tbName.Location = new System.Drawing.Point(26, 2);
+            this.tbName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tbName.MaxLength = 20;
             this.tbName.Name = "tbName";
-            this.tbName.Size = new System.Drawing.Size(111, 20);
+            this.tbName.Size = new System.Drawing.Size(84, 20);
             this.tbName.TabIndex = 8;
             this.tbName.TextChanged += new System.EventHandler(this.tbName_TextChanged);
             // 
             // rbAI
             // 
             this.rbAI.AutoSize = true;
-            this.rbAI.Location = new System.Drawing.Point(306, 5);
+            this.rbAI.Location = new System.Drawing.Point(230, 4);
+            this.rbAI.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.rbAI.Name = "rbAI";
-            this.rbAI.Size = new System.Drawing.Size(38, 20);
+            this.rbAI.Size = new System.Drawing.Size(35, 17);
             this.rbAI.TabIndex = 7;
             this.rbAI.TabStop = true;
             this.rbAI.Text = "AI";
@@ -82,9 +87,10 @@
             // rbHuman
             // 
             this.rbHuman.AutoSize = true;
-            this.rbHuman.Location = new System.Drawing.Point(228, 5);
+            this.rbHuman.Location = new System.Drawing.Point(171, 4);
+            this.rbHuman.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.rbHuman.Name = "rbHuman";
-            this.rbHuman.Size = new System.Drawing.Size(66, 20);
+            this.rbHuman.Size = new System.Drawing.Size(57, 17);
             this.rbHuman.TabIndex = 6;
             this.rbHuman.TabStop = true;
             this.rbHuman.Text = "human";
@@ -92,15 +98,16 @@
             // 
             // PlayerInput
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.cbSelected);
             this.Controls.Add(this.cbColor);
             this.Controls.Add(this.tbName);
             this.Controls.Add(this.rbAI);
             this.Controls.Add(this.rbHuman);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "PlayerInput";
-            this.Size = new System.Drawing.Size(373, 31);
+            this.Size = new System.Drawing.Size(280, 25);
             this.ResumeLayout(false);
             this.PerformLayout();
 

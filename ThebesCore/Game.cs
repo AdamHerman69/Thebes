@@ -6,7 +6,7 @@ using System.Security.AccessControl;
 using System.Text;
 
 namespace ThebesCore
-{   
+{  
     public interface IGame
     {
         List<IPlayer> Players { get; }
@@ -32,6 +32,11 @@ namespace ThebesCore
             Time.Configure(playerCount);
         }
 
+        /// <summary>
+        /// Returns the number of players who are on the specified week
+        /// </summary>
+        /// <param name="time">ITime object specifying the week</param>
+        /// <returns></returns>
         public int PlayersOnWeek(ITime time)
         {
             int count = 0;
@@ -45,6 +50,10 @@ namespace ThebesCore
             return count;
         }
         
+        /// <summary>
+        /// Check if there's at least one player who has some time left
+        /// </summary>
+        /// <returns></returns>
         protected bool AreAllPlayersDone()
         {
             foreach (IPlayer player in Players)
@@ -72,60 +81,15 @@ namespace ThebesCore
             return drawnCard;
         }
 
+        /// <summary>
+        /// Resets the card change info for every player (it's used to implement the changing-cards-in-a-row rule)
+        /// </summary>
         protected void ResetCardChangeInfos()
         {
             for (int i = 1; i < Players.Count; i++)
             {
                 Players[i].ResetCardChnageInfo();
             }
-        }
-    }
-
-    [Serializable]
-    public class ConsoleGame : Game, IGame
-    {
-        public ConsoleGame(int playerCount) : base(playerCount) { }
-
-        public ICard[] DisplayedCards => throw new NotImplementedException();
-
-        public ICard[] DisplayedExhibitions => throw new NotImplementedException();
-
-        public void Play()
-        {
-            while (!AreAllPlayersDone())
-            {
-                Players.Sort();
-                PrintState();
-                ((ConsolePlayer)Players[0]).TakeActionWrapper(new List<ICard>(AvailableCards.AvailableCards), ActiveExhibitions.Exhibitions.ToList<IExhibitionCard>().Where(x => x != null).ToList());
-                ResetCardChangeInfos();
-            }
-
-            Console.WriteLine("---- GAME ENDED ----");
-        }
-
-        private void PrintState()
-        {
-            Console.WriteLine("--------------------------------------------------------------------------------------------");
-
-            // Player stats
-            foreach (IPlayer player in Players)
-            {
-                Console.Write(player.ToString() + "\n\n");
-            }
-
-            // Cards Available
-            Console.WriteLine("Available Cards:");
-            foreach (ICard card in AvailableCards.AvailableCards)
-            {
-                Console.WriteLine(card);
-            }
-            Console.WriteLine();
-            foreach (IExhibitionCard exhibition in this.ActiveExhibitions.Exhibitions)
-            {
-                Console.WriteLine(exhibition);
-            }
-
-            Console.WriteLine($"\n{Players[0].Name}'s turn");
         }
     }
 }

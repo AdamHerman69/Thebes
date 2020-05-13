@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace ThebesCore
 {
+    /// <summary>
+    /// Each instance of a class implementing this interface represents one action a player can do.
+    /// It's used to send information between the UI and the Core.
+    /// </summary>
     public interface IAction
     {
+        /// <summary>
+        /// Executes the action for the specified <paramref name="player"/>
+        /// </summary>
+        /// <param name="player">Player who is executing the action</param>
         void Execute(IPlayer player);
     }
 
@@ -78,12 +86,12 @@ namespace ThebesCore
 
     public class DigAction : IAction
     {
-        IDigSiteSimpleView digSite;
+        IDigSite digSite;
         int weeks;
         List<ICard> singleUseCards;
         List<IToken> tokens;
 
-        public DigAction(IDigSiteSimpleView digSite, int weeks, List<ICard> singleUseCards, List<IToken> tokens)
+        public DigAction(IDigSite digSite, int weeks, List<ICard> singleUseCards, List<IToken> tokens)
         {
             this.digSite = digSite;
             this.weeks = weeks;
@@ -93,7 +101,7 @@ namespace ThebesCore
 
         public void Execute(IPlayer player)
         {
-            List<IToken> dugTokens = player.Dig((IDigSiteFullView)digSite, weeks, singleUseCards);
+            List<IToken> dugTokens = player.Dig(digSite, weeks, singleUseCards);
             if (dugTokens != null && tokens != null)
             {
                 foreach (IToken token in dugTokens)

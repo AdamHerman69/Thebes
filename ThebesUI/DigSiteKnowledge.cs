@@ -13,14 +13,14 @@ namespace ThebesUI
 {
     public partial class DigSiteKnowledge : UserControl
     {
-        public IDigSiteSimpleView digSite;
+        public IDigSite digSite;
 
         public DigSiteKnowledge()
         {
             InitializeComponent();
         }
 
-        public void Initialize(IDigSiteSimpleView digSite)
+        public void Initialize(IDigSite digSite)
         {
             this.digSite = digSite;
             lDigSiteName.Text = digSite.Name;

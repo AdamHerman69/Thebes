@@ -41,7 +41,7 @@ namespace ThebesConsole
 
             //IPlayer adam = new ConsolePlayer(
             //    "Adam",
-            //    GameSettings.Places.OfType<IDigSiteSimpleView>().ToList(),
+            //    GameSettings.Places.OfType<IDigSite>().ToList(),
             //    GameSettings.StartingPlace,
             //    GameSettings.Places,
             //    NotEnoughTimeDialog,
@@ -52,7 +52,7 @@ namespace ThebesConsole
             //    game.PlayersOnWeek);
             //IPlayer vitek = new ConsolePlayer(
             //    "Vitek",
-            //    GameSettings.Places.OfType<IDigSiteSimpleView>().ToList(),
+            //    GameSettings.Places.OfType<IDigSite>().ToList(),
             //    GameSettings.StartingPlace,
             //    GameSettings.Places,
             //    NotEnoughTimeDialog,

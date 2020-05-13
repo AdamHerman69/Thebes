@@ -4,11 +4,13 @@ using System.Text;
 
 namespace ThebesCore
 {
+    /// <summary>
+    /// Manages the card deck
+    /// </summary>
     public interface IDeck
     {
         void Discard(ICard card);
         ICard DrawCard();
-        void recycleDeck();
     }
 
     [Serializable]
@@ -114,7 +116,7 @@ namespace ThebesCore
         /// <summary>
         /// Shuffles discarted cards and builds a new deck from them.
         /// </summary>
-        public void recycleDeck()
+        private void recycleDeck()
         {
             if (CardDeck.Count != 0)
             {

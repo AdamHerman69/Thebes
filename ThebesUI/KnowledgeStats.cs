@@ -18,7 +18,7 @@ namespace ThebesUI
             InitializeComponent();
         }
 
-        public void Initialize(List<IDigSiteSimpleView> digSites)
+        public void Initialize(List<IDigSite> digSites)
         {
             // if number of DigSiteKnowledge controls is not digSite.Count
             if (digSites.Count != ((IEnumerable<Control>)Controls).ToList().Where(x => x is DigSiteKnowledge).Count())
@@ -36,7 +36,7 @@ namespace ThebesUI
             }
         }
 
-        public void UpdateInfo(Dictionary<IDigSiteSimpleView, int> specializedKnowledge, Dictionary<IDigSiteSimpleView, int> rumors, Dictionary<IDigSiteSimpleView, bool> permissions)
+        public void UpdateInfo(Dictionary<IDigSite, int> specializedKnowledge, Dictionary<IDigSite, int> rumors, Dictionary<IDigSite, bool> permissions)
         {
             foreach (Control control in Controls)
             {

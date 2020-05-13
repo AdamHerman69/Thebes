@@ -12,9 +12,9 @@ namespace ThebesCore
         ITime Time { get; }
         int Points { get; set; }
 
-        Dictionary<IDigSiteSimpleView, bool> Permissions { get; set; }
-        Dictionary<IDigSiteSimpleView, int> SpecializedKnowledge { get; set; }
-        Dictionary<IDigSiteSimpleView, int> SingleUseKnowledge { get; set; }
+        Dictionary<IDigSite, bool> Permissions { get; set; }
+        Dictionary<IDigSite, int> SpecializedKnowledge { get; set; }
+        Dictionary<IDigSite, int> SingleUseKnowledge { get; set; }
 
         int GeneralKnowledge { get; set; }
         int Shovels { get; set; }
@@ -24,20 +24,21 @@ namespace ThebesCore
         int Cars { get; set; }
         int Zeppelins { get; set; }
         int GetAssistantKnowledge();
-        List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite);
-        void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
+        List<ICard> GetUsableSingleUseCards(IDigSite digSite);
+        void GetDigStats(IDigSite digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus);
         IPlace CurrentPlace { get; set; }
-        Dictionary<IDigSiteSimpleView, List<IToken>> Tokens { get; }
+        Dictionary<IDigSite, List<IToken>> Tokens { get; }
     }
 
     public interface IPlayer : IPlayerData, IComparable<IPlayer>
     {
-        List<IToken> Dig(IDigSiteFullView digSite, int weeks, List<ICard> singleUseCards);
+        List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards);
         void ResetCardChnageInfo();
         void MoveAndTakeCard(ICard card);
         void EndYear();
         void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace);
         bool UseZeppelin();
+        bool UseSpecialPermission(IDigSite digSite);
     }
 
     [Serializable]
@@ -50,9 +51,9 @@ namespace ThebesCore
         Action<IExhibitionCard> executeExhibition;
         public string Name { get; private set; }
         public ITime Time { get; set; }
-        public Dictionary<IDigSiteSimpleView, bool> Permissions { get; set; }
-        public Dictionary<IDigSiteSimpleView, int> SpecializedKnowledge { get; set; }
-        public Dictionary<IDigSiteSimpleView, int> SingleUseKnowledge { get; set; }
+        public Dictionary<IDigSite, bool> Permissions { get; set; }
+        public Dictionary<IDigSite, int> SpecializedKnowledge { get; set; }
+        public Dictionary<IDigSite, int> SingleUseKnowledge { get; set; }
         public int GeneralKnowledge { get; set; }
         public int Zeppelins { get; set; }
 
@@ -64,7 +65,7 @@ namespace ThebesCore
         public int Cars { get; set; }
         public int Points { get; set; }
         public List<ICard> Cards { get; set; }
-        public Dictionary<IDigSiteSimpleView, List<IToken>> Tokens { get; set; }
+        public Dictionary<IDigSite, List<IToken>> Tokens { get; set; }
         public IPlace CurrentPlace { get; set; }
 
         private int CardChangeCost { get; set; }
@@ -77,7 +78,7 @@ namespace ThebesCore
 
             // permissions
             str += "PERMISSIONS: ";
-            foreach (KeyValuePair<IDigSiteSimpleView, bool> kvp in Permissions)
+            foreach (KeyValuePair<IDigSite, bool> kvp in Permissions)
             {
                 if (kvp.Value)
                 {
@@ -88,7 +89,7 @@ namespace ThebesCore
 
             // knowledge
             str += "KNOWLEDGE: ";
-            foreach (KeyValuePair<IDigSiteSimpleView, int> kvp in SpecializedKnowledge)
+            foreach (KeyValuePair<IDigSite, int> kvp in SpecializedKnowledge)
             {
                 str += $"{kvp.Key} {kvp.Value}({SingleUseKnowledge[kvp.Key]}) ";
             }
@@ -98,7 +99,7 @@ namespace ThebesCore
 
             // tokens
             str += "TOKENS: \n";
-            foreach (KeyValuePair<IDigSiteSimpleView, List<IToken>> kvp in Tokens)
+            foreach (KeyValuePair<IDigSite, List<IToken>> kvp in Tokens)
             {
                 if (kvp.Value.Count > 0)
                 {
@@ -115,7 +116,7 @@ namespace ThebesCore
         }
 
         public Player() { }
-        public Player(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
+        public Player(string name, List<IDigSite> digSites, IPlace startingPlace, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
         {
             this.Name = name;
             this.CurrentPlace = startingPlace;
@@ -127,37 +128,37 @@ namespace ThebesCore
             this.executeExhibition = executeExhibition;
 
             Cards = new List<ICard>();
-            Tokens = new Dictionary<IDigSiteSimpleView, List<IToken>>();
-            Permissions = new Dictionary<IDigSiteSimpleView, bool>();
-            SpecializedKnowledge = new Dictionary<IDigSiteSimpleView, int>();
-            SingleUseKnowledge = new Dictionary<IDigSiteSimpleView, int>();
+            Tokens = new Dictionary<IDigSite, List<IToken>>();
+            Permissions = new Dictionary<IDigSite, bool>();
+            SpecializedKnowledge = new Dictionary<IDigSite, int>();
+            SingleUseKnowledge = new Dictionary<IDigSite, int>();
 
             this.Time = new Time(playersOnWeek, ResetPermissions);
 
             // add all valid permissions
-            Permissions = new Dictionary<IDigSiteSimpleView, bool>();
-            foreach (IDigSiteSimpleView digSite in digSites)
+            Permissions = new Dictionary<IDigSite, bool>();
+            foreach (IDigSite digSite in digSites)
             {
                 Permissions.Add(digSite, true);
             }
 
             // add specialized knowledge values (each player starts with 0)
-            SpecializedKnowledge = new Dictionary<IDigSiteSimpleView, int>();
-            foreach (IDigSiteSimpleView digSite in digSites)
+            SpecializedKnowledge = new Dictionary<IDigSite, int>();
+            foreach (IDigSite digSite in digSites)
             {
                 SpecializedKnowledge.Add(digSite, 0);
             }
 
             // add single use knowledge values (each player starts with 0)
-            SingleUseKnowledge = new Dictionary<IDigSiteSimpleView, int>();
-            foreach (IDigSiteSimpleView digSite in digSites)
+            SingleUseKnowledge = new Dictionary<IDigSite, int>();
+            foreach (IDigSite digSite in digSites)
             {
                 SingleUseKnowledge.Add(digSite, 0);
             }
 
             // create token bags for each dig site
-            Tokens = new Dictionary<IDigSiteSimpleView, List<IToken>>();
-            foreach (IDigSiteSimpleView digSite in digSites)
+            Tokens = new Dictionary<IDigSite, List<IToken>>();
+            foreach (IDigSite digSite in digSites)
             {
                 Tokens.Add(digSite, new List<IToken>());
             }
@@ -172,6 +173,10 @@ namespace ThebesCore
             return Time.CompareTo(other.Time);
         }
 
+        /// <summary>
+        /// Computes knowledge gained from assistants
+        /// </summary>
+        /// <returns>amount of knowledge from assistants</returns>
         public int GetAssistantKnowledge()
         {
             if (Assistants >= 3)
@@ -188,6 +193,10 @@ namespace ThebesCore
             }
         }
 
+        /// <summary>
+        /// Computes token bonus from shovels
+        /// </summary>
+        /// <returns>token bonus</returns>
         public int GetShovelBonus()
         {
             if (Shovels >= 3)
@@ -204,7 +213,14 @@ namespace ThebesCore
             }
         }
 
-        private void AddSingleUseCardsStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, ref int knowledge, ref int tokenBonus)
+        /// <summary>
+        /// Returns knowledge and token bonus from a list of single-use cards.
+        /// </summary>
+        /// <param name="digSite">dig site to dig at</param>
+        /// <param name="singleUseCards">list of cards to use</param>
+        /// <param name="knowledge">knowledge gained</param>
+        /// <param name="tokenBonus">tokens gained</param>
+        private void AddSingleUseCardsStats(IDigSite digSite, List<ICard> singleUseCards, ref int knowledge, ref int tokenBonus)
         {
             if (singleUseCards == null)
             {
@@ -230,7 +246,14 @@ namespace ThebesCore
             return;
         }
 
-        public void GetDigStats(IDigSiteSimpleView digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus)
+        /// <summary>
+        /// Computes total knowledge and token bonus for this player at given digsite.
+        /// </summary>
+        /// <param name="digSite">dig site to dig at</param>
+        /// <param name="singleUseCards">single-use cards to use</param>
+        /// <param name="knowledge">total knowledge</param>
+        /// <param name="tokenBonus">token bonus</param>
+        public void GetDigStats(IDigSite digSite, List<ICard> singleUseCards, out int knowledge, out int tokenBonus)
         {
             knowledge = 0;
             tokenBonus = 0;
@@ -265,7 +288,7 @@ namespace ThebesCore
         /// </summary>
         /// <param name="digSite">digsite to renew permission at</param>
         /// <returns>false if player doesnt have any special permission card or if he already has permission for the digsite</returns>
-        public bool UseSpecialPermission(IDigSiteSimpleView digSite)
+        public bool UseSpecialPermission(IDigSite digSite)
         {
             if (SpecialPermissions > 0 && !Permissions[digSite])
             {
@@ -317,6 +340,9 @@ namespace ThebesCore
             card.UpdateStats(this);
         }
 
+        /// <summary>
+        /// Is used to update player's stats, whenever he uses a single-use card
+        /// </summary>
         private void UpdateStats()
         {
             // zero all necessary fields 
@@ -331,7 +357,12 @@ namespace ThebesCore
             }
         }
 
-        public List<ICard> GetUsableSingleUseCards(IDigSiteSimpleView digSite)
+        /// <summary>
+        /// Gets single-use cards usable at given dig site
+        /// </summary>
+        /// <param name="digSite"></param>
+        /// <returns>List of usable single-use cards</returns>
+        public List<ICard> GetUsableSingleUseCards(IDigSite digSite)
         {
             List<ICard> singleUseCards = new List<ICard>();
             foreach (ICard card in Cards)
@@ -353,7 +384,7 @@ namespace ThebesCore
         /// <param name="digSite">Where to dig</param>
         /// <param name="weeks">How long to dig</param>
         /// <param name="singleUseCards">Single use cards to use. NOT WORKING ATM</param>
-        public List<IToken> Dig(IDigSiteFullView digSite, int weeks, List<ICard> singleUseCards)
+        public List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards)
         {
             // TODO different dialog for invalid permission and no specialized knowledge
             if (Time.RemainingWeeks() < weeks + GameSettings.GetDistance(CurrentPlace, digSite))
@@ -448,8 +479,6 @@ namespace ThebesCore
                 return;
             }
 
-
-
             MoveTo(cardChangePlace);
             Time.SpendWeeks(CardChangeCost);
             LastRoundChange = true;
@@ -458,6 +487,9 @@ namespace ThebesCore
             changeDisplayCards();
         }
 
+        /// <summary>
+        /// Called when there has been an action after changing displayed cards so that player doesn't spend bigger price next time (see game rules)
+        /// </summary>
         public void ResetCardChnageInfo()
         {
             CardChangeCost = CardDisplay.timeToChangeCards;
@@ -476,236 +508,6 @@ namespace ThebesCore
         }
     }
 
-    public interface IConsolePlayer : IPlayer
-    {
-        void TakeActionWrapper(List<ICard> availableCards, List<IExhibitionCard> availableExhibitions);
-    }
-
-    [Serializable]
-    public class ConsolePlayer : Player
-    {
-        public List<IPlace> Places { get; set; }
-        public ConsolePlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
-        {
-            Places = places;
-        }
-
-        public void TakeActionWrapper(List<ICard> availableCards, List<IExhibitionCard> availableExhibitions)
-        {
-            LastRoundChange = false;
-            TakeAction(availableCards, availableExhibitions);
-            if (!LastRoundChange)
-            {
-                ResetCardChnageInfo();
-            }
-        }
-
-        protected void TakeAction(List<ICard> availableCards, List<IExhibitionCard> availableExhibitions)
-        {
-            string[] command = Console.ReadLine().Split();
-            IPlace place;
-            int cardNumber;
-            switch (command[0])
-            {
-                case "help":
-                    string helpstring =
-                        @"Commands:
-                        help: displays this help
-                        card [index]: take specified card
-                        exhibition [index]: execute specified exhibition
-                        changecards [cardChangePlace]: travel to specified card change place and cange display cards
-                        endyear: wait till the year ends
-                        usezeppelin: use zeppelin for the next travel
-                        usepermission [DigSite]: use special permission card for given digsite
-                        dig [DigSite] [weeks]: dig at [DigSite] for [weeks]
-
-                        all commands include the travel required, use 1-based indexing and full dig site names with capitalized first letter
-                        ";
-                    Console.Write(helpstring);
-                    break;
-
-                case "card":
-                    if (command.Length != 2)
-                    {
-                        Console.WriteLine("invalid command format: card [Index]");
-                        break;
-                    }
-                    if (!int.TryParse(command[1], out cardNumber))
-                    {
-                        Console.WriteLine("[Index] is not an integer");
-                        break;
-                    }
-                    if (cardNumber < 1 || cardNumber > availableCards.Count)
-                    {
-                        Console.WriteLine("[Index] is out of bounds");
-                        break;
-                    }
-
-
-                    MoveAndTakeCard(availableCards[cardNumber - 1]);
-                    break;
-
-                case "exhibition":
-                    if (command.Length != 2)
-                    {
-                        Console.WriteLine("invalid command format: exhibition [Index]");
-                        break;
-                    }
-                    if (!int.TryParse(command[1], out cardNumber))
-                    {
-                        Console.WriteLine("[Index] is not an integer");
-                        break;
-                    }
-                    if (cardNumber < 1 || cardNumber > availableExhibitions.Count)
-                    {
-                        Console.WriteLine("[Index] is out of bounds");
-                        break;
-                    }
-
-                    MoveAndTakeCard(availableExhibitions[cardNumber - 1]);
-                    break;
-
-                case "changecards":
-                    if (command.Length != 2)
-                    {
-                        Console.WriteLine("invalid command format: changecards [cardChangePlace]");
-                        break;
-                    }
-                    if ((place = GameSettings.getPlaceByName(command[1])) == null)
-                    {
-                        Console.WriteLine("place with that name doesn't exist");
-                        break;
-                    }
-                    if (!(place is ICardChangePlace))
-                    {
-                        Console.WriteLine("you can't change cards at " + place);
-                        break;
-                    }
-
-                    MoveAndChangeDisplayCards((ICardChangePlace)place);
-                    break;
-
-                case "endyear":
-                    EndYear();
-                    break;
-
-                case "usezeppelin":
-                    if (!UseZeppelin())
-                    {
-                        Console.WriteLine("you don't have any zeppelins");
-                    }
-                    break;
-
-                case "usepermission":
-                    if (command.Length != 2)
-                    {
-                        Console.WriteLine("invalid command format: usepermission [digSite]");
-                        break;
-                    }
-                    if ((place = GameSettings.getPlaceByName(command[1])) == null)
-                    {
-                        Console.WriteLine("place with that name doesn't exist");
-                        break;
-                    }
-                    if (!(place is IDigSiteSimpleView))
-                    {
-                        Console.WriteLine(place + "is not a digsite");
-                        break;
-                    }
-                    if (Permissions[(IDigSiteSimpleView)place])
-                    {
-                        Console.WriteLine("you already have that permission");
-                        break;
-                    }
-                    if (!UseSpecialPermission((IDigSiteSimpleView)place))
-                    {
-                        Console.WriteLine("You don't have any special permission card");
-                        break;
-                    }
-                    break;
-
-                case "dig":
-                    if (command.Length != 3)
-                    {
-                        Console.WriteLine("invalid command format: usepermission [digSite]");
-                        break;
-                    }
-                    if ((place = GameSettings.getPlaceByName(command[1])) == null)
-                    {
-                        Console.WriteLine("place with that name doesn't exist");
-                        break;
-                    }
-                    if (!(place is IDigSiteFullView))
-                    {
-                        Console.WriteLine(place + "is not a digsite");
-                        break;
-                    }
-                    int weeks;
-                    if (!int.TryParse(command[2], out weeks))
-                    {
-                        Console.WriteLine("[weeks] is not an integer");
-                        break;
-                    }
-                    List<ICard> singleUsedCards = GetUsableSingleUseCards((IDigSiteSimpleView)place);
-                    List<ICard> cardsToUse = new List<ICard>();
-                    if (singleUsedCards.Count > 0)
-                    {
-                        bool validResponse = false;
-                        while (!validResponse)
-                        {
-                            Console.WriteLine("You have these single use cards available. Which do you want to use? (indexes separated by space or 'none')");
-                            foreach (ICard card in singleUsedCards)
-                            {
-                                Console.WriteLine(card);
-                            }
-
-                            string[] response = Console.ReadLine().Split();
-
-                            if (response.Length == 1 && response[0].Equals("none"))
-                            {
-                                validResponse = true;
-                            }
-                            else
-                            {
-                                validResponse = true;
-                                int cardIndex;
-                                foreach (string cardIndexString in response)
-                                {
-                                    if (int.TryParse(cardIndexString, out cardIndex) && cardIndex > 0 && cardIndex <= singleUsedCards.Count)
-                                    {
-                                        cardsToUse.Add(singleUsedCards[cardIndex]);
-                                    }
-                                    else
-                                    {
-                                        cardsToUse.Clear();
-                                        validResponse = false;
-                                        Console.WriteLine("Invalid response! Try again.");
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    List<IToken> dugTokens;
-                    if ((dugTokens = Dig((IDigSiteFullView)place, weeks, cardsToUse)) != null)
-                    {
-                        Console.WriteLine("Congratulations! You dug these tokens:");
-                        foreach (Token token in dugTokens)
-                        {
-                            Console.WriteLine(token);
-                        }
-                    }
-                    Console.WriteLine("\nenter something to continue");
-                    Console.ReadLine();
-                    break;
-
-                default:
-                    Console.WriteLine("Unknown command, type 'help' to display options");
-                    break;
-            }
-        }
-    }
-
     public interface IAI
     {
         IAction TakeAction(IGame gameState);
@@ -714,20 +516,5 @@ namespace ThebesCore
     public interface IAIPlayer : IPlayer
     {
         IAI AI { get; }
-    }
-
-    [Serializable]
-    public class AIPlayer : Player, IAIPlayer
-    {
-        public IAI AI { get; private set; }
-
-        public AIPlayer(string name, List<IDigSiteSimpleView> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
-        {
-        }
-
-        public void Init(IAI ai)
-        {
-            this.AI = ai;
-        }
     }
 }

@@ -7,12 +7,35 @@ using System.Threading.Tasks;
 using ThebesCore;
 using Newtonsoft.Json;
 using System.IO;
+using System.Windows.Forms;
 
 namespace ThebesUI
 {
     public static class UIConfig
     {
         public const string IMG_FOLDER = @"C:\Users\admhe\source\repos\Thebes\img\";
+        public static void ReplaceImage(PictureBox pb, Image newImg)
+        {
+            if ( pb.Image != null)
+            {
+                pb.Image.Dispose();
+            }
+            pb.Image = newImg;
+        }
+
+        public static void RemoveImage(PictureBox pb)
+        {
+            if (pb.Image != null)
+            {
+                pb.Image.Dispose();
+            }
+            pb.Image = null;
+        }
+
+        public static void ErrorDialog(string message)
+        {
+            MessageBox.Show(message);
+        }
     }
 
     public struct Rectangle

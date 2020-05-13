@@ -22,6 +22,10 @@ namespace ThebesCore
             this.Id = id;
         }
 
+        /// <summary>
+        /// Updates the player data with the effect of the item
+        /// </summary>
+        /// <param name="player"></param>
         public abstract void UpdateStats(IPlayer player);
         public abstract override string ToString();
     }
@@ -59,7 +63,7 @@ namespace ThebesCore
 
     public interface ISpecializedKnowledgeCard : ICard
     {
-        IDigSiteSimpleView digSite { get; }
+        IDigSite digSite { get; }
         int KnowledgeAmount { get; }
     }
 
@@ -67,9 +71,9 @@ namespace ThebesCore
     public class SpecializedKnowledgeCard : Card, ISpecializedKnowledgeCard
     {
         public int KnowledgeAmount { get; set; }
-        public IDigSiteSimpleView digSite { get; set; }
+        public IDigSite digSite { get; set; }
 
-        public SpecializedKnowledgeCard(string id, IUniversity place, int weeks, int knowledgeAmount, IDigSiteSimpleView digSite) : base(id, place, weeks)
+        public SpecializedKnowledgeCard(string id, IUniversity place, int weeks, int knowledgeAmount, IDigSite digSite) : base(id, place, weeks)
         {
             this.KnowledgeAmount = knowledgeAmount;
             this.digSite = digSite;
@@ -114,7 +118,7 @@ namespace ThebesCore
 
     public interface IRumorsCard : ICard
     {
-        IDigSiteSimpleView digSite { get; set; }
+        IDigSite digSite { get; set; }
         int KnowledgeAmount { get; set; }
     }
 
@@ -122,9 +126,9 @@ namespace ThebesCore
     public class RumorsCard : Card, IRumorsCard
     {
         public int KnowledgeAmount { get; set; }
-        public IDigSiteSimpleView digSite { get; set; }
+        public IDigSite digSite { get; set; }
 
-        public RumorsCard(string id, IUniversity place, int weeks, int knowledgeAmount, IDigSiteSimpleView digSite) : base(id, place, weeks)
+        public RumorsCard(string id, IUniversity place, int weeks, int knowledgeAmount, IDigSite digSite) : base(id, place, weeks)
         {
             this.KnowledgeAmount = knowledgeAmount;
             this.digSite = digSite;
@@ -251,7 +255,10 @@ namespace ThebesCore
         public override void UpdateStats(IPlayer player)
         {
             player.Congresses++;
-            // TODO add points
+            if (player.Congresses <= 7)
+            {
+                player.Points += player.Congresses;
+            }
         }
 
         public override string ToString()
@@ -262,9 +269,9 @@ namespace ThebesCore
 
     public interface IExhibitionCard : ICard
     {
-        List<IDigSiteSimpleView> ArtifactsRequired { get; }
+        List<IDigSite> ArtifactsRequired { get; }
 
-        bool CheckRequiredArtifacts(Dictionary<IDigSiteSimpleView, List<IToken>> tokensObtained);
+        bool CheckRequiredArtifacts(Dictionary<IDigSite, List<IToken>> tokensObtained);
         bool IsSmallExhibition();
         int Points { get; }
     }
@@ -273,9 +280,9 @@ namespace ThebesCore
     public class ExhibitionCard : Card, IExhibitionCard
     {
         public int Points { get; private set; }
-        public List<IDigSiteSimpleView> ArtifactsRequired { get; private set; }
+        public List<IDigSite> ArtifactsRequired { get; private set; }
 
-        public ExhibitionCard(string id, IUniversity place, int weeks, int points, List<IDigSiteSimpleView> artifactsRequired) : base(id, place, weeks)
+        public ExhibitionCard(string id, IUniversity place, int weeks, int points, List<IDigSite> artifactsRequired) : base(id, place, weeks)
         {
             this.Points = points;
             this.ArtifactsRequired = artifactsRequired;
@@ -291,9 +298,9 @@ namespace ThebesCore
             return Points < 5;
         }
 
-        public bool CheckRequiredArtifacts(Dictionary<IDigSiteSimpleView, List<IToken>> tokensObtained)
+        public bool CheckRequiredArtifacts(Dictionary<IDigSite, List<IToken>> tokensObtained)
         {
-            foreach (IDigSiteSimpleView requirement in ArtifactsRequired)
+            foreach (IDigSite requirement in ArtifactsRequired)
             {
                 if (ArtifactsRequired.Where(x => x == requirement).Count() > tokensObtained[requirement].Where(y => y is IArtifactToken).Count())
                 {
@@ -306,7 +313,7 @@ namespace ThebesCore
         public override string ToString()
         {
             string str = $"Exhibition +{Points} at {Place} for {Weeks} requiring: ";
-            foreach (IDigSiteSimpleView digSite in ArtifactsRequired)
+            foreach (IDigSite digSite in ArtifactsRequired)
             {
                 str += $"{digSite.Name}, ";
 
@@ -329,13 +336,13 @@ namespace ThebesCore
 
     public interface IToken : IItem
     {
-        IDigSiteSimpleView DigSite { get; }
+        IDigSite DigSite { get; }
     }
 
     public interface ISpecializedKnowledgeToken : IToken
     {
         int KnowledgeAmount { get; }
-        IDigSiteSimpleView KnowledgeDigSite { get; }
+        IDigSite KnowledgeDigSite { get; }
     }
 
     public interface IGeneralKnowledgeToken : IToken
@@ -353,9 +360,9 @@ namespace ThebesCore
     [Serializable]
     public abstract class Token : Item, IToken
     {
-        public IDigSiteSimpleView DigSite { get; private set; }
+        public IDigSite DigSite { get; private set; }
 
-        public Token(string id, IDigSiteSimpleView digSite) : base(id)
+        public Token(string id, IDigSite digSite) : base(id)
         {
             this.DigSite = digSite;
         }
@@ -365,9 +372,9 @@ namespace ThebesCore
     public class SpecializedKnowledgeToken : Token, ISpecializedKnowledgeToken
     {
         public int KnowledgeAmount { get; set; }
-        public IDigSiteSimpleView KnowledgeDigSite { get; set; }
+        public IDigSite KnowledgeDigSite { get; set; }
 
-        public SpecializedKnowledgeToken(string id, IDigSiteSimpleView digSite, int knowledgeAmount, IDigSiteSimpleView knowledgeDigSite) : base(id, digSite)
+        public SpecializedKnowledgeToken(string id, IDigSite digSite, int knowledgeAmount, IDigSite knowledgeDigSite) : base(id, digSite)
         {
             this.KnowledgeAmount = knowledgeAmount;
             this.KnowledgeDigSite = knowledgeDigSite;
@@ -389,7 +396,7 @@ namespace ThebesCore
     {
         public int KnowledgeAmount { get; set; }
 
-        public GeneralKnowledgeToken(string id, IDigSiteSimpleView digSite, int knowledgeAmount) : base(id, digSite)
+        public GeneralKnowledgeToken(string id, IDigSite digSite, int knowledgeAmount) : base(id, digSite)
         {
             this.KnowledgeAmount = knowledgeAmount;
         }
@@ -411,7 +418,7 @@ namespace ThebesCore
         public int Points { get; set; }
         public string Name { get; set; }
 
-        public ArtifactToken(string id, IDigSiteSimpleView digSite, int points, string name) : base(id, digSite)
+        public ArtifactToken(string id, IDigSite digSite, int points, string name) : base(id, digSite)
         {
             this.Points = points;
             this.Name = name;
@@ -435,7 +442,7 @@ namespace ThebesCore
     [Serializable]
     public class DirtToken : Token, IDirtToken
     {
-        public DirtToken(string id, IDigSiteSimpleView digSite) : base(id, digSite) { }
+        public DirtToken(string id, IDigSite digSite) : base(id, digSite) { }
         public override void UpdateStats(IPlayer player)
         {
             // player's stats don't change

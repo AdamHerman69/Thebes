@@ -28,18 +28,14 @@ namespace ThebesCore
         }
     }
 
-    public interface IDigSiteSimpleView : IPlace
+    public interface IDigSite : IPlace
     {
         List<IToken> Tokens { get; }
-    }
-
-    public interface IDigSiteFullView : IDigSiteSimpleView
-    {
         List<IToken> DrawTokens(int tokenAmount);
     }
 
     [Serializable]
-    public class DigSite : Place, IDigSiteFullView
+    public class DigSite : Place, IDigSite
     {
         public List<IToken> Tokens { get; set; }
         private static Random random = new Random();
@@ -49,6 +45,11 @@ namespace ThebesCore
             Tokens = new List<IToken>();
         }
 
+        /// <summary>
+        /// Randomly draws the requested amount of tokens. Keeping just the dirt.
+        /// </summary>
+        /// <param name="tokenAmount"></param>
+        /// <returns>List of drawn tokens</returns>
         public List<IToken> DrawTokens(int tokenAmount)
         {
             List<IToken> tokensDrawn = new List<IToken>();

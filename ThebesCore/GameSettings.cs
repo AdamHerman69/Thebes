@@ -4,9 +4,13 @@ using System.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
 
 namespace ThebesCore
 {
+    /// <summary>
+    /// Holds the information about the current version of the game played.
+    /// </summary>
     public static class GameSettings
     {
         public static List<IPlace> Places { get; private set; }
@@ -15,11 +19,23 @@ namespace ThebesCore
         public static Dictionary<int, Dictionary<int, int>> TimeWheel { get; private set; }
         public static List<ICard> Cards { get; private set; }
 
+        /// <summary>
+        /// Gets the distnce between two places.
+        /// </summary>
+        /// <param name="from">origin</param>
+        /// <param name="to">destination</param>
+        /// <returns>distance in weeks</returns>
         public static int GetDistance(IPlace from, IPlace to)
         {
             return Distances[from.Index, to.Index];
         }
 
+        /// <summary>
+        /// Returns the amout of tokens drawn for given knowledge and time 
+        /// </summary>
+        /// <param name="knowledge">knowledge amount</param>
+        /// <param name="weeks">time to spend in weeks</param>
+        /// <returns></returns>
         public static int DugTokenCount(int knowledge, int weeks)
         {
             if (weeks > 12) throw new InvalidOperationException("You can't dig for more than 12 weeks");
@@ -33,6 +49,12 @@ namespace ThebesCore
             }
             return TimeWheel[knowledge][weeks];
         }
+
+        /// <summary>
+        /// Returns a place with given name
+        /// </summary>
+        /// <param name="placeName"></param>
+        /// <returns>Place object</returns>
         public static IPlace getPlaceByName(string placeName)
         {
             foreach (IPlace place in Places)
@@ -45,6 +67,10 @@ namespace ThebesCore
             return null;
         }
 
+        /// <summary>
+        /// Loads all data from a .thc file. The format is specified in the documentation
+        /// </summary>
+        /// <param name="path"></param>
         public static void LoadFromFile(string path)
         {
             Places = new List<IPlace>();
@@ -103,10 +129,10 @@ namespace ThebesCore
             if (!line[0].Equals("DISTRIBUTIONS")) throw new FormatException("invalid config file format");
 
             line = lines.Dequeue();
-            for (int i = 0; i < Places.Where(x => x is IDigSiteSimpleView).Count(); i++)
+            for (int i = 0; i < Places.Where(x => x is IDigSite).Count(); i++)
             {
                 if (!line[0].Equals("TOKENS")) throw new FormatException("invalid config file format");
-                IDigSiteSimpleView digSite = (IDigSiteSimpleView)getPlaceByName(line[1]);
+                IDigSite digSite = (IDigSite)getPlaceByName(line[1]);
 
                 while (lines.Count > 0 && !(line = lines.Dequeue())[0].Equals("TOKENS") && !line[0].Equals("DISTANCEMATRIX"))
                 {
@@ -117,7 +143,7 @@ namespace ThebesCore
                             break;
 
                         case "specializedKnowledge":
-                            digSite.Tokens.Add(new SpecializedKnowledgeToken(itemID++.ToString("0000"), digSite, int.Parse(line[1]), (IDigSiteSimpleView)getPlaceByName(line[2])));
+                            digSite.Tokens.Add(new SpecializedKnowledgeToken(itemID++.ToString("0000"), digSite, int.Parse(line[1]), (IDigSite)getPlaceByName(line[2])));
                             break;
 
                         case "generalKnowledge":
@@ -164,7 +190,7 @@ namespace ThebesCore
                 switch (line[0])
                 {
                     case "specializedKnowledge":
-                        Cards.Add(new SpecializedKnowledgeCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2]), int.Parse(line[3]), (IDigSiteSimpleView)getPlaceByName(line[4])));
+                        Cards.Add(new SpecializedKnowledgeCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2]), int.Parse(line[3]), (IDigSite)getPlaceByName(line[4])));
                         break;
 
                     case "generalKnowledge":
@@ -172,7 +198,7 @@ namespace ThebesCore
                         break;
 
                     case "rumors":
-                        Cards.Add(new RumorsCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2]), int.Parse(line[3]), (IDigSiteSimpleView)getPlaceByName(line[4])));
+                        Cards.Add(new RumorsCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2]), int.Parse(line[3]), (IDigSite)getPlaceByName(line[4])));
                         break;
 
                     case "zeppelin":
@@ -195,11 +221,15 @@ namespace ThebesCore
                         Cards.Add(new SpecialPermissionCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2])));
                         break;
 
+                    case "congress":
+                        Cards.Add(new CongressCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2])));
+                        break;
+
                     case "exhibition":
-                        List<IDigSiteSimpleView> artifactsRequired = new List<IDigSiteSimpleView>();
+                        List<IDigSite> artifactsRequired = new List<IDigSite>();
                         for (int i = 4; i < line.Length; i++)
                         {
-                            artifactsRequired.Add((IDigSiteSimpleView)getPlaceByName(line[i]));
+                            artifactsRequired.Add((IDigSite)getPlaceByName(line[i]));
                         }
                         Cards.Add(new ExhibitionCard(itemID++.ToString("0000"), (IUniversity)getPlaceByName(line[1]), int.Parse(line[2]), int.Parse(line[3]), artifactsRequired));
                         break;
@@ -226,11 +256,19 @@ namespace ThebesCore
             }
         }
 
+        /// <summary>
+        /// Saves all the current data to a .thc file
+        /// </summary>
+        /// <param name="path"></param>
         public static void SaveToFile(string path)
         {
             File.WriteAllText(path, getSettingsString());
         }
 
+        /// <summary>
+        /// Returns all current setting in a string with a .thc format
+        /// </summary>
+        /// <returns>.thc string</returns>
         private static string getSettingsString()
         {
             string str = "UNIVERSITIES\n";
@@ -246,7 +284,7 @@ namespace ThebesCore
             str += "\nDIGSITES\n";
             foreach (IPlace place in Places)
             {
-                if (place is IDigSiteSimpleView)
+                if (place is IDigSite)
                 {
                     str += place.Name + "\n";
                 }
@@ -267,10 +305,10 @@ namespace ThebesCore
 
             foreach (IPlace place in Places)
             {
-                if (place is IDigSiteSimpleView)
+                if (place is IDigSite)
                 {
                     str += $"\nTOKENS {place.Name}\n";
-                    foreach (IToken token in ((IDigSiteSimpleView)place).Tokens)
+                    foreach (IToken token in ((IDigSite)place).Tokens)
                     {
                         if (token is IDirtToken)
                         {
@@ -349,10 +387,15 @@ namespace ThebesCore
                 str += $"specialPermission {card.Place} {card.Weeks}\n";
             }
 
+            foreach (ICongressCard card in Cards.Where(x => x is ICongressCard))
+            {
+                str += $"congress {card.Place} {card.Weeks}\n";
+            }
+
             foreach (IExhibitionCard card in Cards.Where(x => x is IExhibitionCard))
             {
                 str += $"exhibition {card.Place} {card.Weeks} {card.Points} ";
-                foreach (IDigSiteSimpleView digSite in card.ArtifactsRequired)
+                foreach (IDigSite digSite in card.ArtifactsRequired)
                 {
                     str += digSite.Name + " ";
                 }
@@ -375,6 +418,10 @@ namespace ThebesCore
             return str;
         }
 
+        /// <summary>
+        /// Loads data from GameSettingsSerializable object
+        /// </summary>
+        /// <param name="data">data to load</param>
         public static void LoadSerializedData(GameSettingsSerializable data)
         {
             Places = data.Places;
@@ -384,10 +431,13 @@ namespace ThebesCore
             Cards = data.Cards;
         }
 
-        public static void Initialize() // temporary, will be replaced with json config file
+        /// <summary>
+        /// Legacy function initializing the game with standart Thebes rules
+        /// </summary>
+        public static void Initialize()
         {
             throw new Exception();
-            List<IToken> CreateTokenList(IDigSiteSimpleView digSite, int one, int two, int three, int four, int five, int six, int seven, IDigSiteSimpleView knowledgeDigSite)
+            List<IToken> CreateTokenList(IDigSite digSite, int one, int two, int three, int four, int five, int six, int seven, IDigSite knowledgeDigSite)
             {
                 List<IToken> tokenList = new List<IToken>();
 
@@ -863,45 +913,45 @@ namespace ThebesCore
             // EXHIBITIONS
             // small
 
-            Cards.Add(new ExhibitionCard("TODO", london, 3, 4, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", london, 3, 4, new List<IDigSite>{
                 greece, egypt, egypt
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", moscow, 3, 4, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", moscow, 3, 4, new List<IDigSite>{
                 mesopotamia, crete, crete
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", vienna, 3, 4, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", vienna, 3, 4, new List<IDigSite>{
                 egypt, palestine, palestine
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", paris, 3, 4, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", paris, 3, 4, new List<IDigSite>{
                 palestine, mesopotamia, mesopotamia
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", berlin, 3, 4, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", berlin, 3, 4, new List<IDigSite>{
                 crete, greece, greece
             }));
 
             // large
 
-            Cards.Add(new ExhibitionCard("TODO", berlin, 4, 5, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", berlin, 4, 5, new List<IDigSite>{
                 palestine, mesopotamia, mesopotamia, crete, crete, crete
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", paris, 4, 5, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", paris, 4, 5, new List<IDigSite>{
                 greece, egypt, egypt, palestine, palestine, palestine
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", london, 4, 5, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", london, 4, 5, new List<IDigSite>{
                 crete, greece, greece, egypt, egypt, egypt
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", vienna, 4, 5, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", vienna, 4, 5, new List<IDigSite>{
                 mesopotamia, crete, crete, greece, greece, greece
             }));
 
-            Cards.Add(new ExhibitionCard("TODO", moscow, 4, 5, new List<IDigSiteSimpleView>{
+            Cards.Add(new ExhibitionCard("TODO", moscow, 4, 5, new List<IDigSite>{
                 egypt, palestine, palestine, mesopotamia, mesopotamia, mesopotamia
             }));
 
@@ -1037,6 +1087,9 @@ namespace ThebesCore
         }
     }
 
+    /// <summary>
+    /// Used to serialize the current settings, holds same data as <see cref="GameSettings"/>
+    /// </summary>
     [Serializable]
     public class GameSettingsSerializable
     {

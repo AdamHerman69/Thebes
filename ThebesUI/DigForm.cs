@@ -13,7 +13,7 @@ namespace ThebesUI
 {
     public partial class DigForm : Form
     {
-        IDigSiteFullView digSite;
+        IDigSite digSite;
         IPlayer player;
         int weeksToDig;
         int tokenBonus;
@@ -22,13 +22,13 @@ namespace ThebesUI
         List<ICard> singleUseCards;
         Action<IAction> executeAction;
 
-        public DigForm(IDigSiteFullView digSite, IPlayer player, Action<IAction> executeAction)
+        public DigForm(IDigSite digSite, IPlayer player, Action<IAction> executeAction)
         {
             InitializeComponent();
             Initialize(digSite, player, executeAction);
         }
 
-        public void Initialize(IDigSiteFullView digSite, IPlayer player, Action<IAction> executeAction)
+        public void Initialize(IDigSite digSite, IPlayer player, Action<IAction> executeAction)
         {
             this.digSite = digSite;
             this.player = player;
@@ -98,6 +98,17 @@ namespace ThebesUI
 
         private void bDigButton_Click(object sender, EventArgs e)
         {
+            if (!player.Permissions[digSite] && player.SpecialPermissions > 0)
+            {
+                var usePermission = MessageBox.Show("Do you want to use your special permission?",
+                                     "Use special permission?",
+                                     MessageBoxButtons.YesNo);
+                if (usePermission == DialogResult.Yes)
+                {
+                    player.UseSpecialPermission(digSite);
+                }
+            }
+
             List<IToken> tokens = new List<IToken>();
             executeAction(new DigAction(digSite, weeksToDig, singleUseCards, tokens));
             if (tokens.Count != 0)

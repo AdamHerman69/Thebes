@@ -177,7 +177,7 @@ namespace ThebesUI
             // display cards
             for (int i = 0; i < displayCards.Length; i++)
             {
-                displayCards[i].Image = GetImage(game.DisplayedCards[i]);
+                UIConfig.ReplaceImage(displayCards[i], GetImage(game.DisplayedCards[i]));
             }
 
             // exhibitions
@@ -185,11 +185,11 @@ namespace ThebesUI
             {
                 if (game.DisplayedExhibitions[i] != null)
                 {
-                    exhibitions[i].Image = GetImage(game.DisplayedExhibitions[i]);
+                    UIConfig.ReplaceImage(exhibitions[i], GetImage(game.DisplayedExhibitions[i]));
                 }
                 else
                 {
-                    exhibitions[i].Image = null;
+                    UIConfig.RemoveImage(exhibitions[i]);
                 }
             }
 
@@ -254,9 +254,9 @@ namespace ThebesUI
             ExecuteAction(new ChangeCardsAction(place));
         }
 
-        private void OpenDigForm(IDigSiteSimpleView digSite)
+        private void OpenDigForm(IDigSite digSite)
         {
-            DigForm digForm = new DigForm((IDigSiteFullView)digSite, game.ActivePlayer, ExecuteAction);
+            DigForm digForm = new DigForm(digSite, game.ActivePlayer, ExecuteAction);
             DialogResult result = digForm.ShowDialog();
 
             UpdateBoard();
@@ -270,9 +270,9 @@ namespace ThebesUI
                 if (placeName_rec.Value.IsInside(clickPosition))
                 {
                     IPlace place = GameSettings.getPlaceByName(placeName_rec.Key);
-                    if (place is IDigSiteSimpleView)
+                    if (place is IDigSite)
                     {
-                        OpenDigForm((IDigSiteSimpleView)place);
+                        OpenDigForm((IDigSite)place);
                     }
                     else if (place is ICardChangePlace)
                     {
@@ -280,7 +280,7 @@ namespace ThebesUI
                     }
                     else if (place is IUniversity)
                     {
-                        MessageBox.Show($"uni: {place}");
+                        MessageBox.Show($"Uni: {place}");
                     }
                 }
             }
@@ -297,7 +297,16 @@ namespace ThebesUI
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                GameState.Serialize(game, sfd.FileName);
+                try
+                {
+                    GameState.Serialize(game, sfd.FileName);
+                    MessageBox.Show("Game state successfully saved");
+                }
+                catch (Exception exception)
+                {
+                    UIConfig.ErrorDialog("Error saving the game state:\n" + exception.Message);
+                    return;
+                }   
             }
         }
 
@@ -310,10 +319,7 @@ namespace ThebesUI
             {
                 bSaveGame_Click(null, null);
             }
-            else
-            {
-                this.Close();
-            }
+            this.Close();
         }
 
         public void ExecuteAction(IAction action)

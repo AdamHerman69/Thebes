@@ -8,7 +8,7 @@ using ThebesCore;
 namespace ThebesAI
 {
     
-
+    [Serializable]
     public class TestAI : IAI
     {
         IPlayerData player;
@@ -22,7 +22,7 @@ namespace ThebesAI
         
         public IAction TakeAction(IGame gameState)
         {
-            IDigSiteSimpleView digSite;
+            IDigSite digSite;
             if (player.Time.RemainingWeeks() >= 11 && (digSite = CanIDig()) != null)
             {
                 return new DigAction(digSite, 7, null, null);
@@ -37,9 +37,9 @@ namespace ThebesAI
             
         }
 
-        private IDigSiteSimpleView CanIDig()
+        private IDigSite CanIDig()
         {
-            foreach (KeyValuePair<IDigSiteSimpleView, int> digSite_amount in player.SpecializedKnowledge)
+            foreach (KeyValuePair<IDigSite, int> digSite_amount in player.SpecializedKnowledge)
             {
                 if (digSite_amount.Value > 1 && digSite_amount.Value + player.GeneralKnowledge > 5 && player.Permissions[digSite_amount.Key])
                 {

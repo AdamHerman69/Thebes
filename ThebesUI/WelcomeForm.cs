@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ThebesCore;
 using ThebesAI;
+using System.IO;
 
 namespace ThebesUI
 {
@@ -26,16 +27,8 @@ namespace ThebesUI
             playerInput4.Color = PlayerColor.yellow;
         }
 
-        public static void NotEnoughTimeDialog(string message)
+        private int GetPlayerCount()
         {
-            MessageBox.Show(message);
-        }
-
-        private void bStartNew_Click(object sender, EventArgs e)
-        {
-            GameSettings.LoadFromFile(@"C:\Users\admhe\source\repos\Thebes\ThebesConsole\bin\Debug\thebes_config_auto.txt");
-
-            // get player count
             int playerCount = 0;
             foreach (Control control in newGameBox.Controls)
             {
@@ -44,25 +37,62 @@ namespace ThebesUI
                     playerCount++;
                 }
             }
+            return playerCount;
+        }
+
+        private void bStartNew_Click(object sender, EventArgs e)
+        {
+            int playerCount;
+            if ((playerCount = GetPlayerCount()) < 2 || playerCount > 4)
+            {
+                MessageBox.Show("Unsupported number of players");
+                return;
+            }
+
+            try
+            {
+                GameSettings.LoadFromFile(@"thebes_config.thc");
+            }
+            catch (Exception exception)
+            {
+                if (exception is FileNotFoundException)
+                {
+                    UIConfig.ErrorDialog("File not found error:\n" + exception.Message);
+                }
+                else if (exception is FormatException)
+                {
+                    UIConfig.ErrorDialog("Error processing the config file:\n" + exception.Message);
+                }
+                else
+                {
+                    UIConfig.ErrorDialog("Unknown error reading the config file:\n" + exception.Message);
+                }
+                return;
+            }
+            
+
+
 
 
             UIGame game = new UIGame(playerCount);
 
             // Create Players
             Dictionary<IPlayer, PlayerColor> players = new Dictionary<IPlayer, PlayerColor>();
+            Player player;
+            PlayerInput pi;
             foreach (Control control in newGameBox.Controls)
             {
                 if (control is PlayerInput && ((PlayerInput)control).Selected())
                 {
-                    PlayerInput pi = (PlayerInput)control;
-                    Player player;
+                    pi = (PlayerInput)control;
+                    
                     if (pi.IsHuman())
                     {
                         player = new Player(
                             pi.PlayerName(),
-                            GameSettings.Places.OfType<IDigSiteSimpleView>().ToList(),
+                            GameSettings.Places.OfType<IDigSite>().ToList(),
                             GameSettings.StartingPlace,
-                            NotEnoughTimeDialog,
+                            UIConfig.ErrorDialog,
                             game.AvailableCards.ChangeDisplayedCards,
                             game.AvailableCards.GiveCard,
                             game.Deck.Discard,
@@ -74,10 +104,10 @@ namespace ThebesUI
                     {
                         player = new AIPlayer(
                             pi.PlayerName(),
-                            GameSettings.Places.OfType<IDigSiteSimpleView>().ToList(),
+                            GameSettings.Places.OfType<IDigSite>().ToList(),
                             GameSettings.StartingPlace,
                             GameSettings.Places,
-                            NotEnoughTimeDialog,
+                            UIConfig.ErrorDialog,
                             game.AvailableCards.ChangeDisplayedCards,
                             game.AvailableCards.GiveCard,
                             game.Deck.Discard,
@@ -87,13 +117,19 @@ namespace ThebesUI
                         ((AIPlayer)player).Init(new TestAI(player, game));
                     }
                     
-
-
-
                     players.Add(player, pi.Color);
                 }
             }
-            game.Initialize(players);
+            try
+            {
+                game.Initialize(players);
+            }
+            catch (Exception exception)
+            {
+                UIConfig.ErrorDialog("Error initializing the game:\n" + exception.Message);
+                return;
+            }
+            
 
             this.Hide();
             GameForm gameForm = new GameForm(game);
@@ -113,7 +149,17 @@ namespace ThebesUI
         private void bStartLoaded_Click(object sender, EventArgs e)
         {
             string filePath = tbFilePath.Text;
-            IUIGame game = GameState.Deserialize(filePath);
+
+            IUIGame game;
+            try
+            {
+                game = GameState.Deserialize(filePath);
+            }
+            catch (Exception exception)
+            {
+                UIConfig.ErrorDialog("Error loading the game from file:\n" + exception.Message);
+                return;
+            }
 
             this.Hide();
             GameForm gameForm = new GameForm(game);

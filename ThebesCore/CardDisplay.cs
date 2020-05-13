@@ -4,11 +4,22 @@ using System.Text;
 
 namespace ThebesCore
 {
+    /// <summary>
+    /// Is responsible for drawing the displayed cards from the deck and giving them to players on request.
+    /// </summary>
     public interface ICardDisplay
     {
         ICard[] AvailableCards { get; }
 
+        /// <summary>
+        /// Changes all 4 displayed cards for new ones
+        /// </summary>
         void ChangeDisplayedCards();
+
+        /// <summary>
+        /// Replaces the <paramref name="card"/> with new one.
+        /// </summary>
+        /// <param name="card">Card to replace</param>
         void GiveCard(ICard card);
     }
 
