@@ -88,12 +88,12 @@
             // 
             this.flpPlayerDisplay.Location = new System.Drawing.Point(12, 12);
             this.flpPlayerDisplay.Name = "flpPlayerDisplay";
-            this.flpPlayerDisplay.Size = new System.Drawing.Size(533, 883);
+            this.flpPlayerDisplay.Size = new System.Drawing.Size(533, 940);
             this.flpPlayerDisplay.TabIndex = 51;
             // 
             // GameForm
             // 
-            this.ClientSize = new System.Drawing.Size(1828, 907);
+            this.ClientSize = new System.Drawing.Size(1828, 964);
             this.Controls.Add(this.flpPlayerDisplay);
             this.Controls.Add(this.bEndYear);
             this.Controls.Add(this.pBoard);

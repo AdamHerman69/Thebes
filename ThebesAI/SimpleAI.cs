@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using ThebesCore;
 
 namespace ThebesAI
@@ -22,6 +23,12 @@ namespace ThebesAI
         
         public IAction TakeAction(IGame gameState)
         {
+            IExhibitionCard exhibition;
+            if (player.Time.RemainingWeeks() > 10 && (exhibition = CanIExhibit()) != null)
+            {
+                return new ExecuteExhibitionAction(exhibition);
+            }
+            
             IDigSite digSite;
             if (player.Time.RemainingWeeks() >= 11 && (digSite = CanIDig()) != null)
             {
@@ -49,9 +56,22 @@ namespace ThebesAI
             return null;
         }
 
+        private IExhibitionCard CanIExhibit()
+        {
+            foreach (IExhibitionCard exhibition in game.DisplayedExhibitions)
+            {
+                if (exhibition == null) continue;
+
+                if (exhibition.CheckRequiredArtifacts(player.Tokens))
+                {
+                    return exhibition;
+                }
+            }
+            return null;
+        }
+
         private ICard ChooseCard()
         {
-            ICard card;
             IEnumerable<ICard> cards;
             if ((cards = game.DisplayedCards.Where(c => c.Place == player.CurrentPlace)).Count() > 0)
             {
@@ -65,16 +85,31 @@ namespace ThebesAI
             {
                 return cards.First();
             }
-            return game.DisplayedCards[0];
+            return ClosestCard();
         }
 
         private bool IsDesired(ICard card)
         {
-            if (card is ISpecializedKnowledgeCard && player.SpecializedKnowledge[((ISpecializedKnowledgeCard)card).digSite] > 1)
+            if (card is ISpecializedKnowledgeCard && player.SpecializedKnowledge[((ISpecializedKnowledgeCard)card).digSite] > 1 && player.SpecializedKnowledge[((ISpecializedKnowledgeCard)card).digSite] < 5)
             {
                 return true;
             }
             return false;
+        }
+
+        private ICard ClosestCard()
+        {
+            int shortestDistance = int.MaxValue;
+            ICard closestCard = null;
+            foreach (ICard card in game.DisplayedCards)
+            {
+                if (shortestDistance > GameSettings.GetDistance(player.CurrentPlace, card.Place))
+                {
+                    shortestDistance = GameSettings.GetDistance(player.CurrentPlace, card.Place);
+                    closestCard = card;
+                }
+            }
+            return closestCard;
         }
     }
 
