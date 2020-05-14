@@ -168,6 +168,16 @@ namespace ThebesUI
             this.SuspendLayout();
             SuspendDrawing(this);
 
+            // zeppelin button
+            if (game.ActivePlayer.Zeppelins > 0)
+            {
+                bUseZeppelin.Visible = true;
+            }
+            else
+            {
+                bUseZeppelin.Visible = false;
+            }
+
             // player displays
             foreach (PlayerDisplay playerDisplay in playerDisplays)
             {

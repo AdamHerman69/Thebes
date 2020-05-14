@@ -33,6 +33,7 @@ namespace ThebesUI
             this.digSite = digSite;
             this.player = player;
             this.executeAction = executeAction;
+            this.Text = digSite.Name;
 
             lDigSiteName.Text = digSite.Name;
 

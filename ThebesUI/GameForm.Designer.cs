@@ -58,12 +58,13 @@
             // 
             // bUseZeppelin
             // 
-            this.bUseZeppelin.Location = new System.Drawing.Point(1484, 784);
+            this.bUseZeppelin.Location = new System.Drawing.Point(1347, 784);
             this.bUseZeppelin.Name = "bUseZeppelin";
             this.bUseZeppelin.Size = new System.Drawing.Size(131, 35);
             this.bUseZeppelin.TabIndex = 48;
             this.bUseZeppelin.Text = "Use Zeppelin";
             this.bUseZeppelin.UseVisualStyleBackColor = true;
+            this.bUseZeppelin.Visible = false;
             this.bUseZeppelin.Click += new System.EventHandler(this.bUseZeppelin_Click);
             // 
             // pBoard
@@ -76,7 +77,7 @@
             // 
             // bEndYear
             // 
-            this.bEndYear.Location = new System.Drawing.Point(1347, 784);
+            this.bEndYear.Location = new System.Drawing.Point(1484, 784);
             this.bEndYear.Name = "bEndYear";
             this.bEndYear.Size = new System.Drawing.Size(131, 35);
             this.bEndYear.TabIndex = 50;
@@ -102,7 +103,7 @@
             this.Controls.Add(this.bSaveGame);
             this.DoubleBuffered = true;
             this.Name = "GameForm";
-            this.Text = "GameForm";
+            this.Text = "Thebes";
             this.ResumeLayout(false);
 
         }
