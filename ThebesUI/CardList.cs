@@ -15,8 +15,6 @@ namespace ThebesUI
         List<PictureBox> cards = new List<PictureBox>();
         Action update;
         public List<ICardView> Selected { get; private set; }
-
-        public CardList() { }
         
         public void Initialize(List<ICardView> cards, Action update)
         {
@@ -54,14 +52,16 @@ namespace ThebesUI
         {
             
             ICardView clickedCard = (ICardView)((PictureBox)sender).Tag;
-            if (IsSelected(clickedCard)) // deselect
+            if (IsSelected(clickedCard)) 
             {
+                // deselect
                 Selected.Remove(clickedCard);
                 ((PictureBox)sender).BorderStyle = BorderStyle.None;
                 update();
             }
-            else // select
+            else 
             {
+                // select
                 Selected.Add(clickedCard);
                 ((PictureBox)sender).BorderStyle = BorderStyle.FixedSingle;
                 update();

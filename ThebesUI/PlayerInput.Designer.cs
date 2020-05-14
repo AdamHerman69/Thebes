@@ -33,6 +33,7 @@
             this.tbName = new System.Windows.Forms.TextBox();
             this.rbAI = new System.Windows.Forms.RadioButton();
             this.rbHuman = new System.Windows.Forms.RadioButton();
+            this.cbAI = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // cbSelected
@@ -40,7 +41,7 @@
             this.cbSelected.AutoSize = true;
             this.cbSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.cbSelected.Location = new System.Drawing.Point(8, 6);
-            this.cbSelected.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cbSelected.Margin = new System.Windows.Forms.Padding(2);
             this.cbSelected.Name = "cbSelected";
             this.cbSelected.Size = new System.Drawing.Size(15, 14);
             this.cbSelected.TabIndex = 9;
@@ -55,7 +56,7 @@
             "Blue",
             "Yellow"});
             this.cbColor.Location = new System.Drawing.Point(113, 2);
-            this.cbColor.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cbColor.Margin = new System.Windows.Forms.Padding(2);
             this.cbColor.Name = "cbColor";
             this.cbColor.Size = new System.Drawing.Size(54, 21);
             this.cbColor.TabIndex = 10;
@@ -65,7 +66,7 @@
             this.tbName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F);
             this.tbName.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.tbName.Location = new System.Drawing.Point(26, 2);
-            this.tbName.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tbName.Margin = new System.Windows.Forms.Padding(2);
             this.tbName.MaxLength = 20;
             this.tbName.Name = "tbName";
             this.tbName.Size = new System.Drawing.Size(84, 20);
@@ -76,38 +77,51 @@
             // 
             this.rbAI.AutoSize = true;
             this.rbAI.Location = new System.Drawing.Point(230, 4);
-            this.rbAI.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbAI.Margin = new System.Windows.Forms.Padding(2);
             this.rbAI.Name = "rbAI";
             this.rbAI.Size = new System.Drawing.Size(35, 17);
             this.rbAI.TabIndex = 7;
             this.rbAI.TabStop = true;
             this.rbAI.Text = "AI";
             this.rbAI.UseVisualStyleBackColor = true;
+            this.rbAI.CheckedChanged += new System.EventHandler(this.rbAI_CheckedChanged);
             // 
             // rbHuman
             // 
             this.rbHuman.AutoSize = true;
             this.rbHuman.Location = new System.Drawing.Point(171, 4);
-            this.rbHuman.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbHuman.Margin = new System.Windows.Forms.Padding(2);
             this.rbHuman.Name = "rbHuman";
             this.rbHuman.Size = new System.Drawing.Size(57, 17);
             this.rbHuman.TabIndex = 6;
             this.rbHuman.TabStop = true;
             this.rbHuman.Text = "human";
             this.rbHuman.UseVisualStyleBackColor = true;
+            this.rbHuman.CheckedChanged += new System.EventHandler(this.rbHuman_CheckedChanged);
+            // 
+            // cbAI
+            // 
+            this.cbAI.FormattingEnabled = true;
+            this.cbAI.Location = new System.Drawing.Point(269, 2);
+            this.cbAI.Margin = new System.Windows.Forms.Padding(2);
+            this.cbAI.Name = "cbAI";
+            this.cbAI.Size = new System.Drawing.Size(105, 21);
+            this.cbAI.TabIndex = 11;
+            this.cbAI.Visible = false;
             // 
             // PlayerInput
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbAI);
             this.Controls.Add(this.cbSelected);
             this.Controls.Add(this.cbColor);
             this.Controls.Add(this.tbName);
             this.Controls.Add(this.rbAI);
             this.Controls.Add(this.rbHuman);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "PlayerInput";
-            this.Size = new System.Drawing.Size(280, 25);
+            this.Size = new System.Drawing.Size(378, 25);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -120,5 +134,6 @@
         private System.Windows.Forms.TextBox tbName;
         private System.Windows.Forms.RadioButton rbAI;
         private System.Windows.Forms.RadioButton rbHuman;
+        private System.Windows.Forms.ComboBox cbAI;
     }
 }

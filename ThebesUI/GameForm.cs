@@ -211,7 +211,9 @@ namespace ThebesUI
             }
 
             // year counter
-            yearCounter.Location = layout.YearCounter[(game.ActivePlayer.Time.CurrentYear % 10) - 1].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
+            int index = (game.ActivePlayer.Time.CurrentYear % 10) - 1;
+            if (index > 2) index = 2;
+            yearCounter.Location = layout.YearCounter[index].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
 
             this.ResumeLayout();
             ResumeDrawing(this);

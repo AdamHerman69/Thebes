@@ -10,12 +10,16 @@ using System.Windows.Forms;
 using ThebesCore;
 using ThebesAI;
 using System.IO;
+using System.Reflection;
 
 namespace ThebesUI
 {
     public partial class WelcomeForm : Form
     {
-        OpenFileDialog ofd = new OpenFileDialog() { Filter = "THB|*.thb" };
+        OpenFileDialog ofdThb = new OpenFileDialog() { Filter = "THB|*.thb" };
+        OpenFileDialog ofdDll = new OpenFileDialog() { Filter = "DLL|*.dll" };
+
+        PlayerInput[] playerInputs = new PlayerInput[4];
 
         public WelcomeForm()
         {
@@ -25,6 +29,16 @@ namespace ThebesUI
             playerInput2.Color = PlayerColor.green;
             playerInput3.Color = PlayerColor.blue;
             playerInput4.Color = PlayerColor.yellow;
+
+            playerInputs[0] = playerInput1;
+            playerInputs[1] = playerInput2;
+            playerInputs[2] = playerInput3;
+            playerInputs[3] = playerInput4;
+
+            foreach (PlayerInput playerInput in playerInputs)
+            {
+                playerInput.AddDefaultAI(typeof(TestAI));
+            }
         }
 
         private int GetPlayerCount()
@@ -80,16 +94,21 @@ namespace ThebesUI
             Dictionary<IPlayer, PlayerColor> players = new Dictionary<IPlayer, PlayerColor>();
             Player player;
             PlayerInput pi;
-            foreach (Control control in newGameBox.Controls)
+
+            if (AnyEmptyNames())
             {
-                if (control is PlayerInput && ((PlayerInput)control).Selected())
-                {
-                    pi = (PlayerInput)control;
-                    
-                    if (pi.IsHuman())
+                MessageBox.Show("All players have to have names");
+                return;
+            }
+
+            foreach (PlayerInput playerInput in playerInputs)
+            {
+                if (playerInput.Selected())
+                { 
+                    if (playerInput.IsHuman())
                     {
                         player = new Player(
-                            pi.PlayerName(),
+                            playerInput.PlayerName(),
                             GameSettings.Places.OfType<IDigSite>().ToList(),
                             GameSettings.StartingPlace,
                             UIConfig.ErrorDialog,
@@ -103,7 +122,7 @@ namespace ThebesUI
                     else
                     {
                         player = new AIPlayer(
-                            pi.PlayerName(),
+                            playerInput.PlayerName(),
                             GameSettings.Places.OfType<IDigSite>().ToList(),
                             GameSettings.StartingPlace,
                             GameSettings.Places,
@@ -114,10 +133,12 @@ namespace ThebesUI
                             game.ActiveExhibitions.GiveExhibition,
                             game.PlayersOnWeek
                             );
-                        ((AIPlayer)player).Init(new TestAI(player, game));
+
+                        IAI ai = (IAI)playerInput.Type.Assembly.CreateInstance(playerInput.Type.FullName, false, 0, null, new object[] { player, game }, null, null);
+                        ((AIPlayer)player).Init(ai);
                     }
                     
-                    players.Add(player, pi.Color);
+                    players.Add(player, playerInput.Color);
                 }
             }
             try
@@ -137,12 +158,25 @@ namespace ThebesUI
             this.Close();
         }
 
+        private bool AnyEmptyNames()
+        {
+            foreach (PlayerInput playerInput in playerInputs)
+            {
+                if (playerInput.Selected() && playerInput.Name.Equals(""))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void bBrowse_Click(object sender, EventArgs e)
         {
-            if (ofd.ShowDialog() == DialogResult.OK)
+            if (ofdThb.ShowDialog() == DialogResult.OK)
             {
-                tbFileName.Text = ofd.SafeFileName;
-                tbFilePath.Text = ofd.FileName;
+                tbFileName.Text = ofdThb.SafeFileName;
+                tbFilePath.Text = ofdThb.FileName;
             }
         }
 
@@ -166,6 +200,56 @@ namespace ThebesUI
             gameForm.ShowDialog();
 
             this.Close();
+        }
+
+        private void bAddAI_Click(object sender, EventArgs e)
+        {
+            if (ofdDll.ShowDialog() == DialogResult.OK)
+            {
+                Assembly assembly = null;
+                AssemblyName assemblyName = new AssemblyName();
+                assemblyName.CodeBase = ofdDll.FileName;
+
+                try
+                {
+                    assembly = Assembly.Load(assemblyName);
+                }
+                catch (Exception exception)
+                {
+                    MessageBox.Show("Error loading the dll:" + exception.Message);
+                    return;
+                }
+                
+
+                List<Type> typesAdded = new List<Type>();
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (typeof(IAI).IsAssignableFrom(type))
+                    {
+                        foreach (PlayerInput playerInput in playerInputs)
+                        {
+                            playerInput.AddAI(type);
+                            typesAdded.Add(type);
+                        }
+                    }
+                }
+
+                if (typesAdded.Count > 0)
+                {
+                    string aiList = "";
+                    foreach (Type type in typesAdded)
+                    {
+                        aiList += type.ToString() + "\n";
+                    }
+
+                    MessageBox.Show("These AIs were succesfully added:\n" + aiList);
+                }
+                else
+                {
+                    MessageBox.Show("No classes implementing the IAI interface found in the provided dll");
+                }
+
+            }
         }
     }
 }
