@@ -19,7 +19,14 @@ namespace ThebesCore
         void Execute(IPlayer player);
     }
 
-    public class ChangeCardsAction : IAction
+    public abstract class Action : IAction
+    {
+        protected static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public abstract void Execute(IPlayer player);
+    }
+
+    public class ChangeCardsAction : Action
     {
         ICardChangePlace cardChangePlace;
 
@@ -28,13 +35,14 @@ namespace ThebesCore
             this.cardChangePlace = cardChangePlace;
         }
 
-        public void Execute(IPlayer player)
+        public override void Execute(IPlayer player)
         {
+            log.Debug($"{player.Time}: Player {player.Name} Changing cards at {cardChangePlace}");
             player.MoveAndChangeDisplayCards(cardChangePlace);
         }
     }
 
-    public class TakeCardAction : IAction
+    public class TakeCardAction : Action
     {
         ICard card;
 
@@ -43,13 +51,14 @@ namespace ThebesCore
             this.card = card;
         }
 
-        public void Execute(IPlayer player)
+        public override void Execute(IPlayer player)
         {
+            log.Debug($"{player.Time}: Player {player.Name} taking {card}");
             player.MoveAndTakeCard(card);
         }
     }
 
-    public class ExecuteExhibitionAction : IAction
+    public class ExecuteExhibitionAction : Action
     {
         IExhibitionCard exhibition;
 
@@ -58,33 +67,36 @@ namespace ThebesCore
             this.exhibition = exhibition;
         }
 
-        public void Execute(IPlayer player)
+        public override void Execute(IPlayer player)
         {
+            log.Debug($"{player.Time}: Player {player.Name} executing exhibition: {exhibition}");
             player.MoveAndTakeCard(exhibition);
         }
     }
 
-    public class EndYearAction : IAction
+    public class EndYearAction : Action
     {
         public EndYearAction() {}
 
-        public void Execute(IPlayer player)
+        public override void Execute(IPlayer player)
         {
+            log.Debug($"{player.Time}: Player {player.Name} ending year");
             player.EndYear();
         }
     }
 
-    public class ZeppelinAction : IAction
+    public class ZeppelinAction : Action
     {
         public ZeppelinAction() { }
 
-        public void Execute(IPlayer player)
+        public override void Execute(IPlayer player)
         {
+            log.Debug($"{player.Time}: Player {player.Name} using a zeppelin");
             player.UseZeppelin();
         }
     }
 
-    public class DigAction : IAction
+    public class DigAction : Action
     {
         IDigSite digSite;
         int weeks;
@@ -99,8 +111,10 @@ namespace ThebesCore
             this.tokens = tokens;
         }
 
-        public void Execute(IPlayer player)
+        public override void Execute(IPlayer player)
         {
+            log.Debug($"{player.Time}: Player {player.Name} digging at {digSite} for {weeks} weeks");
+
             List<IToken> dugTokens = player.Dig(digSite, weeks, singleUseCards);
             if (dugTokens != null && tokens != null)
             {

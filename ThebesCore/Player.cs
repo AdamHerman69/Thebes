@@ -45,7 +45,7 @@ namespace ThebesCore
     public class Player : IComparable<IPlayer>, IPlayerData, IPlayer
     {
         Action<string> errorDialog;
-        Action changeDisplayCards;
+        System.Action changeDisplayCards;
         Action<ICard> takeCard;
         Action<ICard> discardCard;
         Action<IExhibitionCard> executeExhibition;
@@ -116,7 +116,7 @@ namespace ThebesCore
         }
 
         public Player() { }
-        public Player(string name, List<IDigSite> digSites, IPlace startingPlace, Action<string> errorDialog, Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
+        public Player(string name, List<IDigSite> digSites, IPlace startingPlace, Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
         {
             this.Name = name;
             this.CurrentPlace = startingPlace;
