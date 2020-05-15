@@ -13,7 +13,7 @@ namespace ThebesUI
 {
     public static class UIConfig
     {
-        public const string IMG_FOLDER = @"C:\Users\admhe\source\repos\Thebes\img\";
+        public const string IMG_FOLDER = @"..\..\..\img\";
         public static void ReplaceImage(PictureBox pb, Image newImg)
         {
             if ( pb.Image != null)
