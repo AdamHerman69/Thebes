@@ -21,18 +21,23 @@ namespace ThebesUI
         Dictionary<IDigSite, Label> singleUseKnowledgeDisplay;
         Dictionary<IDigSite, PictureBox> permissionDisplay;
 
-        Label lPlayerName, lTime, lPoints, lGeneralKnowledge, lShovels, lAssistants, lSpecialPermissions, lCongress, lCar, lZeppelin;
+        Label lPlayerName, lPoints, lGeneralKnowledge, lShovels, lAssistants, lSpecialPermissions, lCongress, lCar, lZeppelin;
 
         public PlayerDisplay()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Needs to be called before use. Creates all controls
+        /// </summary>
+        /// <param name="player">player whose data is displayed</param>
+        /// <param name="layout">control positioning data</param>
+        /// <param name="color">player's color</param>
         public void Initialize(IPlayerData player, Layout layout, PlayerColor color)
         {
             this.player = player;
             this.BackColor = Color.Transparent;
-            //this.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + $"playerDisplay_{color}.png");
             panel.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + $"playerDisplay_{color}.png");
 
             // knowledge display
@@ -101,19 +106,6 @@ namespace ThebesUI
             Visible = true
             };
             panel.Controls.Add(lPlayerName);
-
-            //// time
-            //labelDims = layout.Time;
-            //lTime = new Label()
-            //{
-            //    Name = $"lTime",
-            //    Text = "0",
-            //    BackColor = Color.Transparent,
-            //    Size = new Size(labelDims.Width, labelDims.Height),
-            //    Location = labelDims.topLeft,
-            //    Visible = true
-            //};
-            //panel.Controls.Add(lTime);
 
             // points
             labelDims = layout.Points;
@@ -233,10 +225,12 @@ namespace ThebesUI
             this.Show();
         }
 
+        /// <summary>
+        /// Updates the displayed information.
+        /// </summary>
         public void UpdateInfo()
         {
             lPlayerName.Text = player.Name;
-            //lTime.Text = player.Time.ToString();
             lPoints.Text = player.Points.ToString();
 
             lGeneralKnowledge.Text = player.GeneralKnowledge.ToString();
@@ -263,12 +257,14 @@ namespace ThebesUI
             // tokens
             List<ITokenView> tokens = player.Tokens.SelectMany(t => t.Value).ToList().ConvertAll(UIGame.ToView);
             
+            // delete all tokens
             foreach (PictureBox pb in flpTokens.Controls)
             {
                 pb.Dispose();
             }
             flpTokens.Controls.Clear();
 
+            // display tokens
             foreach (ITokenView token in tokens)
             {
                 flpTokens.Controls.Add(new PictureBox
@@ -295,7 +291,7 @@ namespace ThebesUI
                 
             }
 
-            // height
+            // height (tailored to the amount of tokens shown)
             this.Height = 152 + 45 * (flpTokens.Controls.Count / 10);
             if (flpTokens.Controls.Count % 10 > 0)
             {

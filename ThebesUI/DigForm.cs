@@ -28,7 +28,13 @@ namespace ThebesUI
             Initialize(digSite, player, executeAction);
         }
 
-        public void Initialize(IDigSite digSite, IPlayer player, Action<IAction> executeAction)
+        /// <summary>
+        /// Called in a constructor to fill with data
+        /// </summary>
+        /// <param name="digSite">where to dig</param>
+        /// <param name="player">player who is ready to dig</param>
+        /// <param name="executeAction">method to execute action once a dig starts</param>
+        private void Initialize(IDigSite digSite, IPlayer player, Action<IAction> executeAction)
         {
             this.digSite = digSite;
             this.player = player;
@@ -67,6 +73,9 @@ namespace ThebesUI
             player.GetDigStats(digSite, singleUseCards, out totalKnowledge, out tokenBonus);
         }
 
+        /// <summary>
+        /// Called to update form data when something changes
+        /// </summary>
         public void UpdateInfo()
         {
             weeksToDig = (int)nudWeeks.Value;

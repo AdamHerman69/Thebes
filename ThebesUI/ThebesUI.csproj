@@ -98,25 +98,14 @@
     <Compile Include="DigResult.Designer.cs">
       <DependentUpon>DigResult.cs</DependentUpon>
     </Compile>
-    <Compile Include="DigSiteKnowledge.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DigSiteKnowledge.Designer.cs">
-      <DependentUpon>DigSiteKnowledge.cs</DependentUpon>
-    </Compile>
     <Compile Include="GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="HelperClasses.cs" />
     <Compile Include="ItemViews.cs" />
-    <Compile Include="KnowledgeStats.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="KnowledgeStats.Designer.cs">
-      <DependentUpon>KnowledgeStats.cs</DependentUpon>
-    </Compile>
     <Compile Include="Layout.cs" />
     <Compile Include="PlayerDisplay.cs">
       <SubType>UserControl</SubType>
@@ -154,14 +143,8 @@
     <EmbeddedResource Include="DigResult.resx">
       <DependentUpon>DigResult.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DigSiteKnowledge.resx">
-      <DependentUpon>DigSiteKnowledge.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="KnowledgeStats.resx">
-      <DependentUpon>KnowledgeStats.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PlayerDisplay.resx">
       <DependentUpon>PlayerDisplay.cs</DependentUpon>

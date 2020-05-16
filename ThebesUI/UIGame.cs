@@ -36,6 +36,10 @@ namespace ThebesUI
 
         public UIGame(int playerCount) : base(playerCount) {}
 
+        /// <summary>
+        /// Initializes the game. Needs to be called before using.
+        /// </summary>
+        /// <param name="playerColors"></param>
         public void Initialize(Dictionary<IPlayer, PlayerColor> playerColors)
         {
             this.Players = playerColors.Keys.ToList();
@@ -44,6 +48,9 @@ namespace ThebesUI
             ActivePlayer = Players[0];
         }
 
+        /// <summary>
+        /// Sorts the players and selects the player who's next. Called after an executed action.
+        /// </summary>
         private void NextMove()
         {
             ResetCardChangeInfos();
@@ -51,6 +58,12 @@ namespace ThebesUI
             ActivePlayer = Players[0];
         }
 
+        /// <summary>
+        /// Executes the given action, lets the AI player playa and ends when it's a human player's turn.
+        /// Also ends the game when all players are done.
+        /// </summary>
+        /// <param name="action">action to execute</param>
+        /// <returns></returns>
         public bool ExecuteAction(IAction action)
         {
             if (action != null)
@@ -147,6 +160,9 @@ namespace ThebesUI
         }
     }
 
+    /// <summary>
+    /// Used to serialize / deserialize the game state.
+    /// </summary>
     [Serializable]
     public class GameState
     {
@@ -159,6 +175,11 @@ namespace ThebesUI
             settings = new GameSettingsSerializable();
         }
 
+        /// <summary>
+        /// Serializes the game state and saves it to filePath
+        /// </summary>
+        /// <param name="game">game object to serialize</param>
+        /// <param name="filePath">where to save</param>
         public static void Serialize(IUIGame game, string filePath)
         {
             GameState state = new GameState(game);
@@ -169,6 +190,11 @@ namespace ThebesUI
             stream.Close();
         }
 
+        /// <summary>
+        /// Deserializes the game from a file. 
+        /// </summary>
+        /// <param name="filePath">file to deserialize</param>
+        /// <returns>Game that is ready to run</returns>
         public static IUIGame Deserialize(string filePath)
         {
             IFormatter formatter = new BinaryFormatter();

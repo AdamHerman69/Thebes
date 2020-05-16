@@ -16,6 +16,11 @@ namespace ThebesUI
         Action update;
         public List<ICardView> Selected { get; private set; }
         
+        /// <summary>
+        /// Needs to be called after the default constructor to populate it with data
+        /// </summary>
+        /// <param name="cards">cards to display</param>
+        /// <param name="update">method to call when a card selection  has been altered</param>
         public void Initialize(List<ICardView> cards, Action update)
         {
             InitializeComponent();

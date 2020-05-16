@@ -11,33 +11,10 @@ using System.Windows.Forms;
 
 namespace ThebesUI
 {
-    public static class UIConfig
-    {
-        public const string IMG_FOLDER = @"..\..\..\img\";
-        public static void ReplaceImage(PictureBox pb, Image newImg)
-        {
-            if ( pb.Image != null)
-            {
-                pb.Image.Dispose();
-            }
-            pb.Image = newImg;
-        }
-
-        public static void RemoveImage(PictureBox pb)
-        {
-            if (pb.Image != null)
-            {
-                pb.Image.Dispose();
-            }
-            pb.Image = null;
-        }
-
-        public static void ErrorDialog(string message)
-        {
-            MessageBox.Show(message);
-        }
-    }
-
+    /// <summary>
+    /// Represents a reclantle shape in a 2D cartesian system. Stored as top left and bottom right points.
+    /// Only supports rectangles with sides parallel to x and y axis.
+    /// </summary>
     public struct Rectangle
     {
         public Point topLeft, bottomRight;
@@ -52,20 +29,41 @@ namespace ThebesUI
             this.bottomRight = bottomRight;
         }
 
+        /// <summary>
+        /// Decides whether a given point lies within the rectanlge (including borders)
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns>true if point is inside the rectangle</returns>
         public bool IsInside(Point point)
         {
             return (point.X >= topLeft.X && point.X <= bottomRight.X && point.Y >= topLeft.Y && point.Y <= bottomRight.Y);
         }
 
+        /// <summary>
+        /// The center point of the rectangle (might be pixel off, because of integer rounding)
+        /// </summary>
         public Point Center { get { return new Point(topLeft.X + Width / 2, topLeft.Y + Height / 2); } }
+        
+        /// <summary>
+        /// Centers a given rectangle (specified by width and height) inside this rectangle.
+        /// </summary>
+        /// <param name="width">width of the rectanlge being centered</param>
+        /// <param name="height">height of the rectangle being centered</param>
+        /// <returns>top left point of the given rectangle so that it's centered inside this rectangle</returns>
         public Point RectanglePositionCenter(int width, int height)
         {
             return new Point(Center.X - width / 2, Center.Y - height / 2);
         }
     }
 
+    /// <summary>
+    /// Holds all necessary information about the layout of controls.
+    /// </summary>
     public class Layout
     {
+        // All properties below are located on the game board. 
+        //The positioning is specified by Rectangle objects and should be inside 1064x766 2D integer cartesian system.
+
         [JsonProperty]
         public Rectangle[] WeekCounter { get; private set; } = new Rectangle[52];
         [JsonProperty]
@@ -77,7 +75,9 @@ namespace ThebesUI
         [JsonProperty]
         public Dictionary<string, Rectangle> Places;
 
-        // player display, relative to player_display_background.png
+        // All properties below are located on the playerDisplay card.
+        //The positioning is specified by Rectangle objects and should be inside 368x152 2D integer cartesian system.
+
         [JsonProperty]
         public Rectangle PlayerName { get; private set; }
         [JsonProperty]
@@ -107,13 +107,13 @@ namespace ThebesUI
         public Dictionary<string, Rectangle> Permissions { get; private set; }
 
 
-        public Layout()
-        {
-            
-        }
+        public Layout() {} 
 
-
-
+        /// <summary>
+        /// Creates a new Layout object from the given json file
+        /// </summary>
+        /// <param name="jsonFilePath">file path to a .json file</param>
+        /// <returns>Layout object, holding data from the json file</returns>
         public static Layout ParseLayout(string jsonFilePath)
         {
             string jsonString = File.ReadAllText(jsonFilePath);

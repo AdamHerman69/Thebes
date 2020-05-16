@@ -41,6 +41,7 @@ namespace ThebesUI
             }
         }
 
+
         private int GetPlayerCount()
         {
             int playerCount = 0;
@@ -54,8 +55,14 @@ namespace ThebesUI
             return playerCount;
         }
 
+        /// <summary>
+        /// Starts a new game with the player data from this form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bStartNew_Click(object sender, EventArgs e)
         {
+            // check player count
             int playerCount;
             if ((playerCount = GetPlayerCount()) < 2 || playerCount > 4)
             {
@@ -63,6 +70,7 @@ namespace ThebesUI
                 return;
             }
 
+            // load config file (.thc)
             try
             {
                 GameSettings.LoadFromFile(@"thebes_config.thc");
@@ -83,8 +91,13 @@ namespace ThebesUI
                 }
                 return;
             }
-            
 
+            // check for empty names
+            if (AnyEmptyNames())
+            {
+                MessageBox.Show("All players have to have names");
+                return;
+            }
 
 
 
@@ -93,13 +106,6 @@ namespace ThebesUI
             // Create Players
             Dictionary<IPlayer, PlayerColor> players = new Dictionary<IPlayer, PlayerColor>();
             Player player;
-            PlayerInput pi;
-
-            if (AnyEmptyNames())
-            {
-                MessageBox.Show("All players have to have names");
-                return;
-            }
 
             foreach (PlayerInput playerInput in playerInputs)
             {
@@ -141,6 +147,8 @@ namespace ThebesUI
                     players.Add(player, playerInput.Color);
                 }
             }
+
+            // initialize game
             try
             {
                 game.Initialize(players);
@@ -151,7 +159,7 @@ namespace ThebesUI
                 return;
             }
             
-
+            // open game form
             this.Hide();
             GameForm gameForm = new GameForm(game);
             gameForm.ShowDialog();
@@ -180,6 +188,11 @@ namespace ThebesUI
             }
         }
 
+        /// <summary>
+        /// Loads the game from file specified by tbFilePath.Text and starts it
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bStartLoaded_Click(object sender, EventArgs e)
         {
             string filePath = tbFilePath.Text;
@@ -202,6 +215,11 @@ namespace ThebesUI
             this.Close();
         }
 
+        /// <summary>
+        /// Opens OpenFileDialog, checks the selected DLL for classes implementing the IAI interface and adds them to all four playerInputs
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bAddAI_Click(object sender, EventArgs e)
         {
             if (ofdDll.ShowDialog() == DialogResult.OK)

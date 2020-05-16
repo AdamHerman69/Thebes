@@ -26,6 +26,10 @@ namespace ThebesUI
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Adds new Type to the list
+        /// </summary>
+        /// <param name="type"></param>
         public void AddDefaultAI(Type type)
         {
             cbAI.Items.Add(type);
@@ -52,6 +56,11 @@ namespace ThebesUI
             cbAI.Items.Add(type);
         }
 
+        /// <summary>
+        /// Checkes this player if his name is filled in
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tbName_TextChanged(object sender, EventArgs e)
         {
             if (!rbHuman.Checked && !rbAI.Checked)
@@ -61,6 +70,11 @@ namespace ThebesUI
             cbSelected.Checked = true;
         }
 
+        /// <summary>
+        /// Displays the AI picker
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void rbAI_CheckedChanged(object sender, EventArgs e)
         {
             if (rbAI.Checked)
@@ -69,6 +83,11 @@ namespace ThebesUI
             }
         }
 
+        /// <summary>
+        /// Hides the AI picker
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void rbHuman_CheckedChanged(object sender, EventArgs e)
         {
             if (rbHuman.Checked)

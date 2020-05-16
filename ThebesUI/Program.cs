@@ -10,6 +10,9 @@ namespace ThebesUI
 {
     static class Program
     {
+        /// <summary>
+        /// Neeeded for logging to work in referenced libraries
+        /// </summary>
         public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 

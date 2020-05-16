@@ -29,7 +29,11 @@ namespace ThebesUI
             UpdateBoard();
         }
 
-        public void Initialize(IUIGame game)
+        /// <summary>
+        /// Called from constructor ot initialize the form
+        /// </summary>
+        /// <param name="game"></param>
+        private void Initialize(IUIGame game)
         {
             this.SuspendLayout();
             this.game = game;
@@ -47,26 +51,6 @@ namespace ThebesUI
                 playerDisplays.Add(pd);
                 flpPlayerDisplay.Controls.Add(pd);
             }
-
-            //// initialize player displays
-            //playerDisplay1.Initialize(game.Players[0], layout, game.Colors[game.Players[0]]);
-            //playerDisplays.Add(playerDisplay1);
-            //playerDisplay2.Initialize(game.Players[1], layout, game.Colors[game.Players[1]]);
-            //playerDisplays.Add(playerDisplay2);
-            //if (game.Players.Count >= 3)
-            //{
-            //    playerDisplay3.Initialize(game.Players[2], layout, game.Colors[game.Players[2]]);
-            //    playerDisplays.Add(playerDisplay3);
-            //}
-            //if (game.Players.Count >= 4)
-            //{
-            //    playerDisplay4.Initialize(game.Players[3], layout, game.Colors[game.Players[3]]);
-            //    playerDisplays.Add(playerDisplay4);
-            //}
-            //foreach (PlayerDisplay playerDisplay in playerDisplays)
-            //{
-            //    Controls.Add(playerDisplay);
-            //}
 
             // background
             pBoard.BackgroundImage = Image.FromFile(UIConfig.IMG_FOLDER + "board.jpg");
@@ -162,11 +146,12 @@ namespace ThebesUI
             this.ResumeLayout(false);
         }
 
-
+        /// <summary>
+        /// Called after every action. Redraws the board with current data
+        /// </summary>
         public void UpdateBoard()
         {
-            this.SuspendLayout();
-            SuspendDrawing(this);
+            DrawingControl.SuspendDrawing(this);
 
             // zeppelin button
             if (game.ActivePlayer.Zeppelins > 0)
@@ -225,28 +210,42 @@ namespace ThebesUI
             if (index > 2) index = 2;
             yearCounter.Location = layout.YearCounter[index].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
 
-            this.ResumeLayout();
-            ResumeDrawing(this);
+            DrawingControl.ResumeDrawing(this);
         }
 
+        /// <summary>
+        /// Gets the appropriate image for a card
+        /// </summary>
+        /// <param name="card"></param>
+        /// <returns></returns>
         private Image GetImage(ICardView card)
         {
             try
             {
                 return Image.FromFile(UIConfig.IMG_FOLDER + card.FileName);
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 return Image.FromFile(UIConfig.IMG_FOLDER + "c_not_found.png");
             }
         }
 
+        /// <summary>
+        /// Active player takes the card clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pbCard_Click(object sender, EventArgs e)
         {
             ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
 
         }
 
+        /// <summary>
+        /// Active player executes the exhibition clicked 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pbExhibition_Click(object sender, EventArgs e)
         {
             if(game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)] != null)
@@ -256,16 +255,29 @@ namespace ThebesUI
             }
         }
 
+        /// <summary>
+        /// Active player uses zeppelin
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bUseZeppelin_Click(object sender, EventArgs e)
         {
             ExecuteAction(new ZeppelinAction());
         }
 
+        /// <summary>
+        /// Active player changes cards
+        /// </summary>
+        /// <param name="place"></param>
         private void ChangeCards(ICardChangePlace place)
         {
             ExecuteAction(new ChangeCardsAction(place));
         }
 
+        /// <summary>
+        /// Opens the dig form
+        /// </summary>
+        /// <param name="digSite"></param>
         private void OpenDigForm(IDigSite digSite)
         {
             DigForm digForm = new DigForm(digSite, game.ActivePlayer, ExecuteAction);
@@ -274,6 +286,11 @@ namespace ThebesUI
             UpdateBoard();
         }
 
+        /// <summary>
+        /// Handles all clicks on the board. Then executes the appropriate action based on click location
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pBoard_Click(object sender, EventArgs e)
         {
             Point clickPosition = pBoard.PointToClient(MousePosition);
@@ -298,6 +315,11 @@ namespace ThebesUI
             }
         }
 
+        /// <summary>
+        /// Opens file browser and then saves the current game state
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bSaveGame_Click(object sender, EventArgs e)
         {
             //open file browser
@@ -322,6 +344,11 @@ namespace ThebesUI
             }
         }
 
+        /// <summary>
+        /// Exits the game with a prompt to save
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bExitGame_Click(object sender, EventArgs e)
         {
             var confirmResult = MessageBox.Show("Do you want to save the game before quitting?",
@@ -334,6 +361,10 @@ namespace ThebesUI
             this.Close();
         }
 
+        /// <summary>
+        /// Executes the given action
+        /// </summary>
+        /// <param name="action"></param>
         public void ExecuteAction(IAction action)
         {
             if (!game.ExecuteAction(action))
@@ -348,65 +379,14 @@ namespace ThebesUI
             }
         }
 
+        /// <summary>
+        /// Ends the year
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bEndYear_Click(object sender, EventArgs e)
         {
             ExecuteAction(new EndYearAction());
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
-
-        private const int WM_SETREDRAW = 11;
-
-        public static void SuspendDrawing(Control parent)
-        {
-            SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
-        }
-
-        public static void ResumeDrawing(Control parent)
-        {
-            SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
-            parent.Refresh();
-        }
-
-    }
-
-    class TransparentPictureBox : PictureBox
-    {
-        public TransparentPictureBox()
-        {
-            this.BackColor = Color.Transparent;
-        }
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            if (Parent != null && this.BackColor == Color.Transparent)
-            {
-                using (var bmp = new Bitmap(Parent.Width, Parent.Height))
-                {
-                    Parent.Controls.Cast<Control>()
-                          .Where(c => Parent.Controls.GetChildIndex(c) > Parent.Controls.GetChildIndex(this))
-                          .Where(c => c.Bounds.IntersectsWith(this.Bounds))
-                          .OrderByDescending(c => Parent.Controls.GetChildIndex(c))
-                          .ToList()
-                          .ForEach(c => c.DrawToBitmap(bmp, c.Bounds));
-
-                    e.Graphics.DrawImage(bmp, -Left, -Top);
-
-                }
-            }
-            base.OnPaint(e);
-        }
-
-        private void InitializeComponent()
-        {
-            ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
-            this.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
-            this.ResumeLayout(false);
-
         }
     }
 }

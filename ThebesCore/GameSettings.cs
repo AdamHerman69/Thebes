@@ -436,7 +436,6 @@ namespace ThebesCore
         /// </summary>
         public static void Initialize()
         {
-            throw new Exception();
             List<IToken> CreateTokenList(IDigSite digSite, int one, int two, int three, int four, int five, int six, int seven, IDigSite knowledgeDigSite)
             {
                 List<IToken> tokenList = new List<IToken>();
