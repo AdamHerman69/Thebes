@@ -91,5 +91,33 @@ namespace ThebesCore
                 Players[i].ResetCardChnageInfo();
             }
         }
+
+        /// <summary>
+        /// Awards each player who has the highest amount of specialized knowledge about one dig site 5 points. 3 points if there's two or more player with the most knowledge.
+        /// Should be called at the very end of the game
+        /// </summary>
+        public void AddPointsFromKnowledge()
+        {
+            foreach (IDigSite digSite in GameSettings.Places.Where(p => p is IDigSite))
+            {
+                Players.OrderByDescending(p => p.SpecializedKnowledge[digSite]);
+
+                if (Players[0].SpecializedKnowledge[digSite] > 0 && Players[0].SpecializedKnowledge[digSite] > Players[1].SpecializedKnowledge[digSite])
+                {
+                    Players[0].Points += 5;
+                }
+                else if (Players[0].SpecializedKnowledge[digSite] > 0)
+                {
+                    foreach (IPlayer player in Players)
+                    {
+                        if (player.SpecializedKnowledge[digSite] == Players[0].SpecializedKnowledge[digSite])
+                        {
+                            player.Points += 3;
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }

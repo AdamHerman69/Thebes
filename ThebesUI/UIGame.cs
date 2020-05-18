@@ -85,6 +85,7 @@ namespace ThebesUI
 
             if (AreAllPlayersDone())
             {
+                AddPointsFromKnowledge();
                 return true;
             }
             return false;
