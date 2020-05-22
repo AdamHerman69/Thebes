@@ -17,18 +17,25 @@ namespace ThebesUI
         {
             InitializeComponent();
 
-            List<ITokenView> tokens = dugTokens.ConvertAll(UIGame.ToView);
-            foreach (ITokenView token in tokens)
+            if (dugTokens.Count == 0)
             {
-                flpTokens.Controls.Add(new PictureBox
-                {
-                    Width = 85,
-                    Height = 85,
-                    SizeMode = PictureBoxSizeMode.StretchImage,
-                    Tag = token,
-                    Image = Image.FromFile(UIConfig.IMG_FOLDER + token.FileName)
-                });
+                label1.Text = "You didn't find any tokens :(";
             }
+            else
+            {
+                List<ITokenView> tokens = dugTokens.ConvertAll(UIGame.ToView);
+                foreach (ITokenView token in tokens)
+                {
+                    flpTokens.Controls.Add(new PictureBox
+                    {
+                        Width = 85,
+                        Height = 85,
+                        SizeMode = PictureBoxSizeMode.StretchImage,
+                        Tag = token,
+                        Image = Image.FromFile(UIConfig.IMG_FOLDER + token.FileName)
+                    });
+                }
+            }      
         }
 
         private void bOK_Click(object sender, EventArgs e)

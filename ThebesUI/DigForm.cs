@@ -71,6 +71,20 @@ namespace ThebesUI
             weeksToDig = 0;
             singleUseCards = new List<ICard>();
             player.GetDigStats(digSite, singleUseCards, out totalKnowledge, out tokenBonus);
+
+            // token table
+            int rowIndex;
+            DataGridViewRow row;
+            for (int weeks = 1; weeks <= 12; weeks++)
+            {
+                rowIndex = this.dgvTokenTable.Rows.Add();
+                row = this.dgvTokenTable.Rows[rowIndex];
+
+                row.Cells["weeksSpent"].Value = weeks;
+                row.Cells["tokensDrawn"].Value = GameSettings.DugTokenCount(totalKnowledge, weeks);
+            }
+
+            dgvTokenTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         /// <summary>
@@ -93,6 +107,16 @@ namespace ThebesUI
 
             lTotalKnowledge.Text = $"Total knowledge: {totalKnowledge}";
             lDrawAmount.Text = $"You'll draw {tokenAmount}";
+
+            // token table
+            DataGridViewRow row;
+            for (int weeks = 1; weeks <= 12; weeks++)
+            {
+                row = this.dgvTokenTable.Rows[weeks - 1];
+
+                row.Cells["weeksSpent"].Value = weeks;
+                row.Cells["tokensDrawn"].Value = GameSettings.DugTokenCount(totalKnowledge, weeks) + tokenBonus;
+            }
         }
 
         private void nudWeeks_ValueChanged(object sender, EventArgs e)
@@ -121,12 +145,10 @@ namespace ThebesUI
 
             List<IToken> tokens = new List<IToken>();
             executeAction(new DigAction(digSite, weeksToDig, singleUseCards, tokens));
-            if (tokens.Count != 0)
-            {
-                DigResult resultForm = new DigResult(tokens);
-                resultForm.ShowDialog();
-                this.Close();
-            }
+
+            DigResult resultForm = new DigResult(tokens);
+            resultForm.ShowDialog();
+            this.Close();
         }
 
         private void bCancel_Click(object sender, EventArgs e)

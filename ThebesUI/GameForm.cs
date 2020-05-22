@@ -173,6 +173,7 @@ namespace ThebesUI
             for (int i = 0; i < displayCards.Length; i++)
             {
                 UIConfig.ReplaceImage(displayCards[i], GetImage(game.DisplayedCards[i]));
+                new ToolTip().SetToolTip(displayCards[i], game.DisplayedCards[i].Description);
             }
 
             // exhibitions
@@ -181,6 +182,7 @@ namespace ThebesUI
                 if (game.DisplayedExhibitions[i] != null)
                 {
                     UIConfig.ReplaceImage(exhibitions[i], GetImage(game.DisplayedExhibitions[i]));
+                    new ToolTip().SetToolTip(exhibitions[i], game.DisplayedExhibitions[i].Description);
                 }
                 else
                 {

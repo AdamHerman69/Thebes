@@ -23,6 +23,11 @@ namespace ThebesUI
 
         Label lPlayerName, lPoints, lGeneralKnowledge, lShovels, lAssistants, lSpecialPermissions, lCongress, lCar, lZeppelin;
 
+        private void flpTokens_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
         public PlayerDisplay()
         {
             InitializeComponent();

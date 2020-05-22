@@ -38,7 +38,7 @@
             // 
             // bSaveGame
             // 
-            this.bSaveGame.Location = new System.Drawing.Point(551, 784);
+            this.bSaveGame.Location = new System.Drawing.Point(414, 784);
             this.bSaveGame.Name = "bSaveGame";
             this.bSaveGame.Size = new System.Drawing.Size(131, 35);
             this.bSaveGame.TabIndex = 46;
@@ -48,7 +48,7 @@
             // 
             // bExitGame
             // 
-            this.bExitGame.Location = new System.Drawing.Point(688, 784);
+            this.bExitGame.Location = new System.Drawing.Point(551, 784);
             this.bExitGame.Name = "bExitGame";
             this.bExitGame.Size = new System.Drawing.Size(131, 35);
             this.bExitGame.TabIndex = 47;
@@ -58,7 +58,7 @@
             // 
             // bUseZeppelin
             // 
-            this.bUseZeppelin.Location = new System.Drawing.Point(1347, 784);
+            this.bUseZeppelin.Location = new System.Drawing.Point(1210, 784);
             this.bUseZeppelin.Name = "bUseZeppelin";
             this.bUseZeppelin.Size = new System.Drawing.Size(131, 35);
             this.bUseZeppelin.TabIndex = 48;
@@ -69,7 +69,7 @@
             // 
             // pBoard
             // 
-            this.pBoard.Location = new System.Drawing.Point(551, 12);
+            this.pBoard.Location = new System.Drawing.Point(417, 12);
             this.pBoard.Name = "pBoard";
             this.pBoard.Size = new System.Drawing.Size(1064, 766);
             this.pBoard.TabIndex = 49;
@@ -77,7 +77,7 @@
             // 
             // bEndYear
             // 
-            this.bEndYear.Location = new System.Drawing.Point(1484, 784);
+            this.bEndYear.Location = new System.Drawing.Point(1347, 784);
             this.bEndYear.Name = "bEndYear";
             this.bEndYear.Size = new System.Drawing.Size(131, 35);
             this.bEndYear.TabIndex = 50;
@@ -87,14 +87,15 @@
             // 
             // flpPlayerDisplay
             // 
+            this.flpPlayerDisplay.AutoScroll = true;
             this.flpPlayerDisplay.Location = new System.Drawing.Point(12, 12);
             this.flpPlayerDisplay.Name = "flpPlayerDisplay";
-            this.flpPlayerDisplay.Size = new System.Drawing.Size(533, 940);
+            this.flpPlayerDisplay.Size = new System.Drawing.Size(396, 809);
             this.flpPlayerDisplay.TabIndex = 51;
             // 
             // GameForm
             // 
-            this.ClientSize = new System.Drawing.Size(1828, 964);
+            this.ClientSize = new System.Drawing.Size(1494, 833);
             this.Controls.Add(this.flpPlayerDisplay);
             this.Controls.Add(this.bEndYear);
             this.Controls.Add(this.pBoard);
@@ -102,6 +103,7 @@
             this.Controls.Add(this.bExitGame);
             this.Controls.Add(this.bSaveGame);
             this.DoubleBuffered = true;
+            this.MinimumSize = new System.Drawing.Size(1510, 872);
             this.Name = "GameForm";
             this.Text = "Thebes";
             this.ResumeLayout(false);

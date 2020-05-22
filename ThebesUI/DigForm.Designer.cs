@@ -45,8 +45,12 @@
             this.nudWeeks = new System.Windows.Forms.NumericUpDown();
             this.lTotalKnowledge = new System.Windows.Forms.Label();
             this.flpTokens = new System.Windows.Forms.FlowLayoutPanel();
+            this.dgvTokenTable = new System.Windows.Forms.DataGridView();
+            this.weeksSpent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tokensDrawn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clSingleUseCards = new ThebesUI.CardList();
             ((System.ComponentModel.ISupportInitialize)(this.nudWeeks)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTokenTable)).BeginInit();
             this.SuspendLayout();
             // 
             // lDigSiteName
@@ -175,7 +179,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold);
-            this.label10.Location = new System.Drawing.Point(508, 66);
+            this.label10.Location = new System.Drawing.Point(674, 64);
             this.label10.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(140, 25);
@@ -184,8 +188,8 @@
             // 
             // bCancel
             // 
-            this.bCancel.Location = new System.Drawing.Point(587, 389);
-            this.bCancel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.bCancel.Location = new System.Drawing.Point(753, 387);
+            this.bCancel.Margin = new System.Windows.Forms.Padding(2);
             this.bCancel.Name = "bCancel";
             this.bCancel.Size = new System.Drawing.Size(86, 27);
             this.bCancel.TabIndex = 15;
@@ -195,8 +199,8 @@
             // 
             // bDigButton
             // 
-            this.bDigButton.Location = new System.Drawing.Point(685, 389);
-            this.bDigButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.bDigButton.Location = new System.Drawing.Point(851, 387);
+            this.bDigButton.Margin = new System.Windows.Forms.Padding(2);
             this.bDigButton.Name = "bDigButton";
             this.bDigButton.Size = new System.Drawing.Size(87, 27);
             this.bDigButton.TabIndex = 16;
@@ -207,7 +211,7 @@
             // nudWeeks
             // 
             this.nudWeeks.Location = new System.Drawing.Point(118, 394);
-            this.nudWeeks.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.nudWeeks.Margin = new System.Windows.Forms.Padding(2);
             this.nudWeeks.Maximum = new decimal(new int[] {
             12,
             0,
@@ -241,16 +245,46 @@
             // 
             // flpTokens
             // 
-            this.flpTokens.Location = new System.Drawing.Point(512, 107);
-            this.flpTokens.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.flpTokens.Location = new System.Drawing.Point(678, 105);
+            this.flpTokens.Margin = new System.Windows.Forms.Padding(2);
             this.flpTokens.Name = "flpTokens";
             this.flpTokens.Size = new System.Drawing.Size(252, 271);
             this.flpTokens.TabIndex = 20;
             // 
+            // dgvTokenTable
+            // 
+            this.dgvTokenTable.AllowUserToAddRows = false;
+            this.dgvTokenTable.AllowUserToDeleteRows = false;
+            this.dgvTokenTable.AllowUserToResizeColumns = false;
+            this.dgvTokenTable.AllowUserToResizeRows = false;
+            this.dgvTokenTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvTokenTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.weeksSpent,
+            this.tokensDrawn});
+            this.dgvTokenTable.Location = new System.Drawing.Point(456, 64);
+            this.dgvTokenTable.Name = "dgvTokenTable";
+            this.dgvTokenTable.RowHeadersVisible = false;
+            this.dgvTokenTable.Size = new System.Drawing.Size(191, 300);
+            this.dgvTokenTable.TabIndex = 21;
+            // 
+            // weeksSpent
+            // 
+            this.weeksSpent.HeaderText = "Weeks spent";
+            this.weeksSpent.Name = "weeksSpent";
+            this.weeksSpent.ReadOnly = true;
+            this.weeksSpent.Width = 80;
+            // 
+            // tokensDrawn
+            // 
+            this.tokensDrawn.HeaderText = "Tokens drawn";
+            this.tokensDrawn.Name = "tokensDrawn";
+            this.tokensDrawn.ReadOnly = true;
+            this.tokensDrawn.Width = 80;
+            // 
             // clSingleUseCards
             // 
             this.clSingleUseCards.Location = new System.Drawing.Point(15, 249);
-            this.clSingleUseCards.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.clSingleUseCards.Margin = new System.Windows.Forms.Padding(2);
             this.clSingleUseCards.Name = "clSingleUseCards";
             this.clSingleUseCards.Size = new System.Drawing.Size(458, 103);
             this.clSingleUseCards.TabIndex = 19;
@@ -259,7 +293,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(793, 432);
+            this.ClientSize = new System.Drawing.Size(955, 432);
+            this.Controls.Add(this.dgvTokenTable);
             this.Controls.Add(this.flpTokens);
             this.Controls.Add(this.clSingleUseCards);
             this.Controls.Add(this.lTotalKnowledge);
@@ -278,10 +313,11 @@
             this.Controls.Add(this.lSpecializedKnowledgeAmount);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lDigSiteName);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DigForm";
             this.Text = "DigForm";
             ((System.ComponentModel.ISupportInitialize)(this.nudWeeks)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTokenTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -307,5 +343,8 @@
         private System.Windows.Forms.Label lTotalKnowledge;
         private CardList clSingleUseCards;
         private System.Windows.Forms.FlowLayoutPanel flpTokens;
+        private System.Windows.Forms.DataGridView dgvTokenTable;
+        private System.Windows.Forms.DataGridViewTextBoxColumn weeksSpent;
+        private System.Windows.Forms.DataGridViewTextBoxColumn tokensDrawn;
     }
 }

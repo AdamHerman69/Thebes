@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
+    <Compile Include="BetterAI.cs" />
     <Compile Include="SimpleAI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

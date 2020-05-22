@@ -46,6 +46,7 @@
             this.flpTokens.Name = "flpTokens";
             this.flpTokens.Size = new System.Drawing.Size(364, 167);
             this.flpTokens.TabIndex = 1;
+            this.flpTokens.Paint += new System.Windows.Forms.PaintEventHandler(this.flpTokens_Paint);
             // 
             // PlayerDisplay
             // 
