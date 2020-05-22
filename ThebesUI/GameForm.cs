@@ -14,11 +14,26 @@ namespace ThebesUI
         IUIGame game;
         PictureBox[] displayCards = new PictureBox[4];
         PictureBox[] exhibitions = new PictureBox[3];
+        ToolTip[] cardToolTips = new ToolTip[4];
+        ToolTip[] exhibitionToolTips = new ToolTip[3];
         Dictionary<IPlayer, TransparentPictureBox> smallPieces;
         Dictionary<IPlayer, TransparentPictureBox> bigPieces;
         TransparentPictureBox yearCounter;
         List<PlayerDisplay> playerDisplays;
         Layout layout;
+
+        /// <summary>
+        /// Enables double buffering for all the controls (to reduce flickering)
+        /// </summary>
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams handleParam = base.CreateParams;
+                handleParam.ExStyle |= 0x02000000;
+                return handleParam;
+            }
+        }
 
         public GameForm(IUIGame game)
         {
@@ -91,6 +106,16 @@ namespace ThebesUI
                 pBoard.Controls.Add(exhibitions[i]);
             }
 
+            //tooltips
+            for (int i = 0; i < cardToolTips.Length; i++)
+            {
+                cardToolTips[i] = new ToolTip();
+            }
+            for (int i = 0; i < exhibitionToolTips.Length; i++)
+            {
+                exhibitionToolTips[i] = new ToolTip();
+            }
+
             // week counter
             smallPieces = new Dictionary<IPlayer, TransparentPictureBox>();
             foreach (IPlayer player in game.Players)
@@ -151,7 +176,7 @@ namespace ThebesUI
         /// </summary>
         public void UpdateBoard()
         {
-            DrawingControl.SuspendDrawing(this);
+            //DrawingControl.SuspendDrawing(this);
 
             // zeppelin button
             if (game.ActivePlayer.Zeppelins > 0)
@@ -173,7 +198,7 @@ namespace ThebesUI
             for (int i = 0; i < displayCards.Length; i++)
             {
                 UIConfig.ReplaceImage(displayCards[i], GetImage(game.DisplayedCards[i]));
-                new ToolTip().SetToolTip(displayCards[i], game.DisplayedCards[i].Description);
+                cardToolTips[i].SetToolTip(displayCards[i], game.DisplayedCards[i].Description);
             }
 
             // exhibitions
@@ -182,7 +207,7 @@ namespace ThebesUI
                 if (game.DisplayedExhibitions[i] != null)
                 {
                     UIConfig.ReplaceImage(exhibitions[i], GetImage(game.DisplayedExhibitions[i]));
-                    new ToolTip().SetToolTip(exhibitions[i], game.DisplayedExhibitions[i].Description);
+                    exhibitionToolTips[i].SetToolTip(exhibitions[i], game.DisplayedExhibitions[i].Description);
                 }
                 else
                 {
@@ -212,7 +237,7 @@ namespace ThebesUI
             if (index > 2) index = 2;
             yearCounter.Location = layout.YearCounter[index].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
 
-            DrawingControl.ResumeDrawing(this);
+            //DrawingControl.ResumeDrawing(this);
         }
 
         /// <summary>
