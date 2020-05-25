@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DigForm));
             this.lDigSiteName = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.lSpecializedKnowledgeAmount = new System.Windows.Forms.Label();
@@ -173,7 +174,6 @@
             this.lDrawAmount.Size = new System.Drawing.Size(173, 22);
             this.lDrawAmount.TabIndex = 11;
             this.lDrawAmount.Text = "You\'ll draw X tokens";
-            this.lDrawAmount.Visible = false;
             // 
             // label10
             // 
@@ -313,6 +313,7 @@
             this.Controls.Add(this.lSpecializedKnowledgeAmount);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lDigSiteName);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DigForm";
             this.Text = "DigForm";

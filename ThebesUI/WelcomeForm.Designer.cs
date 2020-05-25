@@ -28,21 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomeForm));
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.bStartNew = new System.Windows.Forms.Button();
             this.newGameBox = new System.Windows.Forms.GroupBox();
             this.bAddAI = new System.Windows.Forms.Button();
-            this.playerInput4 = new ThebesUI.PlayerInput();
-            this.playerInput3 = new ThebesUI.PlayerInput();
-            this.playerInput2 = new ThebesUI.PlayerInput();
-            this.playerInput1 = new ThebesUI.PlayerInput();
             this.gameFromFileBox = new System.Windows.Forms.GroupBox();
             this.bStartLoaded = new System.Windows.Forms.Button();
             this.tbFilePath = new System.Windows.Forms.MaskedTextBox();
             this.bBrowse = new System.Windows.Forms.Button();
             this.tbFileName = new System.Windows.Forms.MaskedTextBox();
+            this.playerInput4 = new ThebesUI.PlayerInput();
+            this.playerInput3 = new ThebesUI.PlayerInput();
+            this.playerInput2 = new ThebesUI.PlayerInput();
+            this.playerInput1 = new ThebesUI.PlayerInput();
             this.newGameBox.SuspendLayout();
             this.gameFromFileBox.SuspendLayout();
             this.SuspendLayout();
@@ -119,38 +120,6 @@
             this.bAddAI.UseVisualStyleBackColor = true;
             this.bAddAI.Click += new System.EventHandler(this.bAddAI_Click);
             // 
-            // playerInput4
-            // 
-            this.playerInput4.Location = new System.Drawing.Point(4, 128);
-            this.playerInput4.Margin = new System.Windows.Forms.Padding(2);
-            this.playerInput4.Name = "playerInput4";
-            this.playerInput4.Size = new System.Drawing.Size(378, 25);
-            this.playerInput4.TabIndex = 21;
-            // 
-            // playerInput3
-            // 
-            this.playerInput3.Location = new System.Drawing.Point(4, 99);
-            this.playerInput3.Margin = new System.Windows.Forms.Padding(2);
-            this.playerInput3.Name = "playerInput3";
-            this.playerInput3.Size = new System.Drawing.Size(378, 25);
-            this.playerInput3.TabIndex = 20;
-            // 
-            // playerInput2
-            // 
-            this.playerInput2.Location = new System.Drawing.Point(4, 70);
-            this.playerInput2.Margin = new System.Windows.Forms.Padding(2);
-            this.playerInput2.Name = "playerInput2";
-            this.playerInput2.Size = new System.Drawing.Size(378, 25);
-            this.playerInput2.TabIndex = 19;
-            // 
-            // playerInput1
-            // 
-            this.playerInput1.Location = new System.Drawing.Point(4, 41);
-            this.playerInput1.Margin = new System.Windows.Forms.Padding(2);
-            this.playerInput1.Name = "playerInput1";
-            this.playerInput1.Size = new System.Drawing.Size(378, 25);
-            this.playerInput1.TabIndex = 18;
-            // 
             // gameFromFileBox
             // 
             this.gameFromFileBox.Controls.Add(this.bStartLoaded);
@@ -204,6 +173,38 @@
             this.tbFileName.Size = new System.Drawing.Size(170, 20);
             this.tbFileName.TabIndex = 22;
             // 
+            // playerInput4
+            // 
+            this.playerInput4.Location = new System.Drawing.Point(4, 128);
+            this.playerInput4.Margin = new System.Windows.Forms.Padding(2);
+            this.playerInput4.Name = "playerInput4";
+            this.playerInput4.Size = new System.Drawing.Size(378, 25);
+            this.playerInput4.TabIndex = 21;
+            // 
+            // playerInput3
+            // 
+            this.playerInput3.Location = new System.Drawing.Point(4, 99);
+            this.playerInput3.Margin = new System.Windows.Forms.Padding(2);
+            this.playerInput3.Name = "playerInput3";
+            this.playerInput3.Size = new System.Drawing.Size(378, 25);
+            this.playerInput3.TabIndex = 20;
+            // 
+            // playerInput2
+            // 
+            this.playerInput2.Location = new System.Drawing.Point(4, 70);
+            this.playerInput2.Margin = new System.Windows.Forms.Padding(2);
+            this.playerInput2.Name = "playerInput2";
+            this.playerInput2.Size = new System.Drawing.Size(378, 25);
+            this.playerInput2.TabIndex = 19;
+            // 
+            // playerInput1
+            // 
+            this.playerInput1.Location = new System.Drawing.Point(4, 41);
+            this.playerInput1.Margin = new System.Windows.Forms.Padding(2);
+            this.playerInput1.Name = "playerInput1";
+            this.playerInput1.Size = new System.Drawing.Size(378, 25);
+            this.playerInput1.TabIndex = 18;
+            // 
             // WelcomeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -211,6 +212,7 @@
             this.ClientSize = new System.Drawing.Size(792, 369);
             this.Controls.Add(this.gameFromFileBox);
             this.Controls.Add(this.newGameBox);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "WelcomeForm";
             this.Text = "Thebes";

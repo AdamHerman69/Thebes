@@ -26,6 +26,7 @@ namespace ThebesUI
         {
             InitializeComponent();
             Initialize(digSite, player, executeAction);
+            UpdateInfo();
         }
 
         /// <summary>
@@ -122,7 +123,6 @@ namespace ThebesUI
         private void nudWeeks_ValueChanged(object sender, EventArgs e)
         {
             UpdateInfo();
-            lDrawAmount.Show();
         }
 
         private void lvSingleUseCards_ItemCheck(object sender, ItemCheckEventArgs e)

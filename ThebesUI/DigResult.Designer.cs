@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DigResult));
             this.label1 = new System.Windows.Forms.Label();
             this.flpTokens = new System.Windows.Forms.FlowLayoutPanel();
             this.bOK = new System.Windows.Forms.Button();
@@ -47,7 +48,7 @@
             // flpTokens
             // 
             this.flpTokens.Location = new System.Drawing.Point(64, 59);
-            this.flpTokens.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.flpTokens.Margin = new System.Windows.Forms.Padding(2);
             this.flpTokens.Name = "flpTokens";
             this.flpTokens.Size = new System.Drawing.Size(477, 262);
             this.flpTokens.TabIndex = 1;
@@ -55,7 +56,7 @@
             // bOK
             // 
             this.bOK.Location = new System.Drawing.Point(249, 326);
-            this.bOK.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.bOK.Margin = new System.Windows.Forms.Padding(2);
             this.bOK.Name = "bOK";
             this.bOK.Size = new System.Drawing.Size(86, 30);
             this.bOK.TabIndex = 2;
@@ -71,7 +72,8 @@
             this.Controls.Add(this.bOK);
             this.Controls.Add(this.flpTokens);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DigResult";
             this.Text = "DigResult";
             this.ResumeLayout(false);
