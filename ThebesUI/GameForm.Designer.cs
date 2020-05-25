@@ -30,10 +30,10 @@
         {
             this.bSaveGame = new System.Windows.Forms.Button();
             this.bExitGame = new System.Windows.Forms.Button();
-            this.bUseZeppelin = new System.Windows.Forms.Button();
             this.pBoard = new System.Windows.Forms.Panel();
             this.bEndYear = new System.Windows.Forms.Button();
             this.flpPlayerDisplay = new System.Windows.Forms.FlowLayoutPanel();
+            this.cbUseZeppelin = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // bSaveGame
@@ -55,17 +55,6 @@
             this.bExitGame.Text = "Exit game";
             this.bExitGame.UseVisualStyleBackColor = true;
             this.bExitGame.Click += new System.EventHandler(this.bExitGame_Click);
-            // 
-            // bUseZeppelin
-            // 
-            this.bUseZeppelin.Location = new System.Drawing.Point(1210, 784);
-            this.bUseZeppelin.Name = "bUseZeppelin";
-            this.bUseZeppelin.Size = new System.Drawing.Size(131, 35);
-            this.bUseZeppelin.TabIndex = 48;
-            this.bUseZeppelin.Text = "Use Zeppelin";
-            this.bUseZeppelin.UseVisualStyleBackColor = true;
-            this.bUseZeppelin.Visible = false;
-            this.bUseZeppelin.Click += new System.EventHandler(this.bUseZeppelin_Click);
             // 
             // pBoard
             // 
@@ -93,13 +82,25 @@
             this.flpPlayerDisplay.Size = new System.Drawing.Size(396, 809);
             this.flpPlayerDisplay.TabIndex = 51;
             // 
+            // cbUseZeppelin
+            // 
+            this.cbUseZeppelin.AutoSize = true;
+            this.cbUseZeppelin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.cbUseZeppelin.Location = new System.Drawing.Point(1219, 789);
+            this.cbUseZeppelin.Name = "cbUseZeppelin";
+            this.cbUseZeppelin.Size = new System.Drawing.Size(122, 24);
+            this.cbUseZeppelin.TabIndex = 52;
+            this.cbUseZeppelin.Text = "Use Zeppelin";
+            this.cbUseZeppelin.UseVisualStyleBackColor = true;
+            this.cbUseZeppelin.CheckedChanged += new System.EventHandler(this.cbUseZeppelin_CheckedChanged);
+            // 
             // GameForm
             // 
             this.ClientSize = new System.Drawing.Size(1494, 833);
+            this.Controls.Add(this.cbUseZeppelin);
             this.Controls.Add(this.flpPlayerDisplay);
             this.Controls.Add(this.bEndYear);
             this.Controls.Add(this.pBoard);
-            this.Controls.Add(this.bUseZeppelin);
             this.Controls.Add(this.bExitGame);
             this.Controls.Add(this.bSaveGame);
             this.DoubleBuffered = true;
@@ -107,15 +108,16 @@
             this.Name = "GameForm";
             this.Text = "Thebes";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
         private System.Windows.Forms.Button bSaveGame;
         private System.Windows.Forms.Button bExitGame;
-        private System.Windows.Forms.Button bUseZeppelin;
         private System.Windows.Forms.Panel pBoard;
         private System.Windows.Forms.Button bEndYear;
         private System.Windows.Forms.FlowLayoutPanel flpPlayerDisplay;
+        private System.Windows.Forms.CheckBox cbUseZeppelin;
     }
 }

@@ -37,7 +37,7 @@ namespace ThebesCore
         void MoveAndTakeCard(ICard card);
         void EndYear();
         void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace);
-        bool UseZeppelin();
+        bool ToggleZeppelin(bool use);
         bool UseSpecialPermission(IDigSite digSite);
     }
 
@@ -57,7 +57,7 @@ namespace ThebesCore
         public int GeneralKnowledge { get; set; }
         public int Zeppelins { get; set; }
 
-        private bool useZappelin;
+        private bool useZeppelin;
         public int SpecialPermissions { get; set; }
         public int Congresses { get; set; }
         public int Assistants { get; set; }
@@ -270,16 +270,24 @@ namespace ThebesCore
         }
 
         /// <summary>
-        /// Player will use zeppelin for his next move
+        /// Toggle if player should use zeppelin for his next move
         /// </summary>
-        /// <returns>true if player has zeppelin available</returns>
-        public bool UseZeppelin()
+        /// <param name="use">if true, player will use zeppelin for next move</param>
+        /// <returns>true if player has zeppelin available, false if not</returns>
+        public bool ToggleZeppelin(bool use)
         {
-            if (Zeppelins > 0)
+            if (use && Zeppelins > 0)
             {
-                useZappelin = true;
+                useZeppelin = true;
                 return true;
             }
+            else if (!use && Zeppelins > 0)
+            {
+                useZeppelin = false;
+                return true;
+
+            }
+            useZeppelin = false;
             return false;
         }
 
@@ -304,12 +312,12 @@ namespace ThebesCore
         /// <param name="destination"></param>
         public void MoveTo(IPlace destination)
         {
-            if (useZappelin)
+            if (useZeppelin)
             {
                 if (this.Zeppelins > 0)
                 {
                     this.Zeppelins--;
-                    useZappelin = false;
+                    useZeppelin = false;
                 }
                 else
                 {

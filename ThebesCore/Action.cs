@@ -87,12 +87,16 @@ namespace ThebesCore
 
     public class ZeppelinAction : Action
     {
-        public ZeppelinAction() { }
+        bool use;
+        public ZeppelinAction(bool use)
+        {
+            this.use = use;
+        }
 
         public override void Execute(IPlayer player)
         {
             log.Debug($"{player.Time}: Player {player.Name} using a zeppelin");
-            player.UseZeppelin();
+            player.ToggleZeppelin(use);
         }
     }
 

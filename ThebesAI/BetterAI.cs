@@ -16,7 +16,7 @@ namespace ThebesAI
         {
             this.player = player;
             this.game = game;
-        }
+        }  
 
         public IAction TakeAction(IGame gameState)
         {
@@ -30,7 +30,6 @@ namespace ThebesAI
         // cards
         // exhibitions
         // digsites with expected distributions
-
     }
 
     class PlayerPrediction

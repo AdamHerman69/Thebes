@@ -181,11 +181,11 @@ namespace ThebesUI
             // zeppelin button
             if (game.ActivePlayer.Zeppelins > 0)
             {
-                bUseZeppelin.Visible = true;
+                cbUseZeppelin.Visible = true;
             }
             else
             {
-                bUseZeppelin.Visible = false;
+                cbUseZeppelin.Visible = false;
             }
 
             // player displays
@@ -282,15 +282,6 @@ namespace ThebesUI
             }
         }
 
-        /// <summary>
-        /// Active player uses zeppelin
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void bUseZeppelin_Click(object sender, EventArgs e)
-        {
-            ExecuteAction(new ZeppelinAction());
-        }
 
         /// <summary>
         /// Active player changes cards
@@ -414,6 +405,23 @@ namespace ThebesUI
         private void bEndYear_Click(object sender, EventArgs e)
         {
             ExecuteAction(new EndYearAction());
+        }
+
+        /// <summary>
+        /// Toggles Zeppelin for the active player
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbUseZeppelin_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbUseZeppelin.Checked)
+            {
+                ExecuteAction(new ZeppelinAction(true));
+            }
+            else
+            {
+                ExecuteAction(new ZeppelinAction(false));
+            }
         }
     }
 }
