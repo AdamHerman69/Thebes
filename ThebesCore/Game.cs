@@ -7,21 +7,30 @@ using System.Text;
 
 namespace ThebesCore
 {  
-    public interface IGame
+    public interface IGame : ICloneable
     {
+        IPlayer ActivePlayer { get; }
         List<IPlayer> Players { get; }
         ICard[] DisplayedCards { get; }
         ICard[] DisplayedExhibitions { get; }
+        void Move(IAction action);
     }
     
     [Serializable]
-    public class Game
+    public class Game : IGame
     {
+        public IPlayer ActivePlayer { get { return Players[0]; } }
         public List<IPlayer> Players { get; set; }
         public IDeck Deck { get; set; }
         public ICardDisplay AvailableCards { get; set; }
         public IExhibitionDisplay ActiveExhibitions { get; set; }
-                
+
+        ICard[] IGame.DisplayedCards { get { return AvailableCards.AvailableCards; } }
+        ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
+
+
+
+        public Game() { }
         public Game(int playerCount)
         {
             this.Deck = new Deck(GameSettings.Cards, playerCount);
@@ -64,6 +73,16 @@ namespace ThebesCore
                 }
             }
             return true;
+        }
+
+        public void Move(IAction action)
+        {
+            if (action != null)
+            {
+                action.Execute(ActivePlayer);
+                ResetCardChangeInfos();
+                Players.Sort();
+            }
         }
 
 
@@ -118,6 +137,10 @@ namespace ThebesCore
                 }
             }
 
+        }
+        public object Clone()
+        {
+            new Game();
         }
     }
 }

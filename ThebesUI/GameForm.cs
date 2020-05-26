@@ -40,7 +40,7 @@ namespace ThebesUI
             InitializeComponent();
             Initialize(game);
 
-            game.ExecuteAction(null);
+            game.Play(null);
             UpdateBoard();
         }
 
@@ -385,7 +385,7 @@ namespace ThebesUI
         /// <param name="action"></param>
         public void ExecuteAction(IAction action)
         {
-            if (!game.ExecuteAction(action))
+            if (!game.Play(action))
             {
                 UpdateBoard();
             }

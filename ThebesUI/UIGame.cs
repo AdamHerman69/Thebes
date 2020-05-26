@@ -17,21 +17,15 @@ namespace ThebesUI
         void Initialize(Dictionary<IPlayer, PlayerColor> playerColors);
         new ICardView[] DisplayedCards { get; }
         new ICardView[] DisplayedExhibitions { get; }
-        bool ExecuteAction(IAction action);
+        bool Play(IAction action);
         Dictionary<IPlayer, PlayerColor> Colors { get; }
     }
 
     [Serializable]
     public class UIGame : Game, IUIGame
     {
-        public IPlayer ActivePlayer { get; private set; }
-
         public ICardView[] DisplayedCards { get {return Array.ConvertAll(AvailableCards.AvailableCards, ToView); } }
         public ICardView[] DisplayedExhibitions { get { return Array.ConvertAll(ActiveExhibitions.Exhibitions, ToView); } }
-
-        ICard[] IGame.DisplayedCards { get { return AvailableCards.AvailableCards; } }
-
-        ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
         public Dictionary<IPlayer, PlayerColor> Colors { get; private set; }
 
         public UIGame(int playerCount) : base(playerCount) {}
@@ -45,42 +39,23 @@ namespace ThebesUI
             this.Players = playerColors.Keys.ToList();
             this.Colors = playerColors;
             Players.Sort();
-            ActivePlayer = Players[0];
         }
 
-        /// <summary>
-        /// Sorts the players and selects the player who's next. Called after an executed action.
-        /// </summary>
-        private void NextMove()
-        {
-            ResetCardChangeInfos();
-            Players.Sort();
-            ActivePlayer = Players[0];
-        }
 
         /// <summary>
-        /// Executes the given action, lets the AI player playa and ends when it's a human player's turn.
+        /// Plays the given action if not null and let's the AI players play. Ends when it's a human player's turn.
         /// Also ends the game when all players are done.
         /// </summary>
         /// <param name="action">action to execute</param>
         /// <returns></returns>
-        public bool ExecuteAction(IAction action)
+        public bool Play(IAction action)
         {
-            if (action != null)
-            {
-                action.Execute(ActivePlayer);
-            }
+            Move(action);
 
-            if (!AreAllPlayersDone())
+            while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
             {
-                NextMove();
-
-                while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
-                {
-                    action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
-                    action.Execute(ActivePlayer);
-                    NextMove();
-                }
+                action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
+                Move(action);
             }
 
             if (AreAllPlayersDone())
