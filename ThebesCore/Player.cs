@@ -49,6 +49,7 @@ namespace ThebesCore
         Action<ICard> takeCard;
         Action<ICard> discardCard;
         Action<IExhibitionCard> executeExhibition;
+        Func<IDigSite, int, List<IToken>> drawTokens;
         public string Name { get; private set; }
         public ITime Time { get; set; }
         public Dictionary<IDigSite, bool> Permissions { get; set; }
@@ -116,7 +117,7 @@ namespace ThebesCore
         }
 
         public Player() { }
-        public Player(string name, List<IDigSite> digSites, IPlace startingPlace, Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek)
+        public Player(string name, List<IDigSite> digSites, IPlace startingPlace, Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<IDigSite, int, List<IToken>> drawTokens, Func<ITime, int> playersOnWeek)
         {
             this.Name = name;
             this.CurrentPlace = startingPlace;
@@ -126,6 +127,7 @@ namespace ThebesCore
             this.takeCard = takeCard;
             this.discardCard = discardCard;
             this.executeExhibition = executeExhibition;
+            this.drawTokens = drawTokens;
 
             Cards = new List<ICard>();
             Tokens = new Dictionary<IDigSite, List<IToken>>();
@@ -421,7 +423,7 @@ namespace ThebesCore
             int tokenAmount = GameSettings.DugTokenCount(knowledge, weeks) + tokenBonus;
 
             // draw tokens and give them to player
-            List<IToken> dugTokens = digSite.DrawTokens(tokenAmount);
+            List<IToken> dugTokens = drawTokens(digSite, tokenAmount);
             foreach (IToken token in dugTokens)
             {
                 token.UpdateStats(this);

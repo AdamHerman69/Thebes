@@ -298,7 +298,7 @@ namespace ThebesUI
         /// <param name="digSite"></param>
         private void OpenDigForm(IDigSite digSite)
         {
-            DigForm digForm = new DigForm(digSite, game.ActivePlayer, ExecuteAction);
+            DigForm digForm = new DigForm(digSite, game.ActivePlayer, ExecuteAction, game.DigsiteInventory[digSite]);
             DialogResult result = digForm.ShowDialog();
 
             UpdateBoard();

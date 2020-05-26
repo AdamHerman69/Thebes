@@ -122,6 +122,7 @@ namespace ThebesUI
                             game.AvailableCards.GiveCard,
                             game.Deck.Discard,
                             game.ActiveExhibitions.GiveExhibition,
+                            game.DrawTokens,
                             game.PlayersOnWeek
                             );
                     }
@@ -137,6 +138,7 @@ namespace ThebesUI
                             game.AvailableCards.GiveCard,
                             game.Deck.Discard,
                             game.ActiveExhibitions.GiveExhibition,
+                            game.DrawTokens,
                             game.PlayersOnWeek
                             );
 

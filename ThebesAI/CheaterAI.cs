@@ -39,7 +39,7 @@ namespace ThebesAI
 
         public ISimulationState NextState(IAction move)
         {
-            
+            throw new NotImplementedException();
         }
 
         public ISimulationState RandomChild()
@@ -49,10 +49,13 @@ namespace ThebesAI
     }
 
 
-    
+
     class CheaterAI : IAI
     {
-
+        public IAction TakeAction(IGame gameState)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class MCTSNode

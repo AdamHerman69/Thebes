@@ -22,10 +22,10 @@ namespace ThebesUI
         List<ICard> singleUseCards;
         Action<IAction> executeAction;
 
-        public DigForm(IDigSite digSite, IPlayer player, Action<IAction> executeAction)
+        public DigForm(IDigSite digSite, IPlayer player, Action<IAction> executeAction, List<IToken> tokens)
         {
             InitializeComponent();
-            Initialize(digSite, player, executeAction);
+            Initialize(digSite, player, executeAction, tokens);
             UpdateInfo();
         }
 
@@ -35,7 +35,7 @@ namespace ThebesUI
         /// <param name="digSite">where to dig</param>
         /// <param name="player">player who is ready to dig</param>
         /// <param name="executeAction">method to execute action once a dig starts</param>
-        private void Initialize(IDigSite digSite, IPlayer player, Action<IAction> executeAction)
+        private void Initialize(IDigSite digSite, IPlayer player, Action<IAction> executeAction, List<IToken> tokens)
         {
             this.digSite = digSite;
             this.player = player;
@@ -54,7 +54,7 @@ namespace ThebesUI
             clSingleUseCards.Initialize(singleUseCards.ConvertAll(UIGame.ToView), UpdateInfo);
 
             // display tokens
-            foreach (ITokenView token in digSite.Tokens.ConvertAll(UIGame.ToView))
+            foreach (ITokenView token in tokens.ConvertAll(UIGame.ToView))
             {
                 if (! (token is DirtTokenView))
                 {

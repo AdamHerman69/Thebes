@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -14,11 +15,13 @@ namespace ThebesCore
         ICard[] DisplayedCards { get; }
         ICard[] DisplayedExhibitions { get; }
         void Move(IAction action);
+        Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; }
     }
     
     [Serializable]
     public class Game : IGame
     {
+        Random random;
         public IPlayer ActivePlayer { get { return Players[0]; } }
         public List<IPlayer> Players { get; set; }
         public IDeck Deck { get; set; }
@@ -28,15 +31,32 @@ namespace ThebesCore
         ICard[] IGame.DisplayedCards { get { return AvailableCards.AvailableCards; } }
         ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
 
+        public Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; private set; }
 
 
         public Game() { }
         public Game(int playerCount)
         {
+            random = new Random();
             this.Deck = new Deck(GameSettings.Cards, playerCount);
 
             AvailableCards = new CardDisplay(DrawCard, Deck.Discard);
             ActiveExhibitions = new ExhibitionDisplay(Deck.Discard);
+
+            DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();
+            foreach (IPlace place in GameSettings.Places)
+            {
+                if (place is IDigSite)
+                {
+                    IDigSite digSite = (IDigSite)place;
+                    DigsiteInventory.Add(digSite, new List<IToken>());
+
+                    foreach (IToken token in digSite.Tokens)
+                    {
+                        DigsiteInventory[digSite].Add(token);
+                    }
+                }
+            }
 
             Time.Configure(playerCount);
         }
@@ -58,7 +78,28 @@ namespace ThebesCore
             }
             return count;
         }
-        
+
+        /// <summary>
+        /// Randomly draws the requested amount of tokens. Keeping just the dirt.
+        /// </summary>
+        /// <param name="tokenAmount"></param>
+        /// <returns>List of drawn tokens</returns>
+        public List<IToken> DrawTokens(IDigSite digSite, int tokenAmount)
+        {
+            List<IToken> tokensDrawn = new List<IToken>();
+            List<IToken> tokens = DigsiteInventory[digSite];
+            for (int i = 0; i < tokenAmount; i++)
+            {
+                IToken tokenDrawn = tokens[random.Next(0, tokens.Count)];
+                if (!(tokenDrawn is IDirtToken))
+                {
+                    tokens.Remove(tokenDrawn);
+                }
+                tokensDrawn.Add(tokenDrawn);
+            }
+            return tokensDrawn;
+        }
+
         /// <summary>
         /// Check if there's at least one player who has some time left
         /// </summary>
@@ -140,6 +181,7 @@ namespace ThebesCore
         }
         public object Clone()
         {
+            throw new NotImplementedException();
             new Game();
         }
     }
