@@ -16,7 +16,7 @@ namespace ThebesConsole
     public class ConsolePlayer : Player
     {
         public List<IPlace> Places { get; set; }
-        public ConsolePlayer(string name, List<IDigSite> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, playersOnWeek)
+        public ConsolePlayer(string name, List<IDigSite> digSites, IPlace startingPlace, List<IPlace> places, Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<IDigSite, int, List<IToken>> drawTokens, Func<ITime, int> playersOnWeek) : base(name, digSites, startingPlace, errorDialog, changeDisplayCards, takeCard, discardCard, executeExhibition, drawTokens, playersOnWeek)
         {
             Places = places;
         }
@@ -121,7 +121,7 @@ namespace ThebesConsole
                     break;
 
                 case "usezeppelin":
-                    if (!UseZeppelin())
+                    if (!ToggleZeppelin(true))
                     {
                         Console.WriteLine("you don't have any zeppelins");
                     }

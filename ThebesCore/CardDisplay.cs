@@ -21,6 +21,8 @@ namespace ThebesCore
         /// </summary>
         /// <param name="card">Card to replace</param>
         void GiveCard(ICard card);
+
+        CardDisplay Clone(Func<ICard> drawCard, Action<ICard> discardCard);
     }
 
     [Serializable]
@@ -31,6 +33,7 @@ namespace ThebesCore
         Action<ICard> DiscardCard;
         public static int timeToChangeCards = 1;
 
+        public CardDisplay() { }
         public CardDisplay(Func<ICard> drawCard, Action<ICard> discardCard)
         {
             AvailableCards = new ICard[4];
@@ -66,6 +69,15 @@ namespace ThebesCore
 
             this.AvailableCards[cardIndex] = drawCardMethod();
         }
+
+        public CardDisplay Clone(Func<ICard> drawCard, Action<ICard> discardCard)
+        {
+            CardDisplay newCD = new CardDisplay();
+            newCD.drawCardMethod = drawCard;
+            newCD.DiscardCard = discardCard;
+            newCD.AvailableCards = (ICard[])AvailableCards.Clone();
+            return newCD;
+        }
     }
 
     public interface IExhibitionDisplay
@@ -74,6 +86,7 @@ namespace ThebesCore
 
         void DisplayExhibition(IExhibitionCard exhibition);
         void GiveExhibition(IExhibitionCard exhibition);
+        ExhibitionDisplay Clone(Action<ICard> discardCard);
     }
 
     [Serializable]
@@ -111,6 +124,13 @@ namespace ThebesCore
             }
 
             Exhibitions[cardIndex] = null;
+        }
+
+        public ExhibitionDisplay Clone(Action<ICard> discardCard)
+        {
+            ExhibitionDisplay newED = new ExhibitionDisplay(discardCard);
+            newED.Exhibitions = (IExhibitionCard[])Exhibitions.Clone();
+            return newED;
         }
 
     }

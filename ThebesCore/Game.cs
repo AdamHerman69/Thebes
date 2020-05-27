@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ThebesCore
 {  
-    public interface IGame : ICloneable
+    public interface IGame
     {
         IPlayer ActivePlayer { get; }
         List<IPlayer> Players { get; }
@@ -179,10 +179,33 @@ namespace ThebesCore
             }
 
         }
-        public object Clone()
+        public IGame Clone()
         {
-            throw new NotImplementedException();
-            new Game();
+            Game newGame = new Game();
+
+            newGame.random = new Random();
+            newGame.Deck = this.Deck.Clone();
+            newGame.AvailableCards = this.AvailableCards.Clone(newGame.Deck.DrawCard, newGame.Deck.Discard);
+            newGame.ActiveExhibitions = this.ActiveExhibitions.Clone(newGame.Deck.Discard);
+            
+            newGame.DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();
+            foreach (KeyValuePair<IDigSite, List<IToken>> digsite_tokenList in newGame.DigsiteInventory)
+            {
+                newGame.DigsiteInventory[digsite_tokenList.Key] = new List<IToken>(this.DigsiteInventory[digsite_tokenList.Key]);
+            }
+
+
+            newGame.Players = this.Players.Select(p => p.Clone(
+                null,
+                newGame.AvailableCards.ChangeDisplayedCards,
+                newGame.AvailableCards.GiveCard,
+                newGame.Deck.Discard,
+                newGame.ActiveExhibitions.GiveExhibition,
+                newGame.DrawTokens,
+                newGame.PlayersOnWeek
+                )).ToList();
+
+            return newGame;
         }
     }
 }

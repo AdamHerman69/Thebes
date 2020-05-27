@@ -39,6 +39,13 @@ namespace ThebesCore
         void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace);
         bool ToggleZeppelin(bool use);
         bool UseSpecialPermission(IDigSite digSite);
+        IPlayer Clone(Action<string> errorDialog,
+            System.Action changeDisplayCards,
+            Action<ICard> takeCard,
+            Action<ICard> discardCard,
+            Action<IExhibitionCard> executeExhibition,
+            Func<IDigSite, int, List<IToken>> drawTokens,
+            Func<ITime, int> playersOnWeek);
     }
 
     [Serializable]
@@ -515,6 +522,45 @@ namespace ThebesCore
             {
                 Permissions[digsite] = true;
             }
+        }
+
+        public IPlayer Clone(Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<IDigSite, int, List<IToken>> drawTokens, Func<ITime, int> playersOnWeek)
+        {
+            Player newPlayer = new Player();
+            newPlayer.Name = Name;
+            newPlayer.CurrentPlace = CurrentPlace;
+
+            // delegates
+            newPlayer.errorDialog = errorDialog;
+            newPlayer.changeDisplayCards = changeDisplayCards;
+            newPlayer.takeCard = takeCard;
+            newPlayer.discardCard = discardCard;
+            newPlayer.executeExhibition = executeExhibition;
+            newPlayer.drawTokens = drawTokens;
+
+            newPlayer.Time = Time.Clone(playersOnWeek, newPlayer.ResetPermissions);
+
+            newPlayer.GeneralKnowledge = GeneralKnowledge;
+            newPlayer.Zeppelins = Zeppelins;
+            newPlayer.useZeppelin = useZeppelin;
+            newPlayer.SpecialPermissions = SpecialPermissions;
+            newPlayer.Congresses = Congresses;
+            newPlayer.Assistants = Assistants;
+            newPlayer.Shovels = Shovels;
+            newPlayer.Cars = Cars;
+            newPlayer.Points = Points;
+
+            newPlayer.CardChangeCost = CardChangeCost;
+            newPlayer.LastRoundChange = LastRoundChange;
+
+            // Collections
+            newPlayer.Permissions = new Dictionary<IDigSite, bool>(Permissions);
+            newPlayer.SpecializedKnowledge = new Dictionary<IDigSite, int>(SpecializedKnowledge);
+            newPlayer.SingleUseKnowledge = new Dictionary<IDigSite, int>(SingleUseKnowledge);
+            newPlayer.Cards = new List<ICard>(Cards);
+            newPlayer.Tokens = new Dictionary<IDigSite, List<IToken>>(Tokens);
+
+            return newPlayer;
         }
     }
 

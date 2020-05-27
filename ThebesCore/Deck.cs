@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ThebesCore
@@ -11,6 +12,7 @@ namespace ThebesCore
     {
         void Discard(ICard card);
         ICard DrawCard();
+        Deck Clone();
     }
 
     [Serializable]
@@ -20,6 +22,7 @@ namespace ThebesCore
         private List<ICard> DiscardPile { get; set; }
         Random random;
 
+        public Deck() { }
         public Deck(List<ICard> cards, int playerCount)
         {
             DiscardPile = new List<ICard>();
@@ -156,6 +159,15 @@ namespace ThebesCore
         public void Discard(ICard card)
         {
             DiscardPile.Add(card);
+        }
+
+        public Deck Clone()
+        {
+            Deck newDeck = new Deck();
+            newDeck.random = new Random();
+            newDeck.DiscardPile = new List<ICard>(this.DiscardPile);
+            newDeck.CardDeck = new Queue<ICard>(this.CardDeck);
+            return newDeck;
         }
     }
 }

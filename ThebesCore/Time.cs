@@ -20,6 +20,7 @@ namespace ThebesCore
         int RemainingWeeks();
         void SpendWeeks(int weeks);
         string ToString();
+        Time Clone(Func<ITime, int> playersOnWeek, System.Action onNewYear);
     }
 
     [Serializable]
@@ -27,8 +28,7 @@ namespace ThebesCore
     {
         Func<ITime, int> playersOnWeek;
 
-        public delegate void OnNewYear();
-        OnNewYear onNewYear;
+        System.Action onNewYear;
 
         public static int weeksInAYear = 52;
         public static int firstYear;
@@ -76,7 +76,7 @@ namespace ThebesCore
 
         public Time() { }
 
-        public Time(Func<ITime, int> playersOnWeek, OnNewYear onNewYear)
+        public Time(Func<ITime, int> playersOnWeek, System.Action onNewYear)
         {
             //if (startingWeek == 0) // hasn't been configured
             //{
@@ -116,7 +116,7 @@ namespace ThebesCore
             {
                 CurrentYear++;
                 CurrentWeek -= weeksInAYear;
-                onNewYear();
+                this.onNewYear();
             }
 
             this.SameWeekOrder = playersOnWeek(this);
@@ -156,6 +156,18 @@ namespace ThebesCore
             }
 
             return result;
+        }
+
+        public Time Clone(Func<ITime, int> playersOnWeek, System.Action onNewYear)
+        {
+            Time newTime = new Time();
+            newTime.playersOnWeek = playersOnWeek;
+            newTime.onNewYear = onNewYear;
+
+            newTime.CurrentWeek = CurrentWeek;
+            newTime.CurrentYear = CurrentYear;
+            newTime.SameWeekOrder = SameWeekOrder;
+            return newTime;
         }
     }
 }
