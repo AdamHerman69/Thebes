@@ -191,7 +191,7 @@ namespace ThebesCore
             newGame.ActiveExhibitions = this.ActiveExhibitions.Clone(newGame.Deck.Discard);
             
             newGame.DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();
-            foreach (KeyValuePair<IDigSite, List<IToken>> digsite_tokenList in newGame.DigsiteInventory)
+            foreach (KeyValuePair<IDigSite, List<IToken>> digsite_tokenList in this.DigsiteInventory)
             {
                 newGame.DigsiteInventory[digsite_tokenList.Key] = new List<IToken>(this.DigsiteInventory[digsite_tokenList.Key]);
             }

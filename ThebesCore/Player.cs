@@ -406,8 +406,9 @@ namespace ThebesCore
         /// <param name="singleUseCards">Single use cards to use. NOT WORKING ATM</param>
         public List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards)
         {
-            // TODO different dialog for invalid permission and no specialized knowledge
-            if (Time.RemainingWeeks() < weeks + GameSettings.GetDistance(CurrentPlace, digSite))
+            int travelTime = GameSettings.GetDistance(CurrentPlace, digSite);
+            if (useZeppelin) travelTime = 0;
+            if (Time.RemainingWeeks() < weeks + travelTime)
             {
                 errorDialog("You don't have enough time!");
                 return null;
@@ -609,7 +610,12 @@ namespace ThebesCore
             newPlayer.SpecializedKnowledge = new Dictionary<IDigSite, int>(SpecializedKnowledge);
             newPlayer.SingleUseKnowledge = new Dictionary<IDigSite, int>(SingleUseKnowledge);
             newPlayer.Cards = new List<ICard>(Cards);
-            newPlayer.Tokens = new Dictionary<IDigSite, List<IToken>>(Tokens);
+
+            newPlayer.Tokens = new Dictionary<IDigSite, List<IToken>>();
+            foreach (KeyValuePair<IDigSite, List<IToken>> digSite_tokenList in this.Tokens)
+            {
+                newPlayer.Tokens[digSite_tokenList.Key] = new List<IToken>(this.Tokens[digSite_tokenList.Key]);
+            }
 
             return newPlayer;
         }

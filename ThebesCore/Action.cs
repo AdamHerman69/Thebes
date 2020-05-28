@@ -24,6 +24,7 @@ namespace ThebesCore
         protected static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public abstract void Execute(IPlayer player);
+        public abstract override string ToString();
     }
 
     public class ChangeCardsAction : Action
@@ -39,6 +40,11 @@ namespace ThebesCore
         {
             log.Debug($"{player.Time}: Player {player.Name} Changing cards at {cardChangePlace}");
             player.MoveAndChangeDisplayCards(cardChangePlace);
+        }
+
+        public override string ToString()
+        {
+            return $"ChangeCards";
         }
     }
 
@@ -56,6 +62,11 @@ namespace ThebesCore
             log.Debug($"{player.Time}: Player {player.Name} taking {card}");
             player.MoveAndTakeCard(card);
         }
+
+        public override string ToString()
+        {
+            return $"Take {card}";
+        }
     }
 
     public class ExecuteExhibitionAction : Action
@@ -72,6 +83,11 @@ namespace ThebesCore
             log.Debug($"{player.Time}: Player {player.Name} executing exhibition: {exhibition}");
             player.MoveAndTakeCard(exhibition);
         }
+
+        public override string ToString()
+        {
+            return $"Execute {exhibition}";
+        }
     }
 
     public class EndYearAction : Action
@@ -82,6 +98,11 @@ namespace ThebesCore
         {
             log.Debug($"{player.Time}: Player {player.Name} ending year");
             player.EndYear();
+        }
+
+        public override string ToString()
+        {
+            return $"EndYear";
         }
     }
 
@@ -97,6 +118,11 @@ namespace ThebesCore
         {
             log.Debug($"{player.Time}: Player {player.Name} using a zeppelin");
             player.ToggleZeppelin(use);
+        }
+
+        public override string ToString()
+        {
+            return $"UseZeppelin";
         }
     }
 
@@ -130,6 +156,11 @@ namespace ThebesCore
                 }
             }
             
+        }
+
+        public override string ToString()
+        {
+            return $"Dig {digSite}, {weeks} weeks";
         }
     }
 

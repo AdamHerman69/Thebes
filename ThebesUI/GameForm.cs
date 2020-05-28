@@ -385,7 +385,7 @@ namespace ThebesUI
         /// <param name="action"></param>
         public void ExecuteAction(IAction action)
         {
-            if (!game.Play(action))
+            if (!game.Play(action, UpdateBoard))
             {
                 UpdateBoard();
             }

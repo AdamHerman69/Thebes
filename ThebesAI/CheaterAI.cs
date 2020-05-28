@@ -165,7 +165,7 @@ namespace ThebesAI
         public IAction TakeAction(IGame gameState)
         {
             MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null);
-            return mctsNode.Run(3000);
+            return mctsNode.Run(10000);
         }
     }
 
@@ -173,11 +173,16 @@ namespace ThebesAI
     {
         Dictionary<string, int> scores; // string is player name
         int visits;
-        static double explorationConstant = 2;
+        static double explorationConstant = 70;
 
         ISimulationState state;
         List<MCTSNode> children;
         MCTSNode parent;
+
+        public override string ToString()
+        {
+            return $"{state.Move}, UCB: {UCB1("cheater", 0)}, visits: {visits}";
+        }
 
         public MCTSNode(ISimulationState state, MCTSNode parent)
         {
@@ -202,7 +207,7 @@ namespace ThebesAI
             }
         }
 
-        public double UCB1(IPlayer player, double explorationConstant)
+        public double UCB1(string playerName, double explorationConstant)
         {
             if (visits == 0)
             {
@@ -210,7 +215,7 @@ namespace ThebesAI
             }
             else
             {
-                return scores[player.Name] / visits + explorationConstant * Math.Sqrt(Math.Log(parent.visits) / this.visits);
+                return scores[playerName] / visits + explorationConstant * Math.Sqrt(Math.Log(parent.visits) / this.visits);
             }
         }
 
@@ -256,7 +261,8 @@ namespace ThebesAI
                     else
                     {
                         Backpropagate(children[0].RandomRollout());
-                    }                   
+                    }
+                   
                 }
             }
             else
@@ -272,7 +278,7 @@ namespace ThebesAI
             double score;
             foreach (MCTSNode node in children)
             {
-                if ((score = node.UCB1(this.state.ActivePlayer, explorationConstant)) > maxUCB1)
+                if ((score = node.UCB1(this.state.ActivePlayer.Name, explorationConstant)) > maxUCB1)
                 {
                     bestChild = node;
                     maxUCB1 = score;

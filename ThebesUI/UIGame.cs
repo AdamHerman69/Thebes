@@ -17,7 +17,7 @@ namespace ThebesUI
         void Initialize(Dictionary<IPlayer, PlayerColor> playerColors);
         new ICardView[] DisplayedCards { get; }
         new ICardView[] DisplayedExhibitions { get; }
-        bool Play(IAction action);
+        bool Play(IAction action, System.Action redraw = null);
         Dictionary<IPlayer, PlayerColor> Colors { get; }
     }
 
@@ -47,15 +47,18 @@ namespace ThebesUI
         /// Also ends the game when all players are done.
         /// </summary>
         /// <param name="action">action to execute</param>
+        /// <param name="redraw">Action called after each move to redraw the board, null by default</param>
         /// <returns></returns>
-        public bool Play(IAction action)
+        public bool Play(IAction action, System.Action redraw = null)
         {
             Move(action);
 
             while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
             {
+                redraw?.Invoke();
                 action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
                 Move(action);
+                
             }
 
             if (AreAllPlayersDone())
