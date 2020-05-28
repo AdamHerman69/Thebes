@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 
 namespace ThebesCore
@@ -39,6 +40,8 @@ namespace ThebesCore
         void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace);
         bool ToggleZeppelin(bool use);
         bool UseSpecialPermission(IDigSite digSite);
+        bool IsEnoughTime(IAction action);
+        bool CanIDig(DigSite digSite);
         IPlayer Clone(Action<string> errorDialog,
             System.Action changeDisplayCards,
             Action<ICard> takeCard,
@@ -455,6 +458,11 @@ namespace ThebesCore
             return dugTokens;
         }
 
+        public  bool CanIDig(DigSite digSite)
+        {
+            return Permissions[digSite] && SpecializedKnowledge[digSite] > 0;
+        }
+
         /// <summary>
         /// Moves a player to the destination of the desired card and takes it. Spending weeks.
         /// </summary>
@@ -463,10 +471,13 @@ namespace ThebesCore
         {
             if (card is IExhibitionCard && !((IExhibitionCard)card).CheckRequiredArtifacts(Tokens))
             {
-                errorDialog("You don't have the required artifacts!"); // TODO can't execute exhibition dialog
+                errorDialog("You don't have the required artifacts!");
                 return;
             }
-            if (Time.RemainingWeeks() < card.Weeks + GameSettings.GetDistance(CurrentPlace, card.Place))
+
+            int travelTime = GameSettings.GetDistance(CurrentPlace, card.Place);
+            if (useZeppelin) travelTime = 0;
+            if (Time.RemainingWeeks() < card.Weeks + travelTime)
             {
                 errorDialog("You don't have enought time for that!");
                 return;
@@ -490,7 +501,9 @@ namespace ThebesCore
         /// <param name="cardChangePlace">Place where to change cards</param>
         public void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace)
         {
-            if (Time.RemainingWeeks() < GameSettings.GetDistance(CurrentPlace, cardChangePlace) + CardDisplay.timeToChangeCards)
+            int travelTime = GameSettings.GetDistance(CurrentPlace, cardChangePlace);
+            if (useZeppelin) travelTime = 0; 
+            if (Time.RemainingWeeks() < travelTime + CardDisplay.timeToChangeCards)
             {
                 errorDialog("You don't have enough time to change the display cards");
                 return;
@@ -524,6 +537,44 @@ namespace ThebesCore
             }
         }
 
+        private int WeeksNeeded(IAction action)
+        {
+            if (action is ChangeCardsAction)
+            {
+                int weeks = 0;
+                if (!useZeppelin) weeks += GameSettings.GetDistance(CurrentPlace, ((ChangeCardsAction)action).cardChangePlace);
+                return weeks + CardChangeCost;
+            }
+            else if (action is TakeCardAction)
+            {
+                int weeks = 0;
+                if (!useZeppelin) weeks += GameSettings.GetDistance(CurrentPlace, ((TakeCardAction)action).card.Place);
+                return weeks + ((TakeCardAction)action).card.Weeks;
+            }
+            else if (action is ExecuteExhibitionAction)
+            {
+                int weeks = 0;
+                if (!useZeppelin) weeks += GameSettings.GetDistance(CurrentPlace, ((ExecuteExhibitionAction)action).exhibition.Place);
+                return weeks + ((ExecuteExhibitionAction)action).exhibition.Weeks;
+            }
+            else if (action is EndYearAction || action is EndYearAction)
+            {
+                return 0;
+            }
+            else if (action is DigAction)
+            {
+                int weeks = 0;
+                DigAction digAction = (DigAction)action;
+                if (!useZeppelin) weeks += GameSettings.GetDistance(CurrentPlace, digAction.digSite);
+                return weeks + digAction.weeks;
+            }
+            throw new InvalidOperationException();
+        }
+        public bool IsEnoughTime(IAction action)
+        {
+            return Time.CanSpendWeeks(WeeksNeeded(action));
+        }
+
         public IPlayer Clone(Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<IDigSite, int, List<IToken>> drawTokens, Func<ITime, int> playersOnWeek)
         {
             Player newPlayer = new Player();
@@ -553,7 +604,7 @@ namespace ThebesCore
             newPlayer.CardChangeCost = CardChangeCost;
             newPlayer.LastRoundChange = LastRoundChange;
 
-            // Collections
+            // Collections 
             newPlayer.Permissions = new Dictionary<IDigSite, bool>(Permissions);
             newPlayer.SpecializedKnowledge = new Dictionary<IDigSite, int>(SpecializedKnowledge);
             newPlayer.SingleUseKnowledge = new Dictionary<IDigSite, int>(SingleUseKnowledge);

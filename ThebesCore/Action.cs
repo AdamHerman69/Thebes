@@ -28,7 +28,7 @@ namespace ThebesCore
 
     public class ChangeCardsAction : Action
     {
-        ICardChangePlace cardChangePlace;
+        public ICardChangePlace cardChangePlace;
 
         public ChangeCardsAction(ICardChangePlace cardChangePlace)
         {
@@ -44,7 +44,7 @@ namespace ThebesCore
 
     public class TakeCardAction : Action
     {
-        ICard card;
+        public ICard card;
 
         public TakeCardAction(ICard card)
         {
@@ -60,7 +60,7 @@ namespace ThebesCore
 
     public class ExecuteExhibitionAction : Action
     {
-        IExhibitionCard exhibition;
+        public IExhibitionCard exhibition;
 
         public ExecuteExhibitionAction(IExhibitionCard exhibition)
         {
@@ -102,8 +102,8 @@ namespace ThebesCore
 
     public class DigAction : Action
     {
-        IDigSite digSite;
-        int weeks;
+        public IDigSite digSite;
+        public int weeks;
         List<ICard> singleUseCards;
         List<IToken> tokens;
 
@@ -120,6 +120,8 @@ namespace ThebesCore
             log.Debug($"{player.Time}: Player {player.Name} digging at {digSite} for {weeks} weeks");
 
             List<IToken> dugTokens = player.Dig(digSite, weeks, singleUseCards);
+            
+            // only if you need to inspect the result
             if (dugTokens != null && tokens != null)
             {
                 foreach (IToken token in dugTokens)

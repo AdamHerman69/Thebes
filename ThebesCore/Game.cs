@@ -16,6 +16,7 @@ namespace ThebesCore
         ICard[] DisplayedExhibitions { get; }
         void Move(IAction action);
         Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; }
+        IGame Clone();
     }
     
     [Serializable]
@@ -179,13 +180,14 @@ namespace ThebesCore
             }
 
         }
+
         public IGame Clone()
         {
             Game newGame = new Game();
 
             newGame.random = new Random();
             newGame.Deck = this.Deck.Clone();
-            newGame.AvailableCards = this.AvailableCards.Clone(newGame.Deck.DrawCard, newGame.Deck.Discard);
+            newGame.AvailableCards = this.AvailableCards.Clone(newGame.DrawCard, newGame.Deck.Discard);
             newGame.ActiveExhibitions = this.ActiveExhibitions.Clone(newGame.Deck.Discard);
             
             newGame.DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();

@@ -111,6 +111,10 @@ namespace ThebesCore
         {
             if (CardDeck.Count == 0)
             {
+                if (DiscardPile.Where(c => !(c is IExhibitionCard)).Count() == 0)
+                {
+                    return null;
+                }
                 recycleDeck();
             }
             return CardDeck.Dequeue();

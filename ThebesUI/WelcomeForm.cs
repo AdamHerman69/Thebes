@@ -38,6 +38,7 @@ namespace ThebesUI
             foreach (PlayerInput playerInput in playerInputs)
             {
                 playerInput.AddDefaultAI(typeof(TestAI));
+                playerInput.AddAI(typeof(CheaterAI));
             }
         }
 

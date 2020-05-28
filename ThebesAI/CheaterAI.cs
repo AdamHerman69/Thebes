@@ -15,52 +15,163 @@ namespace ThebesAI
         List<ISimulationState> GetAllChildStates();
         IPlayer ActivePlayer { get; }
         ISimulationState RandomChild();
-        Dictionary<IPlayer, int> GetScores();
+        Dictionary<string, int> GetScores();
         IAction Move { get; }
+        IGame Game { get;}
     }
 
     class SimulationState : ISimulationState
     {
-        IGame game;
+        public IGame Game { get; private set; }
+        public IAction Move { get; private set; }
 
-        public IPlayer ActivePlayer => throw new NotImplementedException();
+        public SimulationState(IGame game, IAction move = null)
+        {
+            this.Game = game.Clone();
+            if (move != null)
+            {
+                this.Move = move;
+                this.Game.Move(move);
+            }
+        }
 
-        public IAction Move => throw new NotImplementedException();
+        public IPlayer ActivePlayer { get { return Game.ActivePlayer; } }
 
         public List<ISimulationState> GetAllChildStates()
         {
-            throw new NotImplementedException();
+            List<ISimulationState> childStates = new List<ISimulationState>();
+            List<IAction> possibleActions = GetAllPossibleActions();
+
+            foreach (IAction action in possibleActions)
+            {
+                childStates.Add(new SimulationState(this.Game, action));
+            }
+
+            return childStates;
         }
 
-        public Dictionary<IPlayer, int> GetScores()
+        private List<IAction> GetAllPossibleActions()
         {
-            throw new NotImplementedException();
+            List<IAction> actions = new List<IAction>();
+            IAction action;
+
+            //no time left
+            if (Game.ActivePlayer.Time.RemainingWeeks() == 0)
+            {
+                return actions;
+            }
+
+            // change cards
+            foreach (IPlace place in GameSettings.Places)
+            {
+                if (place is ICardChangePlace)
+                {
+                    action = new ChangeCardsAction((ICardChangePlace)place);
+                    if (Game.ActivePlayer.IsEnoughTime(action))
+                    {
+                        actions.Add(action);
+                    }
+                }
+            }
+
+
+            // take card
+            foreach (ICard card in Game.DisplayedCards)
+            {
+                if (card == null) continue;
+                
+                action = new TakeCardAction(card);
+                if (Game.ActivePlayer.IsEnoughTime(action))
+                {
+                    actions.Add(action);
+                }
+            }
+
+            // execute exhibition
+            foreach (IExhibitionCard exhibition in Game.DisplayedExhibitions)
+            {
+                if (exhibition == null) continue;
+
+                action = new ExecuteExhibitionAction(exhibition);
+                if (Game.ActivePlayer.IsEnoughTime(action) && exhibition.CheckRequiredArtifacts(Game.ActivePlayer.Tokens))
+                {
+                    actions.Add(action);
+                }
+            }
+
+            // dig
+            foreach (DigSite digSite in Game.DigsiteInventory.Keys)
+            {
+                if (!Game.ActivePlayer.CanIDig(digSite)) continue;
+
+                for (int weeks = 1; weeks <= 12; weeks++)
+                {
+                    // TODO single use cards
+                    action = new DigAction(digSite, weeks, null, null);
+                    if (Game.ActivePlayer.IsEnoughTime(action))
+                    {
+                        actions.Add(action);
+                    }
+                }
+            }
+
+            // use zeppelin
+            if (Game.ActivePlayer.Zeppelins > 0 && actions.Count > 0)
+            {
+                actions.Add(new ZeppelinAction(true));
+            }
+
+            // end year
+            actions.Add(new EndYearAction());
+
+            return actions;
+        }
+
+        public Dictionary<string, int> GetScores()
+        {
+            Dictionary<string, int> scores = new Dictionary<string, int>();
+            foreach (IPlayer player in Game.Players)
+            {
+                scores[player.Name] = player.Points;
+            }
+
+            return scores;
         }
 
         public ISimulationState NextState(IAction move)
         {
-            throw new NotImplementedException();
+            return new SimulationState(this.Game, move);
         }
 
         public ISimulationState RandomChild()
         {
-            throw new NotImplementedException();
+            Random random = new Random();
+            List<IAction> possibleActions = GetAllPossibleActions();
+
+            if (possibleActions.Count == 0)
+            {
+                return null;
+            }
+
+            return new SimulationState(Game, possibleActions[random.Next(0, possibleActions.Count)]);
         }
     }
 
 
 
-    class CheaterAI : IAI
+    public class CheaterAI : IAI
     {
+        public CheaterAI(IPlayerData player, IGame game) { }
         public IAction TakeAction(IGame gameState)
         {
-            throw new NotImplementedException();
+            MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null);
+            return mctsNode.Run(3000);
         }
     }
 
     class MCTSNode
     {
-        Dictionary<IPlayer, int> scores;
+        Dictionary<string, int> scores; // string is player name
         int visits;
         static double explorationConstant = 2;
 
@@ -68,9 +179,24 @@ namespace ThebesAI
         List<MCTSNode> children;
         MCTSNode parent;
 
-        private void UpdateScore(Dictionary<IPlayer, int> newScores)
+        public MCTSNode(ISimulationState state, MCTSNode parent)
         {
-            foreach (KeyValuePair<IPlayer, int> player_score in scores)
+            scores = null;
+            visits = 0;
+            children = new List<MCTSNode>();
+            this.state = state;
+            this.parent = parent;
+            
+            this.scores = new Dictionary<string, int>();
+            foreach (IPlayer player in state.Game.Players)
+            {
+                scores.Add(player.Name, 0);
+            }
+        }
+
+        private void UpdateScore(Dictionary<string, int> newScores)
+        {
+            foreach (KeyValuePair<string, int> player_score in newScores)
             {
                 scores[player_score.Key] += newScores[player_score.Key];
             }
@@ -84,17 +210,8 @@ namespace ThebesAI
             }
             else
             {
-                return scores[player] / visits + explorationConstant * Math.Sqrt(Math.Log(parent.visits) / this.visits);
+                return scores[player.Name] / visits + explorationConstant * Math.Sqrt(Math.Log(parent.visits) / this.visits);
             }
-        }
-
-        public MCTSNode(ISimulationState state, MCTSNode parent)
-        {
-            scores = null;
-            visits = 0;
-            children = new List<MCTSNode>();
-            this.state = state;
-            this.parent = parent;
         }
 
         public IAction Run(int miliseconds)
@@ -114,9 +231,8 @@ namespace ThebesAI
             {
                 children.Add(new MCTSNode(state, this));
             }
-            if (children.Count == 0) throw new InvalidOperationException("at least one action should be possible");
         }
-
+        
         private bool IsLeaf()
         {
             return this.children.Count == 0;
@@ -133,7 +249,14 @@ namespace ThebesAI
                 else
                 {
                     Expand();
-                    Backpropagate(children[0].RandomRollout());
+                    if (children.Count == 0)
+                    {
+                        Backpropagate(state.GetScores());
+                    }
+                    else
+                    {
+                        Backpropagate(children[0].RandomRollout());
+                    }                   
                 }
             }
             else
@@ -160,17 +283,17 @@ namespace ThebesAI
             return bestChild;
         }
 
-        private Dictionary<IPlayer, int> RandomRollout()
+        private Dictionary<string, int> RandomRollout()
         {
             ISimulationState randomChild, currentState = this.state;
-            while ((randomChild = state.RandomChild()) != null)
+            while ((randomChild = currentState.RandomChild()) != null)
             {
                 currentState = randomChild;
             }
             return currentState.GetScores();
         }
 
-        private void Backpropagate(Dictionary<IPlayer, int> newScores)
+        private void Backpropagate(Dictionary<string, int> newScores)
         {
             MCTSNode current = this;
             while (current != null )
