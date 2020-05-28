@@ -164,7 +164,7 @@ namespace ThebesAI
         public CheaterAI(IPlayerData player, IGame game) { }
         public IAction TakeAction(IGame gameState)
         {
-            MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null);
+            MCTSNodeTest mctsNode = new MCTSNodeTest(new SimulationState(gameState), null);
             return mctsNode.Run(10000);
         }
     }
@@ -179,11 +179,6 @@ namespace ThebesAI
         List<MCTSNode> children;
         MCTSNode parent;
 
-        public override string ToString()
-        {
-            return $"{state.Move}, UCB: {UCB1("cheater", 0)}, visits: {visits}";
-        }
-
         public MCTSNode(ISimulationState state, MCTSNode parent)
         {
             scores = null;
@@ -197,6 +192,11 @@ namespace ThebesAI
             {
                 scores.Add(player.Name, 0);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{state.Move}, UCB: {UCB1("cheater", 0)}, visits: {visits}";
         }
 
         private void UpdateScore(Dictionary<string, int> newScores)
@@ -249,7 +249,7 @@ namespace ThebesAI
             {
                 if (visits == 0)
                 {
-                    Backpropagate(RandomRollout());
+                    Backpropagate(Rollout());
                 }
                 else
                 {
@@ -260,7 +260,7 @@ namespace ThebesAI
                     }
                     else
                     {
-                        Backpropagate(children[0].RandomRollout());
+                        Backpropagate(children[0].Rollout());
                     }
                    
                 }
@@ -271,7 +271,7 @@ namespace ThebesAI
             }
         }
 
-        private MCTSNode pickBestChild(double explorationConstant)
+        protected virtual MCTSNode pickBestChild(double explorationConstant)
         {
             MCTSNode bestChild = null;
             double maxUCB1 = double.MinValue;
@@ -289,7 +289,7 @@ namespace ThebesAI
             return bestChild;
         }
 
-        private Dictionary<string, int> RandomRollout()
+        protected virtual Dictionary<string, int> Rollout()
         {
             ISimulationState randomChild, currentState = this.state;
             while ((randomChild = currentState.RandomChild()) != null)
@@ -302,7 +302,7 @@ namespace ThebesAI
         private void Backpropagate(Dictionary<string, int> newScores)
         {
             MCTSNode current = this;
-            while (current != null )
+            while (current != null)
             {
                 current.UpdateScore(newScores);
                 current.visits++;
@@ -312,5 +312,12 @@ namespace ThebesAI
         }
     }
 
-    
+    class MCTSNodeTest : MCTSNode
+    {
+        public MCTSNodeTest(ISimulationState state, MCTSNode parent) : base(state, parent)
+        {
+
+        }
+
+    }
 }

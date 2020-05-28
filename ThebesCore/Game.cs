@@ -125,6 +125,11 @@ namespace ThebesCore
                 ResetCardChangeInfos();
                 Players.Sort();
             }
+
+            if (AreAllPlayersDone())
+            {
+                AddPointsFromKnowledge();
+            }
         }
 
 
@@ -159,19 +164,20 @@ namespace ThebesCore
         /// </summary>
         public void AddPointsFromKnowledge()
         {
+            List<IPlayer> sortedPlayers;
             foreach (IDigSite digSite in GameSettings.Places.Where(p => p is IDigSite))
             {
-                Players.OrderByDescending(p => p.SpecializedKnowledge[digSite]);
+                sortedPlayers = Players.OrderByDescending(p => p.SpecializedKnowledge[digSite]).ToList();
 
-                if (Players[0].SpecializedKnowledge[digSite] > 0 && Players[0].SpecializedKnowledge[digSite] > Players[1].SpecializedKnowledge[digSite])
+                if (sortedPlayers[0].SpecializedKnowledge[digSite] > 0 && sortedPlayers[0].SpecializedKnowledge[digSite] > sortedPlayers[1].SpecializedKnowledge[digSite])
                 {
-                    Players[0].Points += 5;
+                    sortedPlayers[0].Points += 5;
                 }
-                else if (Players[0].SpecializedKnowledge[digSite] > 0)
+                else if (sortedPlayers[0].SpecializedKnowledge[digSite] > 0)
                 {
-                    foreach (IPlayer player in Players)
+                    foreach (IPlayer player in sortedPlayers)
                     {
-                        if (player.SpecializedKnowledge[digSite] == Players[0].SpecializedKnowledge[digSite])
+                        if (player.SpecializedKnowledge[digSite] == sortedPlayers[0].SpecializedKnowledge[digSite])
                         {
                             player.Points += 3;
                         }

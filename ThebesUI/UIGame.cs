@@ -57,13 +57,11 @@ namespace ThebesUI
             {
                 redraw?.Invoke();
                 action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
-                Move(action);
-                
+                Move(action);       
             }
 
             if (AreAllPlayersDone())
             {
-                AddPointsFromKnowledge();
                 return true;
             }
             return false;
