@@ -176,8 +176,6 @@ namespace ThebesUI
         /// </summary>
         public void UpdateBoard()
         {
-            //DrawingControl.SuspendDrawing(this);
-
             // zeppelin button
             if (game.ActivePlayer.Zeppelins > 0)
             {
@@ -237,7 +235,7 @@ namespace ThebesUI
             if (index > 2) index = 2;
             yearCounter.Location = layout.YearCounter[index].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
 
-            //DrawingControl.ResumeDrawing(this);
+            this.Refresh();
         }
 
         /// <summary>
