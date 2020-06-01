@@ -6,9 +6,228 @@ using System.Text;
 using System.Threading.Tasks;
 using ThebesCore;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace ThebesAI
 {
+    class SimGame : Game
+    {
+        public Dictionary<IDigSite, double> assumedArtifactSum;
+        public Dictionary<IDigSite, double> assumedArtifactCount;
+
+        public SimGame(Game game)
+        {
+            this.Deck = game.Deck.Clone();
+            this.AvailableCards = game.AvailableCards.Clone(this.DrawCard, this.Deck.Discard);
+            this.ActiveExhibitions = game.ActiveExhibitions.Clone(this.Deck.Discard);
+
+            this.DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();
+            foreach (KeyValuePair<IDigSite, List<IToken>> digsite_tokenList in game.DigsiteInventory)
+            {
+                this.DigsiteInventory[digsite_tokenList.Key] = new List<IToken>(game.DigsiteInventory[digsite_tokenList.Key]);
+            }
+
+
+            this.Players = game.Players.Select(p => p.Clone(
+                null,
+                this.AvailableCards.ChangeDisplayedCards,
+                this.AvailableCards.GiveCard,
+                this.Deck.Discard,
+                this.ActiveExhibitions.GiveExhibition,
+                this.DrawTokens,
+                this.PlayersOnWeek
+                )).ToList();
+
+            // SimGame Specifics
+            assumedArtifactSum = new Dictionary<IDigSite, double>();
+            assumedArtifactCount = new Dictionary<IDigSite, double>();
+
+            if (game is SimGame)
+            {
+                assumedArtifactCount = new Dictionary<IDigSite, double>(((SimGame)game).assumedArtifactCount);
+                assumedArtifactSum = new Dictionary<IDigSite, double>(((SimGame)game).assumedArtifactSum);
+            }
+            else
+            {   
+                foreach (var digSite_tokenList in DigsiteInventory)
+                {
+                    assumedArtifactSum[digSite_tokenList.Key] = 0;
+                    assumedArtifactCount[digSite_tokenList.Key] = 0;
+
+                    foreach (IToken token in digSite_tokenList.Value)
+                    {
+                        if (token is IArtifactToken)
+                        {
+                            assumedArtifactSum[digSite_tokenList.Key] += ((IArtifactToken)token).Points;
+                            assumedArtifactCount[digSite_tokenList.Key] += 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        public double ExpectedValueOfToken(IDigSite digSite)
+        {
+            return assumedArtifactSum[digSite] / (assumedArtifactCount[digSite] + 16);
+        }
+
+        public double ExpectedNumberOfTokens(IDigSite digSite)
+        {
+            return assumedArtifactCount[digSite] / (assumedArtifactCount[digSite] + 16);
+        }
+
+        public new SimGame Clone()
+        {
+            return new SimGame(this);
+        }
+    }
+
+    class SimPlayer : Player
+    {
+        SimGame game;
+        double assumedPoints;
+        Dictionary<IDigSite, double> assumedArtifacts;
+
+        public SimPlayer() { }
+        
+        public SimPlayer(SimGame game, Player player)
+        {
+            this.Name = player.Name;
+            this.CurrentPlace = player.CurrentPlace;
+
+            // delegates
+            this.errorDialog = null;
+            this.changeDisplayCards = game.AvailableCards.ChangeDisplayedCards;
+            this.takeCard = game.AvailableCards.GiveCard;
+            this.discardCard = game.Deck.Discard;
+            this.executeExhibition = game.ActiveExhibitions.GiveExhibition;
+            this.drawTokens = null;
+
+            this.Time = player.Time.Clone(game.PlayersOnWeek, this.ResetPermissions);
+
+            this.GeneralKnowledge = player.GeneralKnowledge;
+            this.Zeppelins = player.Zeppelins;
+            this.useZeppelin = ((SimPlayer)player).useZeppelin;
+            this.SpecialPermissions = player.SpecialPermissions;
+            this.Congresses = player.Congresses;
+            this.Assistants = player.Assistants;
+            this.Shovels = player.Shovels;
+            this.Cars = player.Cars;
+            this.Points = player.Points;
+
+            this.CardChangeCost = player.CardChangeCost;
+            this.LastRoundChange = player.LastRoundChange;
+
+            // Collections 
+            this.Permissions = new Dictionary<IDigSite, bool>(Permissions);
+            this.SpecializedKnowledge = new Dictionary<IDigSite, int>(SpecializedKnowledge);
+            this.SingleUseKnowledge = new Dictionary<IDigSite, int>(SingleUseKnowledge);
+            this.Cards = new List<ICard>(Cards);
+
+            this.Tokens = new Dictionary<IDigSite, List<IToken>>();
+            foreach (KeyValuePair<IDigSite, List<IToken>> digSite_tokenList in player.Tokens)
+            {
+                this.Tokens[digSite_tokenList.Key] = new List<IToken>(player.Tokens[digSite_tokenList.Key]);
+            }
+
+            /////////////////////////////////////////////////
+
+            this.game = game;
+            this.assumedPoints = this.Points;
+
+            assumedArtifacts = new Dictionary<IDigSite, double>();
+            foreach (var digSite_tokenList in Tokens)
+            {
+                assumedArtifacts[digSite_tokenList.Key] = digSite_tokenList.Value.Count();
+            }
+        }
+
+
+        public double AssumedArtifacts(IDigSite digSite)
+        {
+            return this.Tokens[digSite].Where(y => y is IArtifactToken).Count() + assumedArtifacts[digSite];
+        }
+
+        public double AssumedPoints { get => base.Points + assumedPoints; }
+        public override int Points { get => base.Points + (int)assumedPoints; }
+
+        public override void MoveAndTakeCard(ICard card)
+        {
+            if (card is IExhibitionCard && !((IExhibitionCard)card).CheckRequiredArtifacts(this.AssumedArtifacts))
+            {
+                errorDialog("You don't have the required artifacts!");
+                return;
+            }
+
+            int travelTime = GameSettings.GetDistance(CurrentPlace, card.Place);
+            if (useZeppelin) travelTime = 0;
+            if (Time.RemainingWeeks() < card.Weeks + travelTime)
+            {
+                errorDialog("You don't have enough time for that!");
+                return;
+            }
+
+            MoveTo(card.Place);
+            TakeCard(card);
+        }
+
+        // TODO change getPossibleActions na exibice ^^^
+
+        public override List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards)
+        {
+            // don't have to check if valid here
+
+            MoveTo(digSite);
+            Permissions[digSite] = false;
+            Time.SpendWeeks(weeks);
+
+            // get token amount
+            GetDigStats(digSite, singleUseCards, out int knowledge, out int tokenBonus);
+            int tokenAmount = GameSettings.DugTokenCount(knowledge, weeks) + tokenBonus;
+
+            // draw tokens and give them to player
+            double valueDrawn = tokenAmount * game.ExpectedValueOfToken(digSite);
+            double tokenCountDrawn = tokenAmount * game.ExpectedNumberOfTokens(digSite);
+            assumedPoints += valueDrawn;
+            assumedArtifacts[digSite] += tokenCountDrawn;
+
+            // remove assumed tokens from digsite inventory
+            game.assumedArtifactSum[digSite] -= valueDrawn;
+            game.assumedArtifactCount[digSite] -= tokenCountDrawn;
+
+            // TODO actually use single use cards
+            //// discard single-use cards used
+            //if (singleUseCards != null)
+            //{
+            //    foreach (ICard card in singleUseCards)
+            //    {
+            //        Cards.Remove(card);
+            //        discardCard(card);
+            //    }
+            //}
+            //UpdateStats();
+
+            return null;
+        }
+
+
+        public SimPlayer Clone(SimGame game)
+        {
+            SimPlayer clone = new SimPlayer(game, this);
+
+            clone.assumedPoints = this.assumedPoints;
+
+            clone.assumedArtifacts = new Dictionary<IDigSite, double>();
+            foreach (var digSite_double in this.assumedArtifacts)
+            {
+                clone.assumedArtifacts[digSite_double.Key] = digSite_double.Value;
+            }
+
+            return clone;
+        }
+
+    }
+
     interface ISimulationState
     {
         ISimulationState NextState(IAction move);
@@ -52,7 +271,7 @@ namespace ThebesAI
             return childStates;
         }
 
-        private List<IAction> GetAllPossibleActions()
+        protected virtual List<IAction> GetAllPossibleActions()
         {
             List<IAction> actions = new List<IAction>();
             IAction action;
@@ -95,7 +314,12 @@ namespace ThebesAI
                 if (exhibition == null) continue;
 
                 action = new ExecuteExhibitionAction(exhibition);
-                if (Game.ActivePlayer.IsEnoughTime(action) && exhibition.CheckRequiredArtifacts(Game.ActivePlayer.Tokens))
+                if (Game.ActivePlayer.IsEnoughTime(action) && 
+                    (
+                        (Game.ActivePlayer is SimPlayer && exhibition.CheckRequiredArtifacts(((SimPlayer)Game.ActivePlayer).AssumedArtifacts))
+                        || exhibition.CheckRequiredArtifacts(Game.ActivePlayer.Tokens)
+                    )
+                )
                 {
                     actions.Add(action);
                 }
@@ -237,7 +461,6 @@ namespace ThebesAI
     }
 
 
-
     public class CheaterAI : IAI
     {
         public CheaterAI(IPlayerData player, IGame game) { }
@@ -257,6 +480,17 @@ namespace ThebesAI
             return mctsNode.Run(5000);
         }
     }
+
+    public class SimCheaterAI : IAI
+    {
+        public SimCheaterAI(IPlayerData player, IGame game) { }
+        public IAction TakeAction(IGame gameState)
+        {
+            MCTSNode mctsNode = new MCTSNodeCutoff(new SimulationState(new SimGame((Game)gameState)), null);
+            return mctsNode.Run(5000);
+        }
+    }
+
 
     class MCTSNode
     {

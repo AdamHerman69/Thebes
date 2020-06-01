@@ -272,6 +272,7 @@ namespace ThebesCore
         List<IDigSite> ArtifactsRequired { get; }
 
         bool CheckRequiredArtifacts(Dictionary<IDigSite, List<IToken>> tokensObtained);
+        bool CheckRequiredArtifacts(Func<IDigSite, double> tokensObtained);
         bool IsSmallExhibition();
         int Points { get; }
     }
@@ -303,6 +304,18 @@ namespace ThebesCore
             foreach (IDigSite requirement in ArtifactsRequired)
             {
                 if (ArtifactsRequired.Where(x => x == requirement).Count() > tokensObtained[requirement].Where(y => y is IArtifactToken).Count())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public bool CheckRequiredArtifacts(Func<IDigSite, double> tokensObtained)
+        {
+            foreach (IDigSite requirement in ArtifactsRequired)
+            {
+                if (ArtifactsRequired.Where(x => x == requirement).Count() > tokensObtained(requirement))
                 {
                     return false;
                 }

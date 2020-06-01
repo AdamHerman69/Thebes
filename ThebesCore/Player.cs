@@ -54,13 +54,13 @@ namespace ThebesCore
     [Serializable]
     public class Player : IComparable<IPlayer>, IPlayerData, IPlayer
     {
-        Action<string> errorDialog;
-        System.Action changeDisplayCards;
-        Action<ICard> takeCard;
-        Action<ICard> discardCard;
-        Action<IExhibitionCard> executeExhibition;
-        Func<IDigSite, int, List<IToken>> drawTokens;
-        public string Name { get; private set; }
+        protected Action<string> errorDialog;
+        protected System.Action changeDisplayCards;
+        protected Action<ICard> takeCard;
+        protected Action<ICard> discardCard;
+        protected Action<IExhibitionCard> executeExhibition;
+        protected Func<IDigSite, int, List<IToken>> drawTokens;
+        public string Name { get; protected set; }
         public ITime Time { get; set; }
         public Dictionary<IDigSite, bool> Permissions { get; set; }
         public Dictionary<IDigSite, int> SpecializedKnowledge { get; set; }
@@ -68,19 +68,19 @@ namespace ThebesCore
         public int GeneralKnowledge { get; set; }
         public int Zeppelins { get; set; }
 
-        private bool useZeppelin;
+        public bool useZeppelin;
         public int SpecialPermissions { get; set; }
         public int Congresses { get; set; }
         public int Assistants { get; set; }
         public int Shovels { get; set; }
         public int Cars { get; set; }
-        public int Points { get; set; }
+        public virtual int Points { get; set; }
         public List<ICard> Cards { get; set; }
         public Dictionary<IDigSite, List<IToken>> Tokens { get; set; }
         public IPlace CurrentPlace { get; set; }
 
-        private int CardChangeCost { get; set; }
-        protected bool LastRoundChange { get; set; }
+        public int CardChangeCost { get; set; }
+        public bool LastRoundChange { get; set; }
 
         public override string ToString()
         {
@@ -344,7 +344,7 @@ namespace ThebesCore
             CurrentPlace = destination;
         }
 
-        private void TakeCard(ICard card)
+        protected void TakeCard(ICard card)
         {
             Time.SpendWeeks(card.Weeks);
             if (card is IExhibitionCard)
@@ -363,7 +363,7 @@ namespace ThebesCore
         /// <summary>
         /// Is used to update player's stats, whenever he uses a single-use card
         /// </summary>
-        private void UpdateStats()
+        protected void UpdateStats()
         {
             // zero all necessary fields 
             SingleUseKnowledge.Keys.ToList().ForEach(x => SingleUseKnowledge[x] = 0);
@@ -404,7 +404,7 @@ namespace ThebesCore
         /// <param name="digSite">Where to dig</param>
         /// <param name="weeks">How long to dig</param>
         /// <param name="singleUseCards">Single use cards to use. NOT WORKING ATM</param>
-        public List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards)
+        public virtual List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards)
         {
             int travelTime = GameSettings.GetDistance(CurrentPlace, digSite);
             if (useZeppelin) travelTime = 0;
@@ -444,7 +444,6 @@ namespace ThebesCore
                 }
             }
 
-            // TODO change player stats
             // discard single-use cards used
             if (singleUseCards != null)
             {
@@ -468,7 +467,7 @@ namespace ThebesCore
         /// Moves a player to the destination of the desired card and takes it. Spending weeks.
         /// </summary>
         /// <param name="card">Card to take</param>
-        public void MoveAndTakeCard(ICard card)
+        public virtual void MoveAndTakeCard(ICard card)
         {
             if (card is IExhibitionCard && !((IExhibitionCard)card).CheckRequiredArtifacts(Tokens))
             {
@@ -480,7 +479,7 @@ namespace ThebesCore
             if (useZeppelin) travelTime = 0;
             if (Time.RemainingWeeks() < card.Weeks + travelTime)
             {
-                errorDialog("You don't have enought time for that!");
+                errorDialog("You don't have enough time for that!");
                 return;
             }
 
@@ -576,7 +575,7 @@ namespace ThebesCore
             return Time.CanSpendWeeks(WeeksNeeded(action));
         }
 
-        public IPlayer Clone(Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<IDigSite, int, List<IToken>> drawTokens, Func<ITime, int> playersOnWeek)
+        public virtual IPlayer Clone(Action<string> errorDialog, System.Action changeDisplayCards, Action<ICard> takeCard, Action<ICard> discardCard, Action<IExhibitionCard> executeExhibition, Func<IDigSite, int, List<IToken>> drawTokens, Func<ITime, int> playersOnWeek)
         {
             Player newPlayer = new Player();
             newPlayer.Name = Name;

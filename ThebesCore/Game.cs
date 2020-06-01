@@ -22,7 +22,7 @@ namespace ThebesCore
     [Serializable]
     public class Game : IGame
     {
-        Random random;
+        static Random random = new Random();
         public IPlayer ActivePlayer { get { return Players[0]; } }
         public List<IPlayer> Players { get; set; }
         public IDeck Deck { get; set; }
@@ -32,14 +32,13 @@ namespace ThebesCore
         ICard[] IGame.DisplayedCards { get { return AvailableCards.AvailableCards; } }
         ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
 
-        public Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; private set; }
+        public Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; protected set; }
         private bool pointsFromKnowledgeAdded = false;
 
 
         public Game() { }
         public Game(int playerCount)
         {
-            random = new Random();
             this.Deck = new Deck(GameSettings.Cards, playerCount);
 
             AvailableCards = new CardDisplay(DrawCard, Deck.Discard);
@@ -189,11 +188,11 @@ namespace ThebesCore
 
         }
 
-        public IGame Clone()
+        public virtual IGame Clone()
         {
             Game newGame = new Game();
 
-            newGame.random = new Random();
+            // newGame.random = new Random();
             newGame.Deck = this.Deck.Clone();
             newGame.AvailableCards = this.AvailableCards.Clone(newGame.DrawCard, newGame.Deck.Discard);
             newGame.ActiveExhibitions = this.ActiveExhibitions.Clone(newGame.Deck.Discard);
