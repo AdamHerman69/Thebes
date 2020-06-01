@@ -18,6 +18,7 @@ namespace ThebesUI
         new ICardView[] DisplayedCards { get; }
         new ICardView[] DisplayedExhibitions { get; }
         bool Play(IAction action, System.Action redraw = null);
+        Task PlayAsync(IAction action, System.Action endGame, System.Action redraw = null);
         Dictionary<IPlayer, PlayerColor> Colors { get; }
     }
 
@@ -56,7 +57,6 @@ namespace ThebesUI
             while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
             {
                 redraw?.Invoke();
-                //Task<IAction> task = Task<IAction>.Run(() => { return ((IAIPlayer)ActivePlayer).AI.TakeAction(this); });
                 action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
                 Move(action);
             }
@@ -66,6 +66,24 @@ namespace ThebesUI
                 return true;
             }
             return false;
+        }
+
+        public async Task PlayAsync(IAction action, System.Action endGame, System.Action redraw = null)
+        {
+            Move(action);
+            redraw?.Invoke();
+
+            while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
+            {
+                action = await Task.Run(() => ((IAIPlayer)ActivePlayer).AI.TakeAction(this));
+                Move(action);
+                redraw?.Invoke();
+            }
+
+            if (AreAllPlayersDone())
+            {
+                endGame?.Invoke();
+            }
         }
 
         public static ICardView ToView(ICard card)

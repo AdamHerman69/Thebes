@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using ThebesCore;
 
@@ -234,6 +235,16 @@ namespace ThebesUI
             if (index > 2) index = 2;
             yearCounter.Location = layout.YearCounter[index].RectanglePositionCenter(yearCounter.Width, yearCounter.Height);
 
+            // grey out buttons
+            if (game.ActivePlayer is IAIPlayer)
+            {
+                bEndYear.Enabled = false;
+            }
+            else
+            {
+                bEndYear.Enabled = true;
+            }
+
             this.Refresh();
         }
 
@@ -261,8 +272,13 @@ namespace ThebesUI
         /// <param name="e"></param>
         private void pbCard_Click(object sender, EventArgs e)
         {
-            ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
-
+            if (game.ActivePlayer is IAIPlayer)
+            {
+                MessageBox.Show("It's not your turn!");
+                return;
+            }
+            //ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
+            ExecuteActionAsync(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
         }
 
         /// <summary>
@@ -272,10 +288,15 @@ namespace ThebesUI
         /// <param name="e"></param>
         private void pbExhibition_Click(object sender, EventArgs e)
         {
-            if(game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)] != null)
+            if (game.ActivePlayer is IAIPlayer)
             {
-                ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
-
+                MessageBox.Show("It's not your turn!");
+                return;
+            }
+            if (game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)] != null)
+            {
+                //ExecuteAction(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
+                ExecuteActionAsync(new ExecuteExhibitionAction((IExhibitionCard)game.DisplayedExhibitions[Array.IndexOf(exhibitions, sender)].Card));
             }
         }
 
@@ -286,7 +307,13 @@ namespace ThebesUI
         /// <param name="place"></param>
         private void ChangeCards(ICardChangePlace place)
         {
-            ExecuteAction(new ChangeCardsAction(place));
+            if (game.ActivePlayer is IAIPlayer)
+            {
+                MessageBox.Show("It's not your turn!");
+                return;
+            }
+            //ExecuteAction(new ChangeCardsAction(place));
+            ExecuteActionAsync(new ChangeCardsAction(place));
         }
 
         /// <summary>
@@ -295,7 +322,13 @@ namespace ThebesUI
         /// <param name="digSite"></param>
         private void OpenDigForm(IDigSite digSite)
         {
-            DigForm digForm = new DigForm(digSite, game.ActivePlayer, ExecuteAction, game.DigsiteInventory[digSite]);
+            if (game.ActivePlayer is IAIPlayer)
+            {
+                MessageBox.Show("It's not your turn!");
+                return;
+            }
+
+            DigForm digForm = new DigForm(digSite, game.ActivePlayer, ExecuteActionAsync, game.DigsiteInventory[digSite]);
             DialogResult result = digForm.ShowDialog();
 
             UpdateBoard();
@@ -376,23 +409,36 @@ namespace ThebesUI
             this.Close();
         }
 
+        
+        public async Task ExecuteActionAsync(IAction action)
+        {
+            game.PlayAsync(action, ShowResults, UpdateBoard);
+        }
+
         /// <summary>
         /// Executes the given action
         /// </summary>
         /// <param name="action"></param>
         public void ExecuteAction(IAction action)
         {
-            //Task<bool> task = Task<bool>.Run(() => { return game.Play(action, UpdateBoard); });
             if (!game.Play(action, UpdateBoard))
             {
                 UpdateBoard();
             }
             else
             {
-                ResultsForm resultsForm = new ResultsForm(game.Players);
-                resultsForm.ShowDialog();
-                this.Close();
+                ShowResults();
             }
+        }
+
+        /// <summary>
+        /// Closes the game form and shows the results;
+        /// </summary>
+        public void ShowResults()
+        {
+            ResultsForm resultsForm = new ResultsForm(game.Players);
+            resultsForm.ShowDialog();
+            this.Close();
         }
 
         /// <summary>
@@ -402,7 +448,13 @@ namespace ThebesUI
         /// <param name="e"></param>
         private void bEndYear_Click(object sender, EventArgs e)
         {
-            ExecuteAction(new EndYearAction());
+            if (game.ActivePlayer is IAIPlayer)
+            {
+                MessageBox.Show("It's not your turn!");
+                return;
+            }
+            //ExecuteAction(new EndYearAction());
+            ExecuteActionAsync(new EndYearAction());
         }
 
         /// <summary>
@@ -414,11 +466,13 @@ namespace ThebesUI
         {
             if (cbUseZeppelin.Checked)
             {
-                ExecuteAction(new ZeppelinAction(true));
+                //ExecuteAction(new ZeppelinAction(true));
+                ExecuteActionAsync(new ZeppelinAction(true));
             }
             else
             {
-                ExecuteAction(new ZeppelinAction(false));
+                //ExecuteAction(new ZeppelinAction(false));
+                ExecuteActionAsync(new ZeppelinAction(false));
             }
         }
 

@@ -33,6 +33,7 @@ namespace ThebesCore
         ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
 
         public Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; private set; }
+        private bool pointsFromKnowledgeAdded = false;
 
 
         public Game() { }
@@ -126,9 +127,10 @@ namespace ThebesCore
                 Players.Sort();
             }
 
-            if (AreAllPlayersDone())
+            if (AreAllPlayersDone() && !pointsFromKnowledgeAdded)
             {
                 AddPointsFromKnowledge();
+                pointsFromKnowledgeAdded = true;
             }
         }
 

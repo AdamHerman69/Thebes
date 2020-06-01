@@ -20,9 +20,9 @@ namespace ThebesUI
         int tokenAmount;
         int totalKnowledge;
         List<ICard> singleUseCards;
-        Action<IAction> executeAction;
+        Func<IAction, Task> executeAction;
 
-        public DigForm(IDigSite digSite, IPlayer player, Action<IAction> executeAction, List<IToken> tokens)
+        public DigForm(IDigSite digSite, IPlayer player, Func<IAction, Task> executeAction, List<IToken> tokens)
         {
             InitializeComponent();
             Initialize(digSite, player, executeAction, tokens);
@@ -35,7 +35,8 @@ namespace ThebesUI
         /// <param name="digSite">where to dig</param>
         /// <param name="player">player who is ready to dig</param>
         /// <param name="executeAction">method to execute action once a dig starts</param>
-        private void Initialize(IDigSite digSite, IPlayer player, Action<IAction> executeAction, List<IToken> tokens)
+        /// <param name="tokens">tokens present at the digsite</param>
+        private void Initialize(IDigSite digSite, IPlayer player, Func<IAction, Task> executeAction, List<IToken> tokens)
         {
             this.digSite = digSite;
             this.player = player;
@@ -144,8 +145,11 @@ namespace ThebesUI
             }
 
             List<IToken> tokens = new List<IToken>();
-            executeAction(new DigAction(digSite, weeksToDig, singleUseCards, tokens));
+            executeAction(new DigAction(digSite, weeksToDig, singleUseCards, DisplayDigResult));
+        }
 
+        public void DisplayDigResult(List<IToken> tokens)
+        {
             DigResult resultForm = new DigResult(tokens);
             resultForm.ShowDialog();
             this.Close();

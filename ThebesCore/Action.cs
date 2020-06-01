@@ -131,14 +131,14 @@ namespace ThebesCore
         public IDigSite digSite;
         public int weeks;
         List<ICard> singleUseCards;
-        List<IToken> tokens;
+        System.Action<List<IToken>> displayDigResult;
 
-        public DigAction(IDigSite digSite, int weeks, List<ICard> singleUseCards, List<IToken> tokens)
+        public DigAction(IDigSite digSite, int weeks, List<ICard> singleUseCards, System.Action<List<IToken>> displayDigResult)
         {
             this.digSite = digSite;
             this.weeks = weeks;
             this.singleUseCards = singleUseCards;
-            this.tokens = tokens;
+            this.displayDigResult = displayDigResult;
         }
 
         public override void Execute(IPlayer player)
@@ -148,13 +148,16 @@ namespace ThebesCore
             List<IToken> dugTokens = player.Dig(digSite, weeks, singleUseCards);
             
             // only if you need to inspect the result
-            if (dugTokens != null && tokens != null)
+            if (dugTokens != null && displayDigResult != null)
             {
+                List<IToken> tokens = new List<IToken>();
                 foreach (IToken token in dugTokens)
                 {
                     tokens.Add(token);
                 }
+                displayDigResult(tokens);
             }
+
             
         }
 
