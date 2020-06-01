@@ -109,6 +109,7 @@
             this.MinimumSize = new System.Drawing.Size(1510, 872);
             this.Name = "GameForm";
             this.Text = "Thebes";
+            this.Shown += new System.EventHandler(this.GameForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

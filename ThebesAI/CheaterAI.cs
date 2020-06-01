@@ -15,9 +15,11 @@ namespace ThebesAI
         List<ISimulationState> GetAllChildStates();
         IPlayer ActivePlayer { get; }
         ISimulationState RandomChild();
-        Dictionary<string, int> GetScores();
+        Dictionary<string, double> GetScores();
+        Dictionary<string, double> GetExpectedScores();
         IAction Move { get; }
         IGame Game { get;}
+
     }
 
     class SimulationState : ISimulationState
@@ -127,15 +129,92 @@ namespace ThebesAI
             return actions;
         }
 
-        public Dictionary<string, int> GetScores()
+        public Dictionary<string, double> GetScores()
         {
-            Dictionary<string, int> scores = new Dictionary<string, int>();
+            Dictionary<string, double> scores = new Dictionary<string, double>();
             foreach (IPlayer player in Game.Players)
             {
                 scores[player.Name] = player.Points;
             }
 
             return scores;
+        }
+
+        public Dictionary<string, double> GetExpectedScores()
+        {
+            Dictionary<string, double> scores = GetScores();
+
+            // points from digging
+            foreach (IPlayer player in Game.Players)
+            {
+                foreach (IDigSite digSite in Game.DigsiteInventory.Keys)
+                {
+                    scores[player.Name] += PossibleExcavations(player, digSite) * ExpectedDigValue(player, digSite, 8); // 8 weeks seams reasonable
+                }
+            }
+
+            // points from knowledge bonus at the end
+            List<IPlayer> sortedPlayers;
+            foreach (IDigSite digSite in Game.DigsiteInventory.Keys)
+            {
+                sortedPlayers = Game.Players.OrderByDescending(p => p.SpecializedKnowledge[digSite]).ToList();
+
+                if (sortedPlayers[0].SpecializedKnowledge[digSite] > 0 && sortedPlayers[0].SpecializedKnowledge[digSite] > sortedPlayers[1].SpecializedKnowledge[digSite])
+                {
+                    scores[sortedPlayers[0].Name] += 5;
+                }
+                else if (sortedPlayers[0].SpecializedKnowledge[digSite] > 0)
+                {
+                    foreach (IPlayer player in sortedPlayers)
+                    {
+                        if (player.SpecializedKnowledge[digSite] == sortedPlayers[0].SpecializedKnowledge[digSite])
+                        {
+                            scores[player.Name] += 3;
+                        }
+                    }
+                }
+            }
+
+            return scores;
+        }
+        
+        private int PossibleExcavations(IPlayer player, IDigSite digSite)
+        {
+            int excavations = 0;
+            for (int i = player.Time.CurrentYear; i <= Time.finalYear; i++)
+            {
+                excavations++;
+            }
+            if (!player.Permissions[digSite] && excavations > 0)
+            {
+                excavations--;
+            }
+            return excavations;
+        }
+
+        private double ExpectedDigValue(IPlayer player, IDigSite digSite, int weeks)
+        {
+            // get token amount
+            player.GetDigStats(digSite, null, out int knowledge, out int tokenBonus);
+            int tokenAmount = GameSettings.DugTokenCount(knowledge, weeks) + tokenBonus;
+
+            return ExpectedValueOfToken(digSite) * tokenAmount;
+
+
+        }
+
+        // TODO what about knowledge tokens?
+        private double ExpectedValueOfToken(IDigSite digSite)
+        {
+            int tokenValueSum = 0;
+            foreach (IToken token in Game.DigsiteInventory[digSite])
+            {
+                if (token is IArtifactToken)
+                {
+                    tokenValueSum += ((IArtifactToken)token).Points;
+                }
+            }
+            return tokenValueSum / Game.DigsiteInventory[digSite].Count;
         }
 
         public ISimulationState NextState(IAction move)
@@ -164,20 +243,30 @@ namespace ThebesAI
         public CheaterAI(IPlayerData player, IGame game) { }
         public IAction TakeAction(IGame gameState)
         {
-            MCTSNodeTest mctsNode = new MCTSNodeTest(new SimulationState(gameState), null);
-            return mctsNode.Run(10000);
+            MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null);
+            return mctsNode.Run(5000);
+        }
+    }
+
+    public class HeuristicCheaterAI : IAI
+    {
+        public HeuristicCheaterAI(IPlayerData player, IGame game) { }
+        public IAction TakeAction(IGame gameState)
+        {
+            MCTSNodeCutoff mctsNode = new MCTSNodeCutoff(new SimulationState(gameState), null);
+            return mctsNode.Run(5000);
         }
     }
 
     class MCTSNode
     {
-        Dictionary<string, int> scores; // string is player name
-        int visits;
-        static double explorationConstant = 70;
+        protected Dictionary<string, double> scores; // string is player name
+        protected int visits;
+        static double explorationConstant = 150;
 
-        ISimulationState state;
-        List<MCTSNode> children;
-        MCTSNode parent;
+        protected ISimulationState state;
+        protected List<MCTSNode> children;
+        protected MCTSNode parent;
 
         public MCTSNode(ISimulationState state, MCTSNode parent)
         {
@@ -187,7 +276,7 @@ namespace ThebesAI
             this.state = state;
             this.parent = parent;
             
-            this.scores = new Dictionary<string, int>();
+            this.scores = new Dictionary<string, double>();
             foreach (IPlayer player in state.Game.Players)
             {
                 scores.Add(player.Name, 0);
@@ -199,9 +288,9 @@ namespace ThebesAI
             return $"{state.Move}, UCB: {UCB1("cheater", 0)}, visits: {visits}";
         }
 
-        private void UpdateScore(Dictionary<string, int> newScores)
+        private void UpdateScore(Dictionary<string, double> newScores)
         {
-            foreach (KeyValuePair<string, int> player_score in newScores)
+            foreach (KeyValuePair<string, double> player_score in newScores)
             {
                 scores[player_score.Key] += newScores[player_score.Key];
             }
@@ -289,7 +378,7 @@ namespace ThebesAI
             return bestChild;
         }
 
-        protected virtual Dictionary<string, int> Rollout()
+        protected virtual Dictionary<string, double> Rollout()
         {
             ISimulationState randomChild, currentState = this.state;
             while ((randomChild = currentState.RandomChild()) != null)
@@ -299,7 +388,7 @@ namespace ThebesAI
             return currentState.GetScores();
         }
 
-        private void Backpropagate(Dictionary<string, int> newScores)
+        private void Backpropagate(Dictionary<string, double> newScores)
         {
             MCTSNode current = this;
             while (current != null)
@@ -312,11 +401,16 @@ namespace ThebesAI
         }
     }
 
-    class MCTSNodeTest : MCTSNode
+    class MCTSNodeCutoff : MCTSNode
     {
-        public MCTSNodeTest(ISimulationState state, MCTSNode parent) : base(state, parent)
+        public MCTSNodeCutoff(ISimulationState state, MCTSNode parent) : base(state, parent)
         {
 
+        }
+
+        protected override Dictionary<string, double> Rollout()
+        {
+            return this.state.GetExpectedScores();
         }
 
     }

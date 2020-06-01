@@ -56,8 +56,9 @@ namespace ThebesUI
             while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
             {
                 redraw?.Invoke();
+                //Task<IAction> task = Task<IAction>.Run(() => { return ((IAIPlayer)ActivePlayer).AI.TakeAction(this); });
                 action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
-                Move(action);       
+                Move(action);
             }
 
             if (AreAllPlayersDone())

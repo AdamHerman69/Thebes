@@ -40,7 +40,6 @@ namespace ThebesUI
             InitializeComponent();
             Initialize(game);
 
-            game.Play(null);
             UpdateBoard();
         }
 
@@ -383,6 +382,7 @@ namespace ThebesUI
         /// <param name="action"></param>
         public void ExecuteAction(IAction action)
         {
+            //Task<bool> task = Task<bool>.Run(() => { return game.Play(action, UpdateBoard); });
             if (!game.Play(action, UpdateBoard))
             {
                 UpdateBoard();
@@ -420,6 +420,11 @@ namespace ThebesUI
             {
                 ExecuteAction(new ZeppelinAction(false));
             }
+        }
+
+        private void GameForm_Shown(object sender, EventArgs e)
+        {
+            game.Play(null, UpdateBoard);
         }
     }
 }
