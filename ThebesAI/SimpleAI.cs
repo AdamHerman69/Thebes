@@ -73,7 +73,7 @@ namespace ThebesAI
         private ICard ChooseCard()
         {
             IEnumerable<ICard> cards;
-            if ((cards = game.DisplayedCards.Where(c => c.Place == player.CurrentPlace)).Count() > 0)
+            if ((cards = game.DisplayedCards.Where(c => c?.Place == player.CurrentPlace)).Count() > 0)
             {
                 return cards.First();
             }

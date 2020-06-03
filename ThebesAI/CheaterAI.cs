@@ -14,6 +14,7 @@ namespace ThebesAI
     {
         public Dictionary<IDigSite, double> assumedArtifactSum;
         public Dictionary<IDigSite, double> assumedArtifactCount;
+        IPlayer player; // single player version
 
         public SimGame(Game game)
         {
@@ -80,6 +81,9 @@ namespace ThebesAI
         {
             return new SimGame(this);
         }
+
+        public override IPlayer ActivePlayer => this.player;
+
     }
 
     class SimPlayer : Player
@@ -271,6 +275,11 @@ namespace ThebesAI
             return childStates;
         }
 
+        /// <summary>
+        /// /////////////////////////////////////////////////////////// TODO Special Permissions se neodečítaj
+        /// </summary>
+        /// <returns></returns>
+
         protected virtual List<IAction> GetAllPossibleActions()
         {
             List<IAction> actions = new List<IAction>();
@@ -330,7 +339,7 @@ namespace ThebesAI
             {
                 if (!Game.ActivePlayer.CanIDig(digSite)) continue;
 
-                for (int weeks = 1; weeks <= 12; weeks++)
+                for (int weeks = 10; weeks <= 10; weeks++)
                 {
                     // TODO single use cards
                     action = new DigAction(digSite, weeks, null, null);
@@ -340,6 +349,7 @@ namespace ThebesAI
                     }
                 }
             }
+
 
             // use zeppelin
             if (Game.ActivePlayer.Zeppelins > 0 && actions.Count > 0)
@@ -373,7 +383,7 @@ namespace ThebesAI
             {
                 foreach (IDigSite digSite in Game.DigsiteInventory.Keys)
                 {
-                    scores[player.Name] += PossibleExcavations(player, digSite) * ExpectedDigValue(player, digSite, 8); // 8 weeks seams reasonable
+                    scores[player.Name] += PossibleExcavations(player, digSite) * ExpectedDigValue(player, digSite, 10); // 8 weeks seams reasonable
                 }
             }
 
@@ -488,6 +498,18 @@ namespace ThebesAI
         {
             MCTSNode mctsNode = new MCTSNodeCutoff(new SimulationState(new SimGame((Game)gameState)), null);
             return mctsNode.Run(5000);
+        }
+    }
+
+    public class FirstYearDFSAI : IAI
+    {
+        public FirstYearDFSAI(IPlayerData player, IGame game) { }
+        DFSNode head;
+        public IAction TakeAction(IGame gameState)
+        {
+            DFSNode dfsNode = new DFSNode(new SimulationState(new SimGame((Game)gameState)), null);
+            head = dfsNode;
+            return dfsNode.Run();
         }
     }
 
@@ -645,6 +667,59 @@ namespace ThebesAI
         protected override Dictionary<string, double> Rollout()
         {
             return this.state.GetExpectedScores();
+        }
+
+    }
+
+
+    class DFSNode
+    {
+        protected ISimulationState state;
+        //protected List<DFSNode> children;
+        protected DFSNode parent;
+        protected DFSNode bestChild;
+        protected int score;
+
+        public DFSNode(ISimulationState state, DFSNode parent)
+        {
+            score = 0;
+            //children = new List<DFSNode>();
+            this.state = state;
+            this.parent = parent;
+            
+        }
+
+        public double Eval()
+        {
+            if (this.IsTerminal())
+            {
+                return this.state.ActivePlayer.Points;
+            }
+            
+            double maxScore = double.MinValue;
+            double childScore;
+            foreach (ISimulationState state in state.GetAllChildStates())
+            {
+                DFSNode child = new DFSNode(state, this);
+                if ((childScore = child.Eval()) > maxScore)
+                {
+                    maxScore = childScore;
+                    bestChild = child;
+                }
+            }
+            return maxScore;
+        }
+
+        public IAction Run()
+        {
+            this.Eval();
+            return this.bestChild.state.Move;
+        }
+
+        protected bool IsTerminal()
+        {
+            // TODO needs an actual end condition this won't work past the first year
+            return this.state.ActivePlayer.Time.CurrentYear > Time.firstYear;
         }
 
     }

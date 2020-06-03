@@ -23,7 +23,7 @@ namespace ThebesCore
     public class Game : IGame
     {
         static Random random = new Random();
-        public IPlayer ActivePlayer { get { return Players[0]; } }
+        public virtual IPlayer ActivePlayer { get { return Players[0]; } }
         public List<IPlayer> Players { get; set; }
         public IDeck Deck { get; set; }
         public ICardDisplay AvailableCards { get; set; }

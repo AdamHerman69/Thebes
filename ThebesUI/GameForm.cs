@@ -196,7 +196,7 @@ namespace ThebesUI
             for (int i = 0; i < displayCards.Length; i++)
             {
                 UIConfig.ReplaceImage(displayCards[i], GetImage(game.DisplayedCards[i]));
-                cardToolTips[i].SetToolTip(displayCards[i], game.DisplayedCards[i].Description);
+                cardToolTips[i].SetToolTip(displayCards[i], game.DisplayedCards[i]?.Description);
             }
 
             // exhibitions
@@ -255,6 +255,7 @@ namespace ThebesUI
         /// <returns></returns>
         private Image GetImage(ICardView card)
         {
+            if (card == null) return null;
             try
             {
                 return Image.FromFile(UIConfig.IMG_FOLDER + card.FileName);
@@ -275,6 +276,10 @@ namespace ThebesUI
             if (game.ActivePlayer is IAIPlayer)
             {
                 MessageBox.Show("It's not your turn!");
+                return;
+            }
+            if (game.DisplayedCards[Array.IndexOf(displayCards, sender)] == null)
+            {
                 return;
             }
             //ExecuteAction(new TakeCardAction(game.DisplayedCards[Array.IndexOf(displayCards, sender)].Card));
