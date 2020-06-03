@@ -1,0 +1,313 @@
+UNIVERSITIES
+London
+Paris
+Berlin
+Vienna
+Moscow
+Rome
+
+DIGSITES
+Greece
+Mesopotamia
+Egypt
+Crete
+Palestine
+
+CARDCHANGEPLACES
+Warsaw
+
+STARTINGPLACE Warsaw
+
+DISTRIBUTIONS
+
+TOKENS Greece
+specializedKnowledge 1 Crete
+generalKnowledge 1
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+artifact 1 a
+artifact 1 b
+artifact 1 c
+artifact 1 d
+artifact 2 a
+artifact 2 b
+artifact 2 c
+artifact 3 a
+artifact 3 b
+artifact 4 a
+artifact 5 a
+artifact 5 b
+artifact 6 a
+
+TOKENS Mesopotamia
+specializedKnowledge 1 Palestine
+generalKnowledge 1
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+artifact 1 a
+artifact 1 b
+artifact 1 c
+artifact 1 d
+artifact 1 e
+artifact 3 a
+artifact 3 b
+artifact 3 c
+artifact 4 a
+artifact 4 b
+artifact 4 c
+artifact 5 a
+artifact 5 b
+
+TOKENS Egypt
+specializedKnowledge 1 Mesopotamia
+generalKnowledge 1
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+artifact 1 a
+artifact 1 b
+artifact 1 c
+artifact 1 d
+artifact 2 a
+artifact 2 b
+artifact 3 a
+artifact 3 b
+artifact 3 c
+artifact 4 a
+artifact 4 b
+artifact 5 a
+artifact 6 a
+
+TOKENS Crete
+specializedKnowledge 1 Greece
+generalKnowledge 1
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+artifact 1 a
+artifact 1 b
+artifact 1 c
+artifact 2 a
+artifact 2 b
+artifact 3 a
+artifact 3 b
+artifact 3 c
+artifact 3 d
+artifact 4 a
+artifact 4 b
+artifact 4 c
+artifact 5 a
+
+TOKENS Palestine
+specializedKnowledge 1 Egypt
+generalKnowledge 1
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+dirt
+artifact 1 a
+artifact 1 b
+artifact 1 c
+artifact 1 d
+artifact 1 e
+artifact 2 a
+artifact 2 b
+artifact 2 c
+artifact 3 a
+artifact 4 a
+artifact 5 a
+artifact 6 a
+artifact 7 a
+
+DISTANCEMATRIX
+PLACES London Paris Berlin Vienna Moscow Rome Greece Mesopotamia Egypt Crete Palestine Warsaw 
+London	0	1	1	2	3	2	3	4	4	3	4	2	
+Paris	1	0	1	1	3	1	2	3	3	2	3	2	
+Berlin	1	1	0	2	2	2	2	3	4	3	3	1	
+Vienna	2	1	2	0	2	1	2	3	3	2	3	1	
+Moscow	3	3	2	2	0	3	2	3	4	3	4	1	
+Rome	1	1	2	1	3	0	1	2	2	1	2	2	
+Greece	3	2	2	2	2	1	0	1	2	1	2	1	
+Mesopotamia	4	3	3	3	3	2	1	0	2	2	1	2	
+Egypt	4	3	4	3	4	2	2	2	0	1	1	3	
+Crete	3	2	3	2	3	1	1	2	1	0	1	2	
+Palestine	4	3	3	3	4	2	2	2	1	1	0	3	
+Warsaw	2	2	1	1	1	2	1	2	3	2	3	0	
+
+CARDS
+specializedKnowledge Paris 1 1 Mesopotamia
+specializedKnowledge Moscow 1 1 Mesopotamia
+specializedKnowledge Moscow 1 1 Mesopotamia
+specializedKnowledge Rome 1 1 Mesopotamia
+specializedKnowledge Vienna 2 2 Mesopotamia
+specializedKnowledge Vienna 2 2 Mesopotamia
+specializedKnowledge London 2 2 Mesopotamia
+specializedKnowledge Moscow 4 3 Mesopotamia
+specializedKnowledge London 4 3 Mesopotamia
+specializedKnowledge Berlin 1 1 Greece
+specializedKnowledge Vienna 1 1 Greece
+specializedKnowledge Moscow 1 1 Greece
+specializedKnowledge Rome 1 1 Greece
+specializedKnowledge Rome 2 2 Greece
+specializedKnowledge Rome 2 2 Greece
+specializedKnowledge London 2 2 Greece
+specializedKnowledge Berlin 4 3 Greece
+specializedKnowledge London 4 3 Greece
+specializedKnowledge Berlin 1 1 Crete
+specializedKnowledge Vienna 1 1 Crete
+specializedKnowledge Berlin 1 1 Crete
+specializedKnowledge Paris 1 1 Crete
+specializedKnowledge Rome 2 2 Crete
+specializedKnowledge Paris 2 2 Crete
+specializedKnowledge Vienna 2 2 Crete
+specializedKnowledge Moscow 4 3 Crete
+specializedKnowledge Moscow 4 3 Crete
+specializedKnowledge Rome 1 1 Egypt
+specializedKnowledge Moscow 1 1 Egypt
+specializedKnowledge Paris 1 1 Egypt
+specializedKnowledge Paris 1 1 Egypt
+specializedKnowledge Berlin 2 2 Egypt
+specializedKnowledge Berlin 2 2 Egypt
+specializedKnowledge London 2 2 Egypt
+specializedKnowledge Moscow 4 3 Egypt
+specializedKnowledge London 4 3 Egypt
+specializedKnowledge Rome 1 1 Palestine
+specializedKnowledge Vienna 1 1 Palestine
+specializedKnowledge Vienna 1 1 Palestine
+specializedKnowledge Vienna 1 1 Palestine
+specializedKnowledge Berlin 2 2 Palestine
+specializedKnowledge Paris 2 2 Palestine
+specializedKnowledge London 2 2 Palestine
+specializedKnowledge Paris 4 3 Palestine
+specializedKnowledge London 4 3 Palestine
+generalKnowledge Berlin 6 2
+generalKnowledge Moscow 6 2
+generalKnowledge London 6 2
+generalKnowledge Paris 6 2
+generalKnowledge Berlin 3 1
+generalKnowledge Rome 3 1
+generalKnowledge Vienna 3 1
+generalKnowledge Paris 3 1
+rumors Berlin 1 2 Mesopotamia
+rumors Moscow 1 2 Greece
+rumors Paris 1 2 Crete
+rumors Rome 1 2 Egypt
+rumors Vienna 1 2 Palestine
+zeppelin Rome 1
+zeppelin Vienna 1
+car Rome 1
+car Moscow 1
+assistant Berlin 2
+assistant Paris 2
+assistant Paris 2
+assistant Rome 2
+assistant Vienna 2
+assistant Vienna 2
+shovel London 3
+shovel London 3
+shovel Moscow 3
+shovel Moscow 3
+shovel Rome 3
+shovel Rome 3
+specialPermission Moscow 3
+specialPermission London 3
+congress Berlin 2
+congress Berlin 2
+congress Moscow 2
+congress Moscow 2
+congress London 2
+congress Vienna 2
+congress Vienna 2
+congress Paris 2
+congress Paris 2
+exhibition London 3 4 Greece Egypt Egypt 
+exhibition Moscow 3 4 Mesopotamia Crete Crete 
+exhibition Vienna 3 4 Egypt Palestine Palestine 
+exhibition Paris 3 4 Palestine Mesopotamia Mesopotamia 
+exhibition Berlin 3 4 Crete Greece Greece 
+exhibition Berlin 4 5 Palestine Mesopotamia Mesopotamia Crete Crete Crete 
+exhibition Paris 4 5 Greece Egypt Egypt Palestine Palestine Palestine 
+exhibition London 4 5 Crete Greece Greece Egypt Egypt Egypt 
+exhibition Vienna 4 5 Mesopotamia Crete Crete Greece Greece Greece 
+exhibition Moscow 4 5 Egypt Palestine Palestine Mesopotamia Mesopotamia Mesopotamia
+
+TIMEWHEEL
+# [knowledge] [1 week] ... [n week]
+1 0 0 0 0 0 0 0 1 1 1 1 2 
+2 0 0 0 0 0 1 1 1 1 2 2 2 
+3 0 0 1 1 1 2 2 2 3 3 3 4 
+4 0 1 1 2 2 3 3 4 4 4 5 5 
+5 1 1 2 3 3 4 4 5 5 6 7 8 
+6 1 2 3 4 4 5 5 5 6 6 7 8 
+7 1 2 4 4 5 5 6 6 7 8 8 9 
+8 1 3 4 5 5 6 6 7 8 9 9 10 
+9 2 3 5 5 6 6 7 8 9 9 10 10 
+10 2 3 5 5 6 7 8 9 9 10 10 10 
+11 2 4 5 6 6 7 8 9 10 10 10 10 
+12 3 4 5 6 7 8 9 10 10 10 10 10 

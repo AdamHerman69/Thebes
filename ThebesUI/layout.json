@@ -1,0 +1,416 @@
+{
+  "Places": {
+    "London": {
+      "topLeft": "124, 79",
+      "bottomRight": "217, 187"
+    },
+    "Paris": {
+      "topLeft": "176, 199",
+      "bottomRight": "244, 291"
+    },
+    "Berlin": {
+      "topLeft": "325, 151",
+      "bottomRight": "413, 221"
+    },
+    "Vienna": {
+      "topLeft": "393, 243",
+      "bottomRight": "459, 325"
+    },
+    "Moscow": {
+      "topLeft": "610, 95",
+      "bottomRight": "701, 185"
+    },
+    "Rome": {
+      "topLeft": "304, 333",
+      "bottomRight": "398, 413"
+    },
+    "Warsaw": {
+      "topLeft": "441, 173",
+      "bottomRight": "558, 241"
+    },
+    "Greece": {
+      "topLeft": "444, 350",
+      "bottomRight": "596, 466"
+    },
+    "Crete": {
+      "topLeft": "544, 472",
+      "bottomRight": "632, 592"
+    },
+    "Egypt": {
+      "topLeft": "573, 593",
+      "bottomRight": "713, 706"
+    },
+    "Palestine": {
+      "topLeft": "715, 592",
+      "bottomRight": "848, 690"
+    },
+    "Mesopotamia": {
+      "topLeft": "824, 468",
+      "bottomRight": "994, 582"
+    }
+  },
+  "WeekCounter": [
+    {
+      "topLeft": "19, 19",
+      "bottomRight": "64, 64"
+    },
+    {
+      "topLeft": "65, 19",
+      "bottomRight": "130, 52"
+    },
+    {
+      "topLeft": "130, 19",
+      "bottomRight": "197, 52"
+    },
+    {
+      "topLeft": "197, 19",
+      "bottomRight": "265, 52"
+    },
+    {
+      "topLeft": "265, 19",
+      "bottomRight": "332, 52"
+    },
+    {
+      "topLeft": "332, 19",
+      "bottomRight": "399, 52"
+    },
+    {
+      "topLeft": "399, 19",
+      "bottomRight": "466, 52"
+    },
+    {
+      "topLeft": "466, 19",
+      "bottomRight": "534, 52"
+    },
+    {
+      "topLeft": "534, 19",
+      "bottomRight": "601, 52"
+    },
+    {
+      "topLeft": "601, 19",
+      "bottomRight": "668, 52"
+    },
+    {
+      "topLeft": "668, 19",
+      "bottomRight": "735, 52"
+    },
+    {
+      "topLeft": "735, 19",
+      "bottomRight": "803, 52"
+    },
+    {
+      "topLeft": "803, 19",
+      "bottomRight": "870, 52"
+    },
+    {
+      "topLeft": "870, 19",
+      "bottomRight": "937, 52"
+    },
+    {
+      "topLeft": "937, 19",
+      "bottomRight": "1000, 52"
+    },
+    {
+      "topLeft": "1000, 19",
+      "bottomRight": "1046, 60"
+    },
+    {
+      "topLeft": "1013, 69",
+      "bottomRight": "1047, 115"
+    },
+    {
+      "topLeft": "1013, 120",
+      "bottomRight": "1047, 186"
+    },
+    {
+      "topLeft": "1013, 186",
+      "bottomRight": "1047, 252"
+    },
+    {
+      "topLeft": "1013, 252",
+      "bottomRight": "1047, 318"
+    },
+    {
+      "topLeft": "1013, 318",
+      "bottomRight": "1047, 384"
+    },
+    {
+      "topLeft": "1013, 384",
+      "bottomRight": "1047, 450"
+    },
+    {
+      "topLeft": "1013, 450",
+      "bottomRight": "1047, 516"
+    },
+    {
+      "topLeft": "1013, 516",
+      "bottomRight": "1047, 582"
+    },
+    {
+      "topLeft": "1013, 582",
+      "bottomRight": "1047, 648"
+    },
+    {
+      "topLeft": "1013, 650",
+      "bottomRight": "1047, 699"
+    },
+    {
+      "topLeft": "1001, 702",
+      "bottomRight": "1047, 745"
+    },
+    {
+      "topLeft": "934, 714",
+      "bottomRight": "1001, 745"
+    },
+    {
+      "topLeft": "868, 714",
+      "bottomRight": "934, 745"
+    },
+    {
+      "topLeft": "801, 714",
+      "bottomRight": "868, 745"
+    },
+    {
+      "topLeft": "734, 714",
+      "bottomRight": "801, 745"
+    },
+    {
+      "topLeft": "667, 714",
+      "bottomRight": "734, 745"
+    },
+    {
+      "topLeft": "601, 714",
+      "bottomRight": "667, 745"
+    },
+    {
+      "topLeft": "534, 714",
+      "bottomRight": "601, 745"
+    },
+    {
+      "topLeft": "467, 714",
+      "bottomRight": "534, 745"
+    },
+    {
+      "topLeft": "401, 714",
+      "bottomRight": "467, 745"
+    },
+    {
+      "topLeft": "333, 714",
+      "bottomRight": "401, 745"
+    },
+    {
+      "topLeft": "267, 714",
+      "bottomRight": "333, 745"
+    },
+    {
+      "topLeft": "200, 714",
+      "bottomRight": "267, 745"
+    },
+    {
+      "topLeft": "128, 714",
+      "bottomRight": "200, 745"
+    },
+    {
+      "topLeft": "67, 714",
+      "bottomRight": "128, 745"
+    },
+    {
+      "topLeft": "17, 700",
+      "bottomRight": "62, 746"
+    },
+    {
+      "topLeft": "17, 649",
+      "bottomRight": "50, 694"
+    },
+    {
+      "topLeft": "17, 579",
+      "bottomRight": "50, 645"
+    },
+    {
+      "topLeft": "17, 514",
+      "bottomRight": "50, 579"
+    },
+    {
+      "topLeft": "17, 448",
+      "bottomRight": "50, 514"
+    },
+    {
+      "topLeft": "17, 382",
+      "bottomRight": "50, 448"
+    },
+    {
+      "topLeft": "17, 316",
+      "bottomRight": "50, 382"
+    },
+    {
+      "topLeft": "17, 250",
+      "bottomRight": "50, 316"
+    },
+    {
+      "topLeft": "17, 185",
+      "bottomRight": "50, 250"
+    },
+    {
+      "topLeft": "17, 119",
+      "bottomRight": "50, 185"
+    },
+    {
+      "topLeft": "15, 65",
+      "bottomRight": "49, 113"
+    }
+  ],
+  "YearCounter": [
+    {
+      "topLeft": "72, 344",
+      "bottomRight": "122, 391"
+    },
+    {
+      "topLeft": "74, 288",
+      "bottomRight": "121, 339"
+    },
+    {
+      "topLeft": "71, 238",
+      "bottomRight": "121, 280"
+    }
+  ],
+  "DisplayedCards": [
+    {
+      "topLeft": "762, 92",
+      "bottomRight": "864, 240"
+    },
+    {
+      "topLeft": "874, 92",
+      "bottomRight": "975, 240"
+    },
+    {
+      "topLeft": "762, 250",
+      "bottomRight": "864, 396"
+    },
+    {
+      "topLeft": "874, 250",
+      "bottomRight": "975, 396"
+    }
+  ],
+  "DisplayedExhibitions": [
+    {
+      "topLeft": "92, 442",
+      "bottomRight": "238, 540"
+    },
+    {
+      "topLeft": "92, 566",
+      "bottomRight": "238, 666"
+    },
+    {
+      "topLeft": "270, 566",
+      "bottomRight": "416, 666"
+    }
+  ],
+  "PlayerName": {
+    "topLeft": "50, 9",
+    "bottomRight": "191, 23"
+  },
+  "Points": {
+    "topLeft": "13, 7",
+    "bottomRight": "50, 26"
+  },
+  "Time": {
+    "topLeft": "334, 3",
+    "bottomRight": "434, 33"
+  },
+  "GeneralKnowledge": {
+    "topLeft": "75, 38",
+    "bottomRight": "100, 60"
+  },
+  "Shovel": {
+    "topLeft": "75, 107",
+    "bottomRight": "100, 130"
+  },
+  "Assistant": {
+    "topLeft": "75, 69",
+    "bottomRight": "100, 94"
+  },
+  "SpecialPermission": {
+    "topLeft": "156, 91",
+    "bottomRight": "184, 113"
+  },
+  "Congress": {
+    "topLeft": "156, 39",
+    "bottomRight": "184, 63"
+  },
+  "Car": {
+    "topLeft": "156, 119",
+    "bottomRight": "184, 142"
+  },
+  "Zeppelin": {
+    "topLeft": "156, 67",
+    "bottomRight": "184, 89"
+  },
+  "SpecializedKnowledgeLs": {
+    "Egypt": {
+      "topLeft": "250, 25",
+      "bottomRight": "277, 44"
+    },
+    "Greece": {
+      "topLeft": "250, 49",
+      "bottomRight": "277, 67"
+    },
+    "Crete": {
+      "topLeft": "250, 72",
+      "bottomRight": "277, 91"
+    },
+    "Palestine": {
+      "topLeft": "250, 96",
+      "bottomRight": "277, 115"
+    },
+    "Mesopotamia": {
+      "topLeft": "250, 120",
+      "bottomRight": "277, 139"
+    }
+  },
+  "SingleUseKnowledgeLs": {
+    "Egypt": {
+      "topLeft": "316, 25",
+      "bottomRight": "348, 44"
+    },
+    "Greece": {
+      "topLeft": "316, 49",
+      "bottomRight": "348, 67"
+    },
+    "Crete": {
+      "topLeft": "316, 72",
+      "bottomRight": "348, 91"
+    },
+    "Palestine": {
+      "topLeft": "316, 96",
+      "bottomRight": "348, 115"
+    },
+    "Mesopotamia": {
+      "topLeft": "316, 120",
+      "bottomRight": "348, 139"
+    }
+  },
+  
+  
+    "Permissions": {
+    "Egypt": {
+      "topLeft": "211, 23",
+      "bottomRight": "239, 44"
+    },
+    "Greece": {
+      "topLeft": "211, 47",
+      "bottomRight": "238, 67"
+    },
+    "Crete": {
+      "topLeft": "212, 71",
+      "bottomRight": "239, 92"
+    },
+    "Palestine": {
+      "topLeft": "212, 95",
+      "bottomRight": "239, 116"
+    },
+    "Mesopotamia": {
+      "topLeft": "212, 120",
+      "bottomRight": "240, 139"
+    }
+  }
+}
