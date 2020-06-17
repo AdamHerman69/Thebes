@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ThebesUI
 {
@@ -45,7 +46,28 @@ namespace ThebesUI
 
     public static class UIConfig
     {
-        public const string IMG_FOLDER = @"..\..\..\img\";
+        public static string IMG_FOLDER = @"..\..\..\img\";
+
+        public static void FindImgFolder()
+        {
+            string path = @".\img\";
+            try
+            {
+                int counter = 0;
+                while (counter < 5 && !Directory.Exists(path))
+                {
+                    path = @".\." + path;
+                    counter++;
+                }
+                IMG_FOLDER = path;
+            }
+            catch (Exception)
+            {
+                throw new FileNotFoundException("Couldn't find the img folder");
+            }
+            
+        }
+
         public static void ReplaceImage(PictureBox pb, Image newImg)
         {
             if (pb.Image != null)

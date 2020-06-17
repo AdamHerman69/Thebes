@@ -25,6 +25,8 @@ namespace ThebesUI
         {
             InitializeComponent();
 
+            UIConfig.FindImgFolder();
+
             playerInput1.Color = PlayerColor.red;
             playerInput2.Color = PlayerColor.green;
             playerInput3.Color = PlayerColor.blue;
