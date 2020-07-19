@@ -17,6 +17,7 @@ namespace ThebesCore
         void Move(IAction action);
         Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; }
         IGame Clone();
+        int ArtifactSum(IDigSite digSite);
     }
     
     [Serializable]
@@ -186,6 +187,19 @@ namespace ThebesCore
                 }
             }
 
+        }
+
+        public int ArtifactSum(IDigSite digSite)
+        {
+            int sum = 0;
+            foreach (IToken token in digSite.Tokens)
+            {
+                if (token is IArtifactToken)
+                {
+                    sum += ((IArtifactToken)token).Points;
+                }
+            }
+            return sum;
         }
 
         public virtual IGame Clone()

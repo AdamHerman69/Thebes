@@ -38,6 +38,7 @@ namespace ThebesCore
         /// <returns>Queue representation of the final deck</returns>
         private Queue<ICard> BuildDeck(List<ICard> cards, int playerCount)
         {
+            List<ICard> cardsCopy = new List<ICard>(cards);
             if (playerCount < 2 || playerCount > 4)
             {
                 throw new InvalidOperationException("Invalid number of players. This deck implemetation only works for 2 to 4 players");
@@ -47,10 +48,10 @@ namespace ThebesCore
             List<IExhibitionCard> smallExhibitions = new List<IExhibitionCard>();
             List<IExhibitionCard> largeExhibitions = new List<IExhibitionCard>();
 
-            while (cards.Count != 0)
+            while (cardsCopy.Count != 0)
             {
-                int randomIndex = random.Next(cards.Count);
-                ICard randomCard = cards[randomIndex];
+                int randomIndex = random.Next(cardsCopy.Count);
+                ICard randomCard = cardsCopy[randomIndex];
 
                 if (randomCard is IExhibitionCard)
                 {
@@ -68,7 +69,7 @@ namespace ThebesCore
                     newDeck.Add(randomCard);
                 }
 
-                cards.RemoveAt(randomIndex);
+                cardsCopy.RemoveAt(randomIndex);
             }
 
             // Positioning exhibition cards in the deck according to the rules.

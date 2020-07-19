@@ -14,7 +14,6 @@ namespace ThebesAI
     {
         public Dictionary<IDigSite, double> assumedArtifactSum;
         public Dictionary<IDigSite, double> assumedArtifactCount;
-        IPlayer player; // single player version
 
         public SimGame(Game game)
         {
@@ -82,7 +81,7 @@ namespace ThebesAI
             return new SimGame(this);
         }
 
-        public override IPlayer ActivePlayer => this.player;
+        //public override IPlayer ActivePlayer => this.player;
 
     }
 
@@ -352,7 +351,7 @@ namespace ThebesAI
 
 
             // use zeppelin
-            if (Game.ActivePlayer.Zeppelins > 0 && actions.Count > 0)
+            if (Game.ActivePlayer.Zeppelins > 0 && !((Player)Game.ActivePlayer).useZeppelin && actions.Count > 0)
             {
                 actions.Add(new ZeppelinAction(true));
             }

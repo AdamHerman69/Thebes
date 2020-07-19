@@ -44,7 +44,7 @@ namespace ThebesUI
 
 
         /// <summary>
-        /// Plays the given action if not null and let's the AI players play. Ends when it's a human player's turn.
+        /// Plays the given action if not null and lets the AI players play. Ends when it's a human player's turn.
         /// Also ends the game when all players are done.
         /// </summary>
         /// <param name="action">action to execute</param>

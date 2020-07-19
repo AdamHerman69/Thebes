@@ -44,6 +44,7 @@ namespace ThebesUI
                 playerInput.AddAI(typeof(HeuristicCheaterAI));
                 playerInput.AddAI(typeof(SimCheaterAI));
                 playerInput.AddAI(typeof(FirstYearDFSAI));
+                playerInput.AddAI(typeof(EvolutionAI));
             }
         }
 
