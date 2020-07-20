@@ -60,6 +60,7 @@ namespace ThebesUI
                 action = ((IAIPlayer)ActivePlayer).AI.TakeAction(this);
                 Move(action);
             }
+            redraw?.Invoke();
 
             if (AreAllPlayersDone())
             {

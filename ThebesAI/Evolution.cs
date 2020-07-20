@@ -13,15 +13,14 @@ using System.IO;
 namespace ThebesAI
 {
     /*
-     * true / false traits
+     * Zkusit zohlednit:
      * 
-     * mít x nějakejch karet
-     * mít povolení pro digsity
-     * přidat bodovej multiplier
-     * mít x tokenů od y barvy
-     * time left weight
+     * vemu knihu když jich můžu mít nejvíc
+     * 
+     * 
      * 
      */
+
 
     public struct Weights : IEnumerable<double>
     {
@@ -59,168 +58,168 @@ namespace ThebesAI
 
         public Weights(string nothing) 
         {
-            knowledgeCards = new double[13] 
+            knowledgeCards = new double[13]
             {   0,
-                0.0020496833269402375,
-                0.000044458309937917996,
-                9.133551588167725,
-                4.351315812735974e-7,
-                1.1859396624744787e-7,
-                0.000008584659058245017,
-                1.591448143400574e-12,
-                5.319418177139304e-15,
-                5.885749995694802e-8,
-                0.00862858477580439,
-                1.0826110037125302e-10,
-                4.415288970119904e-9
+                1.1037508079887661E-05,
+                4.423210424306365E-08,
+                13.009785750785342,
+                2.2142512362146583E-06,
+                1.6210347428513657E-07,
+                6.5597901272757263E-08,
+                1.9837604204390725E-15,
+                2.9296689817262733E-15,
+                2.3100046398081926E-07,
+                0.00014722574621158239,
+                3.2182504734312679E-12,
+                2.2143612949910419E-11,
             };
 
             tKnowledgeCards = new double[13] 
             {
-                2.0005671306800305e-8,
-                1.1667670853189579e-11,
-                0.000013097582308064662,
-                2.924896927339194e-12,
-                9.121746080189497e-9,
-                0.0022623000348201906,
-                7.335724939859327e-7,
-                4.4581795841987085e-8,
-                8.825945100432129e-14,
-                2.9827427080007036e-13,
-                3.150850949469863e-13,
-                3.4803837360361654e-8,
-                3.748230953619839e-14
+                1.0368319512336537E-08,
+                3.9386212264555813E-12,
+                6.6790697654043283E-06,
+                3.9068477712150828E-16,
+                1.7690317948754689E-08,
+                0.00064954904956271734,
+                6.019300996498915E-10,
+                2.2697604850393586E-08,
+                2.3003829808627842E-15,
+                7.0353141347936878E-14,
+                2.4769334755451079E-13,
+                8.9186031185078167E-09,
+                2.1729795519247193E-13,
             };
 
             singleUseKnowledgeCards = new double[6] 
             {
-                0,
-                7.252396296476999e-8,
-                0.000006220968750865157,
-                2.1879225874508627e-8,
-                7.858436280796917e-10,
-                9.393732354653443e-9
+               0,
+                3.2976480072428905E-09,
+                1.3194086132934448E-05,
+                3.6244100063906858E-08,
+                7.7331739624187129E-13,
+                2.1433102880505741E-08,
             };
 
             generalKnowledgeCards = new double[13] 
             {
                 0,
-                3.96585354391474e-8,
-                1358.970971158819,
-                1.1974080436642822e-7,
-                0.000016569118584056017,
-                5.693700044270805e-7,
-                0.0000018184248666728766,
-                0.04354505284782457,
-                5.424853198230491e-14,
-                0.07357875297763782,
-                1.6203482200613113e-10,
-                2.381412737491374e-9,
-                1.372560296512603e-10
+                2.1695869158524315E-10,
+                946.59692377158808,
+                2.4160757689717004E-07,
+                2.9381931340014189E-05,
+                1.660319913003155E-09,
+                4.2273568635208688E-06,
+                0.0388530128799772,
+                1.2873427970030681E-14,
+                2.6203687257285542E-05,
+                8.7446441059509208E-12,
+                1.2601777282966746E-09,
+                1.1336155855371867E-11,
             };
             tGeneralKnowledgeCards = new double[13] 
             {
-                1.6429781038386988e-7,
-                8.143390398517959e-10,
-                0.00004470620959790173,
-                3.4775521746963103e-13,
-                8.020745603146505e-7,
-                4.902383882145659e-7,
-                0.000007928507356784314,
-                1.6159707111801825e-12,
-                0.00000169315035140683,
-                2.746237003401887e-7,
-                5.879828846450945e-8,
-                1.1542845084407851e-9,
-                0.0008712092322610341,
+                1.1488553890876533E-08,
+                1.2085783026623123E-09,
+                1.6575173237691361E-06,
+                5.2811835104650861E-13,
+                7.9595695172966628E-08,
+                6.1527371963869907E-07,
+                5.0143269196907159E-06,
+                9.90962724182828E-14,
+                3.2351958444299958E-09,
+                1.7243045651395564E-07,
+                1.5345555940832E-07,
+                3.1941304263110021E-11,
+                0.0014233278594004983,
             };
 
             shovels = new double[5] 
             {
                 0,
-                0.000001729289002888193,
-                1.0462460891350776e-9,
-                2.2795139446438006,
+                2.5944420135446523E-06,
+                1.5966353807529544E-12,
+                5.4266953278127232,
                 0,
             };
 
             tShovels = new double[5] 
             {
-                2.6456808027864073e-10,
-                2.572355254877213e-9,
-                5.138996927353314e-13,
-                4.30173322132337e-7,
-                4.093091136023641e-15,
+                1.3489069041461626E-11,
+                1.3030632524437439E-10,
+                8.8805675548175E-15,
+                3.2651515934147844E-10,
+                2.1331920813508376E-14,
             };
 
             assistants = new double[5] 
             {
                 0,
-                2.645475823043279e-9,
-                1.054649039582463e-7,
-                8.299328391956445e-9,
+                4.0791929713811216E-09,
+                1.5710656676215277E-10,
+                4.6001911910408103E-10,
                 0,
             };
             tAssistants = new double[5] 
             {
-                1.4124057856528376e-9,
-                0.000007576705658507248,
-                0.000019190668164534102,
-                6.435802150992901e-18,
-                3.608318014747887e-7
+                1.5870023582001166E-09,
+                7.0431022582841274E-07,
+                1.3966415306154843E-05,
+                2.6744205389749509E-18,
+                1.8329104522116111E-10,
             };
 
             specialPermissions = new double[4] 
             {
                 0,
-                5.0462725848473885e-11,
-                0.00001953549745918159,
-                0.014993422620390261
+                9.78667358195109E-15,
+                3.0184969834541402E-05,
+                0.013682068960582895,
             };
 
             zeppelins = new double[6] 
             {
                 0,
-                0.017784555905542565,
-                1.5622114595609596e-9,
-                0.0000014077552628243986,
-                2.999850940123164e-8,
-                0.0009303468366914499,
+                0.010545284784401376,
+                6.6621636014441717E-10,
+                1.8758757307435428E-07,
+                1.1761499876937767E-09,
+                0.0011842056593770517,
             };
 
             congresses = new double[9] 
             {
                 0,
-                7.679629770923098e-7,
-                1.3522959486658074e-9,
-                8.888617463850518e-7,
-                6.809307116616667e-10,
-                0.052929490232342356,
-                0.000002760673833028447,
-                4.048603424572042e-7,
+                4.17734108212371E-09,
+                2.8981074175019588E-10,
+                5.1391002944486067E-07,
+                1.7544299883335087E-10,
+                0.090673938275772012,
+                1.4389752400682561E-07,
+                1.4241895187725792E-07,
                 0,
             };
             tCongresses = new double[9] 
             {
-                3.5723595442180424e-9,
-                1.247079578259405e-13,
-                5.009612692060049e-11,
-                2.1124793070372387e-18,
-                2.3502528597885245e-10,
-                2.1918584841218303e-7,
-                2.0857947036581566e-12,
-                0.0000037058812558783226,
-                2.811031930396176e-10,
+                7.8834647914570634E-09,
+                1.0519365856000629E-14,
+                1.677355021501641E-10,
+                1.3203067649884011E-18,
+                1.9881558350931395E-11,
+                6.0123055440694365E-10,
+                8.9154463068929766E-13,
+                2.7622597399386247E-06,
+                6.04401847669993E-12,
             };
 
-            car = new double[1] { 0.000604475996634021};
-            tCar = new double[1] { 0.0009957692217319666 };
+            car = new double[1] { 2.2683087269476137E-05, };
+            tCar = new double[1] { 0.00056772673078374846 };
 
-            permission = new double[1] { 1.5005055795291187e-9};
-            tPermission = new double[1] { 2.47595953991525e-9};
+            permission = new double[1] { 1.362997680440333E-09, };
+            tPermission = new double[1] { 1.2416096724153225E-10, };
 
-            timeLeftMultiplier = new double[1] { 20.755333815059412};
-            pointsMultiplier = new double[1] { 24.343590052840856};
+            timeLeftMultiplier = new double[1] { 19.7974530090443, };
+            pointsMultiplier = new double[1] { 39.36968916975745 };
 
             weightArrays = new List<double[]>
             {
@@ -246,70 +245,23 @@ namespace ThebesAI
             };
         }
 
-        public Weights(int nothing)
-        {
-            knowledgeCards = new double[13] {0.0, 2.0, 2.5, 3.0, 3.5, 4.0, 3.5, 2.8, 2.5, 1.8, 1.0, 0.3, 0.1};
-            tKnowledgeCards = new double[13] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
-
-            singleUseKnowledgeCards = new double[6] { 0.0, 0.5, 1.0, 0.7, 0.5, 0.3 };
-
-            generalKnowledgeCards = new double[13] { 0.0, 5.0, 6.0, 7.0, 6.0, 5.0, 3.0, 2.8, 2.5, 1.8, 1.0, 0.3, 0.1 };
-            tGeneralKnowledgeCards = new double[13] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
-
-            shovels = new double[5] {0.0, 1.0, 3.0, 4.0, 0.0};
-            tShovels = new double[5] { 1.0, 1.0, 1.0, 1.0, 1.0};
-
-            assistants = new double[5] { 0.0, 0.8, 2.5, 3.5, 0.0 };
-            tAssistants = new double[5] { 1.0, 1.0, 1.0, 1.0, 1.0 };
-                
-            specialPermissions = new double[4] { 0.0, 4.0, 3.0, 1.0};
-            zeppelins = new double[6] { 0.0, 2.0, 2.0, 2.0, 2.0, 2.0 };
-
-            congresses = new double[9] {0.0, 2.0, 3.0, 2.0, 1.0, 1.0, 1.0, 1.0, 0.0};
-            tCongresses = new double[9] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
-
-            car = new double[1] { 5.0 };
-            tCar = new double[1] { 1.0 };
-
-            permission = new double[1] { 4.0 };
-            tPermission = new double[1] { 1.0 };
-
-            timeLeftMultiplier = new double[1] { 0.3 };
-            pointsMultiplier = new double[1] { 1 };
-
-            weightArrays = new List<double[]> 
-            { 
-                knowledgeCards,
-                tKnowledgeCards,
-                singleUseKnowledgeCards,
-                generalKnowledgeCards,
-                tGeneralKnowledgeCards,
-                shovels,
-                tShovels,
-                assistants,
-                tAssistants,
-                specialPermissions,
-                zeppelins,
-                congresses,
-                tCongresses,
-                car,
-                tCar,
-                permission,
-                tPermission,
-                timeLeftMultiplier,
-                pointsMultiplier
-            };
-        }
-
+        /// <summary>
+        /// Produces a child combining the weights of the supplied array. For every weight a random parent is chosen.
+        /// </summary>
+        /// <param name="parents">Array of parents</param>
+        /// <returns>A set of new weights</returns>
         public static Weights Crossover(params Weights[] parents)
         {
-            Weights child = new Weights(69);
+            Weights child = new Weights("useless parameter");
+            
+            // get an enumerator for each parent
             IEnumerator<double>[] enums = new IEnumerator<double>[parents.Length];
             for (int i = 0; i < parents.Length; i++)
             {
                 enums[i] = parents[i].GetEnumerator();
             }
 
+            // set all child's weights, every weight is inherited from a randomly chosen parent
             WeightsEnum childEnum = (WeightsEnum)child.GetEnumerator();
             while (childEnum.MoveNext())
             {
@@ -325,22 +277,34 @@ namespace ThebesAI
             return child;
         }
 
-        public void Mutate(double probability, double rangePercentage)
+        /// <summary>
+        /// Alteres the weights with according to the provided parameters 
+        /// </summary>
+        /// <param name="probability">probability [0, 1] that a single weight is going to get altered</param>
+        /// <param name="rangeProportion">the 'severity' of the mutation, the max possible change that can occur, represented as a proportion of the weight</param>
+        public void Mutate(double probability, double rangeProportion)
         {
             WeightsEnum enumerator = (WeightsEnum) this.GetEnumerator();
 
             while (enumerator.MoveNext())
             {
+                // is chosen for mutation?
                 if (random.NextDouble() <= probability)
                 {
                     // mutation
-                    double range = Math.Abs(weightArrays[enumerator.arrayPosition][enumerator.doublePosition] * rangePercentage);
-                    double modification = random.NextDouble() * 2 * range - range;
+                    double range = Math.Abs(weightArrays[enumerator.arrayPosition][enumerator.doublePosition] * rangeProportion); // compute the modification range
+                    double modification = random.NextDouble() * 2 * range - range; // randomly choose a number whithin the range [-range, range]
                     weightArrays[enumerator.arrayPosition][enumerator.doublePosition] = enumerator.Current + modification;
                 }
             }
         }
 
+        /// <summary>
+        /// Returns the specified weight. Returns the last weight in the array if index is out of bounds
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public double GetWeight(double[] array, int index)
         {
             if (index < array.Length)
@@ -407,9 +371,9 @@ namespace ThebesAI
 
         public EvolutionAI() { }
 
-        public EvolutionAI(IPlayerData player, IGame game)
+        public EvolutionAI(IPlayerData player, IGame game) // UI calls all AI constructors with these parameters
         {
-            weights = new Weights("adam");
+            weights = new Weights("useless parameter");
         }
 
         public EvolutionAI(Weights weights)
@@ -419,14 +383,15 @@ namespace ThebesAI
 
         public IAction TakeAction(IGame gameState)
         {
-            //SimGame simGame = new SimGame((Game)gameState);
-
             string playerName = gameState.ActivePlayer.Name;
+
+            // generate all possible moves and their resulting game states
             List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
 
             double bestScore = double.MinValue;
             SimulationState bestState = null;
 
+            // Evaluate all child states and pick the best one
             double score;
             foreach (SimulationState state in possibleStates)
             {
@@ -441,11 +406,11 @@ namespace ThebesAI
             return bestState.Move;
         }
 
-        private double EvalScore(ISimulationState state, IPlayer player)
+        protected virtual double EvalScore(ISimulationState state, IPlayer player)
         {
             double score = 0;
             
-            // knowledge
+            // digsite dependent points
             foreach (IDigSite digSite in state.Game.DigsiteInventory.Keys)
             {
                 // specialized knowledge
@@ -456,7 +421,6 @@ namespace ThebesAI
                 //single use knowledge
                 score += weights.GetWeight(weights.singleUseKnowledgeCards, player.SingleUseKnowledge[digSite])
                     * state.Game.ArtifactSum(digSite);
-
                 
                 // permissions
                 if (player.Permissions[digSite])
@@ -502,19 +466,20 @@ namespace ThebesAI
 
         public Individual() { }
 
-        public Individual(int id, int generation)
+        public Individual(Weights? weights = null, int id = -1, int generation = -1)
         {
             this.id = id;
-            this.ai = new EvolutionAI(null, null);
-            ai.weights.Mutate(1, 0.9);
+            this.generation = generation;
             scores = new List<int>();
-        }
 
-        public Individual(int id, int generation, Weights weights)
-        {
-            this.id = id;
-            this.ai = new EvolutionAI(weights);
-            scores = new List<int>();
+            if (weights == null)
+            {
+                this.ai = new EvolutionAI(null, null);
+            }
+            else
+            {
+                this.ai = new EvolutionAI(weights.Value);
+            }
         }
 
         public void AddScore(int score)
@@ -534,25 +499,43 @@ namespace ThebesAI
         List<Individual> individuals = new List<Individual>();
         int currentGen = 0;
         int currentID = 0;
+        Weights currentBest;
+        double currentBestScore = double.MinValue;
 
-        public void GenerateIndividuals(int count)
+        public Population(int count, Weights? seed = null, double mutationProbability = 1, double mutationRange = 1)
         {
+            Individual individual;
             for (int i = 0; i < count; i++)
             {
-                individuals.Add(new Individual(currentID++, currentGen));
+                individual = new Individual(seed, currentID++, currentGen);
+                individual.ai.weights.Mutate(mutationProbability, mutationRange);
+                individuals.Add(individual);
             }
         }
-
-        public void TestGeneration(int gamesPerPlayer)
+            
+        public void TestGeneration(int gamesPerPlayer, int playerPerGame)
         {
+            if (playerPerGame < 2 || playerPerGame > 4)
+            {
+                throw new ArgumentOutOfRangeException("Game only supports 2 - 4 players");
+            }
+            if (gamesPerPlayer < 1)
+            {
+                throw new ArgumentOutOfRangeException("You have to play at least one game to test the players");
+            }
+            if (individuals.Count % playerPerGame != 0)
+            {
+                throw new ArgumentOutOfRangeException("Number of individual in a population must be divisible by playersPerGame");
+            }
+
             int populationIndex = 0, playersIndex = 0;
-            Individual[] players = new Individual[4];
+            Individual[] players = new Individual[playerPerGame];
             for (int i = 0; i < gamesPerPlayer; i++)
             {
                 while (populationIndex < individuals.Count)
                 {
                     players[playersIndex] = individuals[populationIndex];
-                    if (playersIndex == 3)
+                    if (playersIndex == playerPerGame - 1)
                     {
                         PlayMatch(players);
                         playersIndex = -1;
@@ -569,34 +552,51 @@ namespace ThebesAI
             }
         }
 
-        public void CreateNewGeneration()
+        public void CreateNewGeneration(double survivorRatio, int parentAmount, double mutationProbability = 0.15, double mutationRange = 1)
         {
             currentGen++;
 
-            // sort by average score
+            // sort by average score descending
             individuals.Sort((x, y) => y.AverageScore().CompareTo(x.AverageScore()));
 
-            // add first 20 to new population
+            // report a new best score
+            double bestScore = individuals[0].AverageScore();
+            if (bestScore > currentBestScore)
+            {
+                currentBestScore = bestScore;
+                currentBest = individuals[0].ai.weights;
+                Console.WriteLine($"-------------------- new best score: {bestScore}");
+                
+                using(var tw = new StreamWriter($"currentBest.txt", true))
+                    {
+                    tw.Write(new JavaScriptSerializer().Serialize(currentBest));
+                }
+            }
+
+            int survivorCount = (int)Math.Round(individuals.Count * survivorRatio);
+
+            // select survivors
             List<Individual> newPopulation = new List<Individual>();
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < survivorCount; i++)
             {
                 newPopulation.Add(individuals[i]);
             }
 
-            // generate 80 new ones from the last top 20
+            // generate the rest of the population
             List<Individual> newGeneration = new List<Individual>();
-            Weights[] parents = new Weights[4];
+            Weights[] parents = new Weights[parentAmount];
             Individual newIndividual;
-            for (int i = 0; i < 70; i++)
+            for (int i = 0; i < individuals.Count - survivorCount; i++)
             {
-                // choose 4 parents randomly
-                for (int j = 0; j < 4; j++)
+                // choose parents randomly
+                for (int j = 0; j < parentAmount; j++)
                 {
                     parents[j] = newPopulation[random.Next(newPopulation.Count)].ai.weights;
                 }
+
                 // add newly created indiviudal to the new generation
-                newIndividual = new Individual(currentID++, currentGen, Weights.Crossover(parents));
-                newIndividual.ai.weights.Mutate(0.1, 1);
+                newIndividual = new Individual(Weights.Crossover(parents), currentID++, currentGen);
+                newIndividual.ai.weights.Mutate(mutationProbability, mutationRange);
                 newGeneration.Add(newIndividual);
             }
 
@@ -618,22 +618,20 @@ namespace ThebesAI
             }
         }
 
-        private void PlayMatch(Individual[] individuals)
+        public static void PlayMatch(Individual[] individuals)
         {
-            if (individuals.Length != 4)
+            if (individuals.Length < 2 || individuals.Length > 4)
             {
-                Console.WriteLine("wrong number of players!!!!!!");
-                return;
+                throw new ArgumentOutOfRangeException("Game only supports 2 - 4 players");
             }
 
-            //GameSettings.LoadFromFile(@"thebes_config.thc");
-            SimulationGame game = new SimulationGame(4);
+            SimulationGame game = new SimulationGame(individuals.Length);
 
             // create players
             List<IPlayer> players = new List<IPlayer>();
             AIPlayer player;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < individuals.Length; i++)
             {
                 player = new AIPlayer(
                             i.ToString(),
@@ -665,16 +663,16 @@ namespace ThebesAI
             }
         }
 
-        public void Evolve()
+        public void Evolve(int playersPerGame , int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.15, double mutationRange = 1)
         {
             GameSettings.LoadFromFile(@"thebes_config.thc");
-            GenerateIndividuals(100);
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < generations; i++)
             {
-                TestGeneration(5);
+                TestGeneration(gamesPerPlayer, playersPerGame);
 
                 Console.WriteLine($"Generation {this.currentGen} tested: Best average score: {individuals.Max(x => x.AverageScore())},");
-                if (currentGen % 20 == 0)
+                // print generation
+                if (false)
                 {
                     using (var tw = new StreamWriter($"gen_{currentGen}.txt", true))
                     {
@@ -682,7 +680,7 @@ namespace ThebesAI
                     }
                 }
 
-                CreateNewGeneration();
+                CreateNewGeneration(survivorRatio, parentAmount, mutationProbability, mutationRange);
             }
             
         }

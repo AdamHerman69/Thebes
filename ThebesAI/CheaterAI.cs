@@ -231,7 +231,7 @@ namespace ThebesAI
 
     }
 
-    interface ISimulationState
+    public interface ISimulationState
     {
         ISimulationState NextState(IAction move);
         List<ISimulationState> GetAllChildStates();
@@ -244,7 +244,7 @@ namespace ThebesAI
 
     }
 
-    class SimulationState : ISimulationState
+    public class SimulationState : ISimulationState
     {
         public IGame Game { get; private set; }
         public IAction Move { get; private set; }

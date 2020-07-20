@@ -7,6 +7,7 @@ using ThebesCore;
 using ThebesAI;
 using System.IO;
 using System.Web.Script.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace ThebesSimulation
 {
@@ -14,16 +15,32 @@ namespace ThebesSimulation
     {
         static void Main(string[] args)
         {
-            //using (var sr = new StreamReader($"gen_1060.txt", true))
-            //{
-            //    string json = sr.ReadToEnd();
-            //    List<Individual> individuals = new JavaScriptSerializer().Deserialize<List<Individual>>(json);
+            //GameSettings.LoadFromFile(@"thebes_config.thc");
 
-            //    Console.ReadLine();
+            //Individual[] individuals = new Individual[4];
+            //for (int i = 0; i < individuals.Length; i++)
+            //{
+            //    individuals[i] = new Individual(i);
             //}
 
-            Population population = new Population();
-            population.Evolve();
+            //int counter = 10;
+            //for (int i = 0; i < 1000; i++)
+            //{
+
+            //    if (i % 100 == 0)
+            //    {
+            //        Console.WriteLine(counter--);
+            //    }
+            //    Population.PlayMatch(individuals);
+            //}
+            //for (int i = 0; i < individuals.Length; i++)
+            //{
+            //    Console.WriteLine($"Average score for {i}: {individuals[i].AverageScore()}");
+            //}
+            //Console.ReadLine();
+
+            Population population = new Population(99);
+            population.Evolve(3, 10000, 7);
             Console.ReadLine();
         }
     }

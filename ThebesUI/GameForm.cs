@@ -420,21 +420,21 @@ namespace ThebesUI
             game.PlayAsync(action, ShowResults, UpdateBoard);
         }
 
-        /// <summary>
-        /// Executes the given action
-        /// </summary>
-        /// <param name="action"></param>
-        public void ExecuteAction(IAction action)
-        {
-            if (!game.Play(action, UpdateBoard))
-            {
-                UpdateBoard();
-            }
-            else
-            {
-                ShowResults();
-            }
-        }
+        ///// <summary>
+        ///// Executes the given action
+        ///// </summary>
+        ///// <param name="action"></param>
+        //public void ExecuteAction(IAction action)
+        //{
+        //    if (!game.Play(action, UpdateBoard))
+        //    {
+        //        UpdateBoard();
+        //    }
+        //    else
+        //    {
+        //        ShowResults();
+        //    }
+        //}
 
         /// <summary>
         /// Closes the game form and shows the results;
@@ -483,7 +483,7 @@ namespace ThebesUI
 
         private void GameForm_Shown(object sender, EventArgs e)
         {
-            game.Play(null, UpdateBoard);
+            game.PlayAsync(null, ShowResults, UpdateBoard);
         }
     }
 }
