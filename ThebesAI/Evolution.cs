@@ -710,19 +710,6 @@ namespace ThebesAI
             }
         }
 
-        //public int ArtifactSum(IDigSite digSite)
-        //{
-        //    int sum = 0;
-        //    foreach (IToken token in digSite.Tokens)
-        //    {
-        //        if (token is IArtifactToken)
-        //        {
-        //            sum += ((IArtifactToken)token).Points;
-        //        }
-        //    }
-        //    return sum;
-        //}
-
         public override IGame Clone()
         {
             SimulationGame newGame = new SimulationGame();

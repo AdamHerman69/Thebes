@@ -31,7 +31,6 @@ namespace ThebesCore
     public interface IDigSite : IPlace
     {
         List<IToken> Tokens { get; }
-        //List<IToken> DrawTokens(int tokenAmount);
     }
 
     [Serializable]
@@ -44,26 +43,6 @@ namespace ThebesCore
         {
             Tokens = new List<IToken>();
         }
-
-        ///// <summary>
-        ///// Randomly draws the requested amount of tokens. Keeping just the dirt.
-        ///// </summary>
-        ///// <param name="tokenAmount"></param>
-        ///// <returns>List of drawn tokens</returns>
-        //public List<IToken> DrawTokens(int tokenAmount)
-        //{
-        //    List<IToken> tokensDrawn = new List<IToken>();
-        //    for (int i = 0; i < tokenAmount; i++)
-        //    {
-        //        IToken tokenDrawn = Tokens[random.Next(0, Tokens.Count)];
-        //        if (! (tokenDrawn is IDirtToken))
-        //        {
-        //            Tokens.Remove(tokenDrawn);
-        //        }
-        //        tokensDrawn.Add(tokenDrawn);
-        //    }
-        //    return tokensDrawn;
-        //}
     }
 
     public interface ICardChangePlace : IPlace

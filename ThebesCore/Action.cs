@@ -8,7 +8,7 @@ namespace ThebesCore
 {
     /// <summary>
     /// Each instance of a class implementing this interface represents one action a player can do.
-    /// It's used to send information between the UI and the Core.
+    /// It's used to send information between the UI / AI and the Core.
     /// </summary>
     public interface IAction
     {
@@ -27,10 +27,17 @@ namespace ThebesCore
         public abstract override string ToString();
     }
 
+    /// <summary>
+    /// Changes the displayed cards at a given card-change place
+    /// </summary>
     public class ChangeCardsAction : Action
     {
         public ICardChangePlace cardChangePlace;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cardChangePlace">The place where the cards can be changed</param>
         public ChangeCardsAction(ICardChangePlace cardChangePlace)
         {
             this.cardChangePlace = cardChangePlace;
@@ -48,10 +55,17 @@ namespace ThebesCore
         }
     }
 
+    /// <summary>
+    /// Takes the specified card
+    /// </summary>
     public class TakeCardAction : Action
     {
         public ICard card;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="card">Card to be taken by the player</param>
         public TakeCardAction(ICard card)
         {
             this.card = card;
@@ -69,10 +83,17 @@ namespace ThebesCore
         }
     }
 
+    /// <summary>
+    /// Executes the given exhibition
+    /// </summary>
     public class ExecuteExhibitionAction : Action
     {
         public IExhibitionCard exhibition;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exhibition">Exhibition to execute</param>
         public ExecuteExhibitionAction(IExhibitionCard exhibition)
         {
             this.exhibition = exhibition;
@@ -90,6 +111,9 @@ namespace ThebesCore
         }
     }
 
+    /// <summary>
+    /// Player waits for the end of the year
+    /// </summary>
     public class EndYearAction : Action
     {
         public EndYearAction() {}
@@ -106,6 +130,9 @@ namespace ThebesCore
         }
     }
 
+    /// <summary>
+    /// Uses the zeppelin card for the next move
+    /// </summary>
     public class ZeppelinAction : Action
     {
         bool use;
@@ -126,6 +153,9 @@ namespace ThebesCore
         }
     }
 
+    /// <summary>
+    /// Executes a dig, specified by the parameters
+    /// </summary>
     public class DigAction : Action
     {
         public IDigSite digSite;
@@ -133,6 +163,13 @@ namespace ThebesCore
         List<ICard> singleUseCards;
         System.Action<List<IToken>> displayDigResult;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="digSite">Where to dig</param>
+        /// <param name="weeks">How long to dig for</param>
+        /// <param name="singleUseCards">Single-use cards to use</param>
+        /// <param name="displayDigResult">Function that displays the dig result</param>
         public DigAction(IDigSite digSite, int weeks, List<ICard> singleUseCards, System.Action<List<IToken>> displayDigResult)
         {
             this.digSite = digSite;
@@ -157,8 +194,6 @@ namespace ThebesCore
                 }
                 displayDigResult(tokens);
             }
-
-            
         }
 
         public override string ToString()

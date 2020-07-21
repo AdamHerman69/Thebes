@@ -10,14 +10,53 @@ namespace ThebesCore
 {  
     public interface IGame
     {
+        /// <summary>
+        /// Player whose currently expected to make a move
+        /// </summary>
         IPlayer ActivePlayer { get; }
+
+        /// <summary>
+        /// All players in the game
+        /// </summary>
         List<IPlayer> Players { get; }
+
+        /// <summary>
+        /// Cards currently available
+        /// </summary>
         ICard[] DisplayedCards { get; }
+
+        /// <summary>
+        /// Exhibitions available
+        /// </summary>
         ICard[] DisplayedExhibitions { get; }
+
+        /// <summary>
+        /// Executes the provided action
+        /// </summary>
+        /// <param name="action">Action (move) to execute</param>
         void Move(IAction action);
+
+        /// <summary>
+        /// Tokens available on each dig site
+        /// </summary>
         Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; }
+
+        /// <summary>
+        /// Bonus tokens (for the first visitor) available on each digsite
+        /// </summary>
         Dictionary<IDigSite, IToken> BonusTokens { get; }
+
+        /// <summary>
+        /// Clones the present game state
+        /// </summary>
+        /// <returns>Copy of the present game state</returns>
         IGame Clone();
+
+        /// <summary>
+        /// Returnes the sum of artifact values at a given dig site 
+        /// </summary>
+        /// <param name="digSite">Specified dig site</param>
+        /// <returns>Sum of artifact values</returns>
         int ArtifactSum(IDigSite digSite);
     }
     
@@ -25,7 +64,7 @@ namespace ThebesCore
     public class Game : IGame
     {
         static Random random = new Random();
-        public virtual IPlayer ActivePlayer { get { return Players[0]; } }
+        public virtual IPlayer ActivePlayer { get { Players.Sort(); return Players[0]; } }
         public List<IPlayer> Players { get; set; }
         public IDeck Deck { get; set; }
         public ICardDisplay AvailableCards { get; set; }
@@ -139,6 +178,10 @@ namespace ThebesCore
             return true;
         }
 
+        /// <summary>
+        /// Executes the given action
+        /// </summary>
+        /// <param name="action">Action (move) to execute</param>
         public void Move(IAction action)
         {
             if (action != null)
@@ -154,7 +197,6 @@ namespace ThebesCore
                 pointsFromKnowledgeAdded = true;
             }
         }
-
 
         /// <summary>
         /// Draws cards from <see cref="Deck"/> until a non-exhibition card is found. Exhibitions drawn are added using <see cref="AddNewExhibitionCard(ExhibitionCard)"/> method.
@@ -210,6 +252,11 @@ namespace ThebesCore
 
         }
 
+        /// <summary>
+        /// Computes the sum of artifact values at a given dig site
+        /// </summary>
+        /// <param name="digSite">Specified dig site </param>
+        /// <returns>Sum of artifact values</returns>
         public int ArtifactSum(IDigSite digSite)
         {
             int sum = 0;
@@ -223,6 +270,10 @@ namespace ThebesCore
             return sum;
         }
 
+        /// <summary>
+        /// Clones the present game state
+        /// </summary>
+        /// <returns>Copy of the present game state</returns>
         public virtual IGame Clone()
         {
             Game newGame = new Game();

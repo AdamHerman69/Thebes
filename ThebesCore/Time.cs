@@ -13,11 +13,30 @@ namespace ThebesCore
         int CurrentYear { get; set; }
         int SameWeekOrder { get; set; }
 
+        /// <summary>
+        /// Checks if there's the specified amount of weeks left
+        /// </summary>
+        /// <param name="weeks">Weeks to chekc</param>
+        /// <returns>True if there's enough time, false otherwise</returns>
         bool CanSpendWeeks(int weeks);
         int CompareTo(ITime other);
+
+        /// <summary>
+        /// Forwards the time to a new year
+        /// </summary>
         void EndYear();
         bool Equals(ITime other);
+
+        /// <summary>
+        /// Computes weeks remaining to the end of the game
+        /// </summary>
+        /// <returns>Weeks remaining</returns>
         int RemainingWeeks();
+
+        /// <summary>
+        /// Forwards the time by the amount of weeks specified
+        /// </summary>
+        /// <param name="weeks">amount of weeks</param>
         void SpendWeeks(int weeks);
         string ToString();
         Time Clone(Func<ITime, int> playersOnWeek, System.Action onNewYear);
@@ -39,7 +58,7 @@ namespace ThebesCore
 
         public static void Configure(int playerCount)
         {
-            // supporting only 2-4 players atm
+            // supporting only 2-4 players
             if (playerCount < 2 || playerCount > 4)
             {
                 throw new ArgumentException("Supportig only 2-4 players atm");
@@ -78,11 +97,6 @@ namespace ThebesCore
 
         public Time(Func<ITime, int> playersOnWeek, System.Action onNewYear)
         {
-            //if (startingWeek == 0) // hasn't been configured
-            //{
-            //    throw new InvalidOperationException("Time needs to be configured first");
-            //}
-
             this.CurrentWeek = startingWeek;
             this.CurrentYear = firstYear;
             this.SameWeekOrder = initialOrderCounter--;

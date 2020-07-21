@@ -10,12 +10,12 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace ThebesAI
 {
-    class SimGame : Game
+    class DeterministicGame : Game
     {
         public Dictionary<IDigSite, double> assumedArtifactSum;
         public Dictionary<IDigSite, double> assumedArtifactCount;
 
-        public SimGame(Game game)
+        public DeterministicGame(Game game)
         {
             this.Deck = game.Deck.Clone();
             this.AvailableCards = game.AvailableCards.Clone(this.DrawCard, this.Deck.Discard);
@@ -42,10 +42,10 @@ namespace ThebesAI
             assumedArtifactSum = new Dictionary<IDigSite, double>();
             assumedArtifactCount = new Dictionary<IDigSite, double>();
 
-            if (game is SimGame)
+            if (game is DeterministicGame)
             {
-                assumedArtifactCount = new Dictionary<IDigSite, double>(((SimGame)game).assumedArtifactCount);
-                assumedArtifactSum = new Dictionary<IDigSite, double>(((SimGame)game).assumedArtifactSum);
+                assumedArtifactCount = new Dictionary<IDigSite, double>(((DeterministicGame)game).assumedArtifactCount);
+                assumedArtifactSum = new Dictionary<IDigSite, double>(((DeterministicGame)game).assumedArtifactSum);
             }
             else
             {   
@@ -76,24 +76,22 @@ namespace ThebesAI
             return assumedArtifactCount[digSite] / (assumedArtifactCount[digSite] + 16);
         }
 
-        public new SimGame Clone()
+        public new DeterministicGame Clone()
         {
-            return new SimGame(this);
+            return new DeterministicGame(this);
         }
-
-        //public override IPlayer ActivePlayer => this.player;
 
     }
 
     class SimPlayer : Player
     {
-        SimGame game;
+        DeterministicGame game;
         double assumedPoints;
         Dictionary<IDigSite, double> assumedArtifacts;
 
         public SimPlayer() { }
         
-        public SimPlayer(SimGame game, Player player)
+        public SimPlayer(DeterministicGame game, Player player)
         {
             this.Name = player.Name;
             this.CurrentPlace = player.CurrentPlace;
@@ -214,7 +212,7 @@ namespace ThebesAI
         }
 
 
-        public SimPlayer Clone(SimGame game)
+        public SimPlayer Clone(DeterministicGame game)
         {
             SimPlayer clone = new SimPlayer(game, this);
 
@@ -495,7 +493,7 @@ namespace ThebesAI
         public SimCheaterAI(IPlayerData player, IGame game) { }
         public IAction TakeAction(IGame gameState)
         {
-            MCTSNode mctsNode = new MCTSNodeCutoff(new SimulationState(new SimGame((Game)gameState)), null);
+            MCTSNode mctsNode = new MCTSNodeCutoff(new SimulationState(new DeterministicGame((Game)gameState)), null);
             return mctsNode.Run(5000);
         }
     }
@@ -506,7 +504,7 @@ namespace ThebesAI
         DFSNode head;
         public IAction TakeAction(IGame gameState)
         {
-            DFSNode dfsNode = new DFSNode(new SimulationState(new SimGame((Game)gameState)), null);
+            DFSNode dfsNode = new DFSNode(new SimulationState(new DeterministicGame((Game)gameState)), null);
             head = dfsNode;
             return dfsNode.Run();
         }

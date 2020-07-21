@@ -11,7 +11,7 @@ using System.IO;
 namespace ThebesUI
 {
     /// <summary>
-    /// Provides a transparent picutre box, that can be on top of other controls (not only just parent)
+    /// Provides a transparent picutre box, that can be on top of other controls (not just parent)
     /// 
     /// Source:
     /// Stack Overflow user Reza Aghaei
@@ -44,17 +44,27 @@ namespace ThebesUI
         }
     }
 
+    /// <summary>
+    /// Configuration and helper methods for the UI
+    /// </summary>
     public static class UIConfig
     {
+        /// <summary>
+        /// Path to the img folder with all the graphic files
+        /// </summary>
         public static string IMG_FOLDER = @"..\..\..\img\";
 
-        public static void FindImgFolder()
+        /// <summary>
+        /// Tries to find an img folder in the filesystem near the folder
+        /// </summary>
+        /// <param name="levelLimit">how far up the filesystem should we search</param>
+        public static void FindImgFolder(int levelLimit)
         {
             string path = @".\img\";
             try
             {
                 int counter = 0;
-                while (counter < 5 && !Directory.Exists(path))
+                while (counter < levelLimit && !Directory.Exists(path))
                 {
                     path = @".\." + path;
                     counter++;
@@ -68,6 +78,11 @@ namespace ThebesUI
             
         }
 
+        /// <summary>
+        /// Replaces the image in a picture box
+        /// </summary>
+        /// <param name="pb">picture box</param>
+        /// <param name="newImg">new image</param>
         public static void ReplaceImage(PictureBox pb, Image newImg)
         {
             if (pb.Image != null)
@@ -77,6 +92,10 @@ namespace ThebesUI
             pb.Image = newImg;
         }
 
+        /// <summary>
+        /// Removes the image from a picture box
+        /// </summary>
+        /// <param name="pb"></param>
         public static void RemoveImage(PictureBox pb)
         {
             if (pb.Image != null)
@@ -86,6 +105,10 @@ namespace ThebesUI
             pb.Image = null;
         }
 
+        /// <summary>
+        /// Displays a message box with the given message
+        /// </summary>
+        /// <param name="message">message to display</param>
         public static void ErrorDialog(string message)
         {
             MessageBox.Show(message);

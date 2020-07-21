@@ -33,15 +33,64 @@ namespace ThebesCore
 
     public interface IPlayer : IPlayerData, IComparable<IPlayer>
     {
+        /// <summary>
+        /// Moves a player to the dig site and proceeds to dig according to the amount of knowledge and weeks spend.
+        /// </summary>
+        /// <param name="digSite">Where to dig</param>
+        /// <param name="weeks">How long to dig</param>
+        /// <param name="singleUseCards">Single use cards to use</param>
         List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards);
+
+        /// <summary>
+        /// Called when there has been an action after changing displayed cards so that player doesn't spend bigger price next time (see game rules)
+        /// </summary>
         void ResetCardChnageInfo();
+
+        /// <summary>
+        /// Moves a player to the destination of the desired card and takes it. Spending weeks.
+        /// </summary>
+        /// <param name="card">Card to take</param>
         void MoveAndTakeCard(ICard card);
+
+        /// <summary>
+        /// Ends the year for a player by waiting for another. Used when he doesn't want to do anything.
+        /// </summary>
         void EndYear();
+
+        /// <summary>
+        /// Moves player to the desired card changing place and changes the cards
+        /// </summary>
+        /// <param name="cardChangePlace">Place where to change cards</param>
         void MoveAndChangeDisplayCards(ICardChangePlace cardChangePlace);
+
+        /// <summary>
+        /// Toggle if player should use zeppelin for his next move
+        /// </summary>
+        /// <param name="use">if true, player will use zeppelin for next move</param>
+        /// <returns>true if player has zeppelin available, false if not</returns>
         bool ToggleZeppelin(bool use);
+
+        /// <summary>
+        /// Use special permission card to renew one of his permissions
+        /// </summary>
+        /// <param name="digSite">digsite to renew permission at</param>
+        /// <returns>false if player doesnt have any special permission card or if he already has permission for the digsite</returns>
         bool UseSpecialPermission(IDigSite digSite);
+
+        /// <summary>
+        /// Check if the player has enough time to execute the specified action
+        /// </summary>
+        /// <param name="action">Action specified</param>
+        /// <returns>true if there's enough time, false otherwise</returns>
         bool IsEnoughTime(IAction action);
+
+        /// <summary>
+        /// Checks if a player can dig at the specified dig site
+        /// </summary>
+        /// <param name="digSite">Dig site specified</param>
+        /// <returns>True if the player can dig, false otherwise</returns>
         bool CanIDig(DigSite digSite);
+
         IPlayer Clone(Action<string> errorDialog,
             System.Action changeDisplayCards,
             Action<ICard> takeCard,
@@ -403,7 +452,7 @@ namespace ThebesCore
         /// </summary>
         /// <param name="digSite">Where to dig</param>
         /// <param name="weeks">How long to dig</param>
-        /// <param name="singleUseCards">Single use cards to use. NOT WORKING ATM</param>
+        /// <param name="singleUseCards">Single use cards to use</param>
         public virtual List<IToken> Dig(IDigSite digSite, int weeks, List<ICard> singleUseCards)
         {
             int travelTime = GameSettings.GetDistance(CurrentPlace, digSite);
@@ -460,6 +509,12 @@ namespace ThebesCore
             return dugTokens;
         }
 
+
+        /// <summary>
+        /// Checks if a player can dig at the specified dig site
+        /// </summary>
+        /// <param name="digSite">Dig site specified</param>
+        /// <returns>True if the player can dig, false otherwise</returns>
         public  bool CanIDig(DigSite digSite)
         {
             return Permissions[digSite] && SpecializedKnowledge[digSite] > 0;
@@ -572,6 +627,12 @@ namespace ThebesCore
             }
             throw new InvalidOperationException();
         }
+
+        /// <summary>
+        /// Check if the player has enough time to execute the specified action
+        /// </summary>
+        /// <param name="action">Action specified</param>
+        /// <returns>true if there's enough time, false otherwise</returns>
         public bool IsEnoughTime(IAction action)
         {
             return Time.CanSpendWeeks(WeeksNeeded(action));

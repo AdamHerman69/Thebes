@@ -10,8 +10,22 @@ namespace ThebesCore
     /// </summary>
     public interface IDeck
     {
+        /// <summary>
+        /// Discards a used card (the card can be drawn again later in the game)
+        /// </summary>
+        /// <param name="card"></param>
         void Discard(ICard card);
+
+        /// <summary>
+        /// Draws a card from the deck
+        /// </summary>
+        /// <returns>card drawn</returns>
         ICard DrawCard();
+
+        /// <summary>
+        /// Clones this instance in its particular state
+        /// </summary>
+        /// <returns>Copy of this instance</returns>
         Deck Clone();
     }
 
