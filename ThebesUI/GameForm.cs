@@ -19,6 +19,7 @@ namespace ThebesUI
         ToolTip[] exhibitionToolTips = new ToolTip[3];
         Dictionary<IPlayer, TransparentPictureBox> smallPieces;
         Dictionary<IPlayer, TransparentPictureBox> bigPieces;
+        Dictionary<IDigSite, TransparentPictureBox> bonusTokens;
         TransparentPictureBox yearCounter;
         List<PlayerDisplay> playerDisplays;
         Layout layout;
@@ -152,6 +153,27 @@ namespace ThebesUI
                 pBoard.Controls.Add(bigPieces[player]);
             }
 
+            // bonus tokens
+            bonusTokens = new Dictionary<IDigSite, TransparentPictureBox>();
+            foreach (KeyValuePair<IDigSite, IToken> kvp  in game.BonusTokens)
+            {
+                ITokenView tokenView = UIGame.ToView(kvp.Value);
+
+                pbDims = layout.Places[kvp.Key.Name];
+                bonusTokens.Add(kvp.Key, new TransparentPictureBox()
+                {
+                    Location = pbDims.RectanglePositionCenter(45, 45),
+                    Width = 45,
+                    Height = 45,
+                    Visible = true,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    BackColor = Color.Transparent,
+                    Image = Image.FromFile(UIConfig.IMG_FOLDER + tokenView.FileName)
+                });
+                bonusTokens[kvp.Key].Click += new EventHandler(pBoard_Click);
+                pBoard.Controls.Add(bonusTokens[kvp.Key]);
+            }
+
             // year counter
             pbDims = layout.YearCounter[(game.ActivePlayer.Time.CurrentYear % 10) - 1];
             yearCounter = new TransparentPictureBox()
@@ -221,6 +243,18 @@ namespace ThebesUI
                 player_pb.Value.BringToFront();
             }
 
+            //bonus tokens
+            foreach (KeyValuePair<IDigSite, TransparentPictureBox> kvp in bonusTokens)
+            {
+                if (game.BonusTokens[kvp.Key] == null)
+                {
+                    if (pBoard.Controls.Contains(kvp.Value))
+                    {
+                        pBoard.Controls.Remove(kvp.Value);
+                    }
+                }
+            }
+
             // player pieces
             int offset = 0;
             foreach (KeyValuePair<IPlayer, TransparentPictureBox> player_pb in bigPieces)
@@ -229,6 +263,7 @@ namespace ThebesUI
                 player_pb.Value.Left += offset;
                 offset += 20;
             }
+
 
             // year counter
             int index = (game.ActivePlayer.Time.CurrentYear % 10) - 1;

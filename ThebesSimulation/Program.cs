@@ -39,8 +39,8 @@ namespace ThebesSimulation
             //}
             //Console.ReadLine();
 
-            Population population = new Population(99);
-            population.Evolve(3, 10000, 7);
+            Population population = new Population(100);
+            population.Evolve(2, 10000, 7);
             Console.ReadLine();
         }
     }

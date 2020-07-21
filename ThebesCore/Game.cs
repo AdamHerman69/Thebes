@@ -16,6 +16,7 @@ namespace ThebesCore
         ICard[] DisplayedExhibitions { get; }
         void Move(IAction action);
         Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; }
+        Dictionary<IDigSite, IToken> BonusTokens { get; }
         IGame Clone();
         int ArtifactSum(IDigSite digSite);
     }
@@ -34,6 +35,7 @@ namespace ThebesCore
         ICard[] IGame.DisplayedExhibitions { get { return ActiveExhibitions.Exhibitions; } }
 
         public Dictionary<IDigSite, List<IToken>> DigsiteInventory { get; protected set; }
+        public Dictionary<IDigSite, IToken> BonusTokens { get; protected set; }
         private bool pointsFromKnowledgeAdded = false;
 
 
@@ -46,6 +48,7 @@ namespace ThebesCore
             ActiveExhibitions = new ExhibitionDisplay(Deck.Discard);
 
             DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();
+            BonusTokens = new Dictionary<IDigSite, IToken>();
             foreach (IPlace place in GameSettings.Places)
             {
                 if (place is IDigSite)
@@ -53,9 +56,19 @@ namespace ThebesCore
                     IDigSite digSite = (IDigSite)place;
                     DigsiteInventory.Add(digSite, new List<IToken>());
 
+                    bool bonusTokenAdded = false;
                     foreach (IToken token in digSite.Tokens)
                     {
-                        DigsiteInventory[digSite].Add(token);
+                        if (!bonusTokenAdded && token is IArtifactToken && ((IArtifactToken)token).Points == 1)
+                        {
+                            BonusTokens[digSite] = token;
+                            bonusTokenAdded = true;
+                        }
+                        else
+                        {
+                            DigsiteInventory[digSite].Add(token);
+                        }
+                        
                     }
                 }
             }
@@ -99,6 +112,14 @@ namespace ThebesCore
                 }
                 tokensDrawn.Add(tokenDrawn);
             }
+
+            // add bonus token if available
+            if (BonusTokens[digSite] != null)
+            {
+                tokensDrawn.Add(BonusTokens[digSite]);
+                BonusTokens[digSite] = null;
+            }
+
             return tokensDrawn;
         }
 
@@ -216,6 +237,8 @@ namespace ThebesCore
             {
                 newGame.DigsiteInventory[digsite_tokenList.Key] = new List<IToken>(this.DigsiteInventory[digsite_tokenList.Key]);
             }
+
+            newGame.BonusTokens = new Dictionary<IDigSite, IToken>(this.BonusTokens);
 
 
             newGame.Players = this.Players.Select(p => p.Clone(
