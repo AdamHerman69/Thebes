@@ -74,10 +74,24 @@ namespace ThebesUI
             Move(action);
             redraw?.Invoke();
 
+            IPlayer currentAIPlayer;
+            int week, year;
             while (!AreAllPlayersDone() && ActivePlayer is IAIPlayer)
             {
+                // save info to check for faulty AI
+                week = ActivePlayer.Time.CurrentWeek;
+                year = ActivePlayer.Time.CurrentYear;
+                currentAIPlayer = ActivePlayer;
+
                 action = await Task.Run(() => ((IAIPlayer)ActivePlayer).AI.TakeAction(this));
                 Move(action);
+
+                //check for broken AI infinite loop
+                if (ActivePlayer == currentAIPlayer && ActivePlayer.Time.CurrentWeek == week && ActivePlayer.Time.CurrentYear == year && !(action is ZeppelinAction))
+                {
+                    UIConfig.ErrorDialog("It looks like the AI is trying to make an invalid move. You can try to let it decide again, but if it's deterministic you'll probably have to end the game.");
+                }
+
                 redraw?.Invoke();
             }
 

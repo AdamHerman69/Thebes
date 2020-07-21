@@ -411,7 +411,7 @@ namespace ThebesCore
 
         /// <summary>
         /// Is used to update player's stats, whenever he uses a single-use card
-        /// </summary>
+        /// </summary>  
         protected void UpdateStats()
         {
             // zero all necessary fields 
