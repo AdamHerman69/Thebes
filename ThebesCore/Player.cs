@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Security.Policy;
 using System.Text;
 
@@ -465,8 +466,16 @@ namespace ThebesCore
             }
             if (!Permissions[digSite])
             {
-                errorDialog("You don't have a valid permisssion!");
-                return null;
+                if (SpecialPermissions > 0)
+                {
+                    SpecialPermissions--;
+                    // Permissions[digSite] = true; not needed
+                }
+                else
+                {
+                    errorDialog("You don't have a valid permisssion!");
+                    return null;
+                }  
             }
             if (SpecializedKnowledge[digSite] < 1)
             {
@@ -518,7 +527,7 @@ namespace ThebesCore
         /// <returns>True if the player can dig, false otherwise</returns>
         public  bool CanIDig(DigSite digSite)
         {
-            return Permissions[digSite] && SpecializedKnowledge[digSite] > 0;
+            return (Permissions[digSite] || SpecialPermissions > 0) && SpecializedKnowledge[digSite] > 0;
         }
 
         /// <summary>

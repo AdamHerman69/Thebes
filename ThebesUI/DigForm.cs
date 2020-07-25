@@ -132,20 +132,23 @@ namespace ThebesUI
         }
 
         private void bDigButton_Click(object sender, EventArgs e)
-        {
+        {    
             if (!player.Permissions[digSite] && player.SpecialPermissions > 0)
             {
-                var usePermission = MessageBox.Show("Do you want to use your special permission?",
+                var usePermission = MessageBox.Show("You don't have a valid permission. Do you want to use your special permission?",
                                      "Use special permission?",
                                      MessageBoxButtons.YesNo);
                 if (usePermission == DialogResult.Yes)
                 {
-                    player.UseSpecialPermission(digSite);
+                    List<IToken> tokens = new List<IToken>();
+                    executeAction(new DigAction(digSite, weeksToDig, singleUseCards, DisplayDigResult));
                 }
             }
-
-            List<IToken> tokens = new List<IToken>();
-            executeAction(new DigAction(digSite, weeksToDig, singleUseCards, DisplayDigResult));
+            else
+            {
+                List<IToken> tokens = new List<IToken>();
+                executeAction(new DigAction(digSite, weeksToDig, singleUseCards, DisplayDigResult));
+            }
         }
 
         public void DisplayDigResult(List<IToken> tokens)

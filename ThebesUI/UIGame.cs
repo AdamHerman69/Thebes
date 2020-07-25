@@ -82,7 +82,7 @@ namespace ThebesUI
                 week = ActivePlayer.Time.CurrentWeek;
                 year = ActivePlayer.Time.CurrentYear;
                 currentAIPlayer = ActivePlayer;
-
+                    
                 action = await Task.Run(() => ((IAIPlayer)ActivePlayer).AI.TakeAction(this));
                 Move(action);
 
