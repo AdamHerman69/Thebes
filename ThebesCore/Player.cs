@@ -361,6 +361,7 @@ namespace ThebesCore
         {
             if (SpecialPermissions > 0 && !Permissions[digSite])
             {
+                SpecialPermissions--;
                 Permissions[digSite] = true;
                 return true;
             }
