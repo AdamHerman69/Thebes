@@ -1084,6 +1084,39 @@ namespace ThebesCore
 
             Cards.Add(new RumorsCard("TODO", vienna, 1, 2, palestine));
         }
+
+
+        /// <summary>
+        /// Generic method to generate all subsets of a set
+        /// 
+        /// Courtesy of Stack overflow user Servy:
+        /// https://stackoverflow.com/a/14820995/13426274
+        /// </summary>
+        /// <typeparam name="T">type of item in the set</typeparam>
+        /// <param name="source">source set</param>
+        /// <returns>iterator of all subsets</returns>
+        public static IEnumerable<IEnumerable<T>> Subsets<T>(IEnumerable<T> source)
+        {
+            List<T> list = source.ToList();
+            int length = list.Count;
+            int max = (int)Math.Pow(2, list.Count);
+
+            for (int count = 0; count < max; count++)
+            {
+                List<T> subset = new List<T>();
+                uint rs = 0;
+                while (rs < length)
+                {
+                    if ((count & (1u << (int)rs)) > 0)
+                    {
+                        subset.Add(list[(int)rs]);
+                    }
+                    rs++;
+                }
+                yield return subset;
+            }
+        }
+
     }
 
     /// <summary>
