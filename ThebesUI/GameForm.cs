@@ -150,6 +150,7 @@ namespace ThebesUI
                     BackColor = Color.Transparent,
                     Image = Image.FromFile(UIConfig.IMG_FOLDER + $"p_big_{game.Colors[player]}.png")
                 });
+                bigPieces[player].Click += new EventHandler(pBoard_Click); // to enable click through
                 pBoard.Controls.Add(bigPieces[player]);
             }
 
@@ -170,7 +171,7 @@ namespace ThebesUI
                     BackColor = Color.Transparent,
                     Image = Image.FromFile(UIConfig.IMG_FOLDER + tokenView.FileName)
                 });
-                bonusTokens[kvp.Key].Click += new EventHandler(pBoard_Click);
+                bonusTokens[kvp.Key].Click += new EventHandler(pBoard_Click); // to enable click through
                 pBoard.Controls.Add(bonusTokens[kvp.Key]);
             }
 
