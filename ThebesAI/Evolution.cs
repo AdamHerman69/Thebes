@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 using ThebesCore;
 using System.Web.Script.Serialization;
 using System.IO;
+using System.Xml.Schema;
 
 namespace ThebesAI
 {
@@ -21,8 +22,19 @@ namespace ThebesAI
      * 
      */
 
+    /*
+     * POZNAMKY DO BP
+     * 
+     * lineárnost a nelineárnost různejch proměnejch (počet knih - nelineární, čas - lineární)
+     * 
+     * zmínit normalizace vs nenormalizace (v pocketu odkaz na paper v něm jsou odkazy hned v úvodu)
+     * 
+     * náš model nám neumožňuje použít zeppelin správně
+     * 
+     */
 
-    public struct Weights : IEnumerable<double>
+
+    public class Weights    : IEnumerable<double>
     {
         static Random random = new Random();
         List<double[]> weightArrays;
@@ -245,12 +257,18 @@ namespace ThebesAI
             };
         }
 
+        public Weights(int random)
+        {
+            var enumerator = this.GetEnumerator();
+
+        }
+
         /// <summary>
         /// Produces a child combining the weights of the supplied array. For every weight a random parent is chosen.
         /// </summary>
         /// <param name="parents">Array of parents</param>
         /// <returns>A set of new weights</returns>
-        public static Weights Crossover(params Weights[] parents)
+        public static Weights Procreate(params Weights[] parents)
         {
             Weights child = new Weights("useless parameter");
             
@@ -364,6 +382,614 @@ namespace ThebesAI
         }
     }
 
+    public class Weight
+    {
+        public double Value { get; set; }
+
+        public Weight(double weight)
+        {
+            this.Value = weight;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public abstract class Criterion
+    {
+        public abstract int WeightsNeeded { get; }
+        protected Weight[] mainWeights;
+        protected Weight[,] subWeights;
+
+        public Criterion(int mainWeightsLength, int subWeightsCount) 
+        {
+            mainWeights = new Weight[mainWeightsLength];
+            subWeights = new Weight[subWeightsCount, mainWeightsLength];
+        }
+
+        public void ReceiveWeights(Queue<Weight> allocatedWeights)
+        {
+            for (int i = 0; i < mainWeights.Length; i++)
+            {
+                mainWeights[i] = allocatedWeights.Dequeue();
+            }
+            
+            for (int i = 0; i < subWeights.GetLength(0); i++)
+            {
+                for (int j = 0; j < subWeights.GetLength(1); j++)
+                {
+                    subWeights[i, j] = allocatedWeights.Dequeue();
+                }
+            }
+        }
+
+        public abstract double GetScore(ISimulationState gameState, IPlayer player);
+    }
+
+    public class CSpecializedKnowledge : Criterion
+    {
+        public override int WeightsNeeded => 13 + 13 * 3;
+
+        public CSpecializedKnowledge() : base(13, 3) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
+            {
+                weightIndex = Math.Min(mainWeights.Length - 1, player.SpecializedKnowledge[digSite]);
+
+                mainWeight = mainWeights[weightIndex].Value;
+
+                score += mainWeight;
+
+                // remaining weeks in a year
+                score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+                // years left
+                score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+                // artifact value sum at the dig site
+                score += mainWeight * subWeights[2, weightIndex].Value * (gameState.Game.ArtifactSum(digSite));
+            }
+
+            return score;
+        }
+    }
+
+    public class CSingleUseKnowledge : Criterion
+    {
+        public override int WeightsNeeded => 13 + 13 * 3;
+
+        public CSingleUseKnowledge() : base(13, 3) {}
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
+            {
+                weightIndex = Math.Min(mainWeights.Length - 1, player.SingleUseKnowledge[digSite]);
+
+                mainWeight = mainWeights[weightIndex].Value;
+
+                score += mainWeight;
+
+                // remaining weeks in a year
+                score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+                // years left
+                score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+                // artifact value sum at the dig site
+                score += mainWeight * subWeights[2, weightIndex].Value * (gameState.Game.ArtifactSum(digSite));
+            }
+
+            return score;
+        }
+    }
+
+    public class CPermissions : Criterion
+    {
+        public override int WeightsNeeded => 1 + 1 * 3;
+
+        public CPermissions() : base(1, 3) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
+            {
+                weightIndex = 0;
+
+                mainWeight = mainWeights[weightIndex].Value;
+
+                if (player.Permissions[digSite])
+                {
+                    score += mainWeight;
+
+                    // remaining weeks in a year
+                    score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+                    // years left
+                    score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+                    // artifact value sum at the dig site
+                    score += mainWeight * subWeights[2, weightIndex].Value * (gameState.Game.ArtifactSum(digSite));
+                }
+            }
+
+            return score;
+        }
+    }
+
+    public class CGeneralKnowledge : Criterion
+    {
+        public override int WeightsNeeded => 13 + 13 * 4;
+
+        public CGeneralKnowledge() : base(13, 4) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = Math.Min(mainWeights.Length - 1, player.GeneralKnowledge);
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            score += mainWeight;
+
+            // remaining weeks in a year
+            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+            // years left
+            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+            // consider number of assistants
+            score += mainWeight * subWeights[2, weightIndex].Value * player.Assistants;
+
+            // consider number of shovels
+            score += mainWeight * subWeights[3, weightIndex].Value * player.Shovels;
+
+
+            return score;
+        }
+    }
+
+    public class CShovels : Criterion
+    {
+        public override int WeightsNeeded => 5 + 5 * 4;
+
+        public CShovels() : base(5, 4) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = Math.Min(mainWeights.Length - 1, player.Shovels);
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            score += mainWeight;
+
+            // remaining weeks in a year
+            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+            // years left
+            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+            // consider number of assistants
+            score += mainWeight * subWeights[2, weightIndex].Value * player.Assistants;
+
+            // consider number of general knowledge
+            score += mainWeight * subWeights[3, weightIndex].Value * player.GeneralKnowledge;
+
+            return score;
+        }
+    }
+
+    public class CAssistants : Criterion
+    {
+        public override int WeightsNeeded => 5 + 5 * 4;
+
+        public CAssistants() : base(5, 4) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = Math.Min(mainWeights.Length - 1, player.Assistants);
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            score += mainWeight;
+
+            // remaining weeks in a year
+            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+            // years left
+            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+            // consider number of general knowledge
+            score += mainWeight * subWeights[2, weightIndex].Value * player.GeneralKnowledge;
+
+            // consider number of shovels
+            score += mainWeight * subWeights[3, weightIndex].Value * player.Shovels;
+
+            return score;
+        }
+    }
+
+    public class CSpecialPermissions : Criterion
+    {
+        public override int WeightsNeeded => 3 + 3 * 2;
+
+        public CSpecialPermissions() : base(3, 2) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = Math.Min(mainWeights.Length - 1, player.SpecialPermissions);
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            score += mainWeight;
+
+            // remaining weeks in a year
+            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+            // years left
+            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+            return score;
+        }
+    }
+
+    public class CZeppelins : Criterion
+    {
+        public override int WeightsNeeded => 3 + 3 * 2;
+
+        public CZeppelins() : base(3, 2) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = Math.Min(mainWeights.Length - 1, player.Zeppelins);
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            score += mainWeight;
+
+            // remaining weeks in a year
+            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+            // years left
+            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+            return score;
+        }
+    }
+
+    public class CCongresses : Criterion
+    {
+        public override int WeightsNeeded => 9 + 9 * 2;
+
+        public CCongresses() : base(9, 2) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = Math.Min(mainWeights.Length - 1, player.Congresses);
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            score += mainWeight;
+
+            // remaining weeks in a year
+            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+            // years left
+            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+
+            return score;
+        }
+    }
+
+    public class CCar : Criterion
+    {
+        public override int WeightsNeeded => 1 + 1 * 2;
+
+        public CCar() : base(1, 2) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+
+            weightIndex = 0;
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            if (player.Cars > 0)
+            {
+                score += mainWeight;
+
+                // remaining weeks in a year
+                score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+
+                // years left
+                score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            }
+
+            return score;
+        }
+    }
+
+    public class CPoints : Criterion
+    {
+        public override int WeightsNeeded => 1 + 1 * 1;
+
+        public CPoints() : base(1, 1) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+            int points = player.Points;
+
+            // add end game points for most knowledge
+
+            List<IPlayer> sortedPlayers;
+            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
+            {
+                sortedPlayers = gameState.Game.Players.OrderByDescending(p => p.SpecializedKnowledge[digSite]).ToList();
+
+                // our player has the most of this knowledge (5 points)
+                if (sortedPlayers[0] == player && sortedPlayers[0].SpecializedKnowledge[digSite] > 0 && sortedPlayers[0].SpecializedKnowledge[digSite] > sortedPlayers[1].SpecializedKnowledge[digSite])
+                {
+                    points += 5;
+                }
+
+                // our player shares the first place with another (3 points)
+                else if (sortedPlayers[0].SpecializedKnowledge[digSite] > 0)
+                {
+                    foreach (IPlayer p in sortedPlayers)
+                    {
+                        if (p == player && p.SpecializedKnowledge[digSite] == sortedPlayers[0].SpecializedKnowledge[digSite])
+                        {
+                            points += 3;
+                        }
+                    }
+                }
+            }
+
+
+            weightIndex = 0;
+
+            mainWeight = mainWeights[weightIndex].Value;
+
+            // points * point weight
+            score += mainWeight * points;
+
+            // points * point weight * time (adjusted for importance of points as game progresses)
+            score += mainWeight * subWeights[0, weightIndex].Value * player.Time.RemainingWeeks();
+
+            return score;
+        }
+    }
+
+    public class CTime : Criterion
+    {
+        public override int WeightsNeeded => 1;
+
+        public CTime() : base(1, 0){}
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            // weeks left * weight
+            return mainWeights[0].Value * player.Time.RemainingWeeks();
+        }
+    }
+
+    public class BetterEvolutionAI : IAI
+    {
+        protected static Random random = new Random();
+
+        public List<Criterion> criteria;
+        public Weight[] weights;
+
+        /// <summary>
+        /// Creates AI with provided weights if not null. If null the weights will be random
+        /// </summary>
+        /// <param name="weights">weights to create the AI with</param>
+        public BetterEvolutionAI(Weight[] assignedWeights = null)
+        {
+            criteria = new List<Criterion>()
+            {
+                new CSpecializedKnowledge(),
+                new CSingleUseKnowledge(),
+                new CPermissions(),
+                new CGeneralKnowledge(),
+                new CShovels(),
+                new CAssistants(),
+                new CSpecialPermissions(),
+                new CZeppelins(),
+                new CCongresses(),
+                new CCar(),
+                new CPoints(),
+                new CTime()
+            };
+
+            if (assignedWeights == null)
+            {
+                int weightCount = criteria.Sum(c => c.WeightsNeeded);
+                weights = new Weight[weightCount];
+
+                for (int i = 0; i < weightCount; i++)
+                {
+                    weights[i] = new Weight(RandomDouble(-1, 1));
+                }
+            }
+            else
+            {
+                this.weights = assignedWeights;
+            }
+
+            // Provide the criteria with the weights
+            Queue<Weight> weightsQueue = new Queue<Weight>(weights);
+            foreach (Criterion criterion in criteria)
+            {
+                criterion.ReceiveWeights(weightsQueue);
+            }
+        }
+
+
+        protected virtual double EvalScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+
+            foreach (Criterion criterion in criteria)
+            {
+                score += criterion.GetScore(gameState, player);
+            }
+
+            return score;
+        }
+
+        public IAction TakeAction(IGame gameState)
+        {
+            string playerName = gameState.ActivePlayer.Name;
+
+            // generate all possible moves and their resulting game states
+            List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
+
+            double bestScore = double.MinValue;
+            SimulationState bestState = null;
+
+            // Evaluate all child states and pick the best one
+            double score;
+            foreach (SimulationState state in possibleStates)
+            {
+                score = EvalScore(state, state.Game.Players.First(p => p.Name.Equals(playerName)));
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestState = state;
+                }
+            }
+
+            return bestState.Move;
+        }
+
+        protected double RandomDouble(double lowerBound, double upperBound)
+        {
+            return random.NextDouble() * (upperBound - lowerBound) + lowerBound;
+        }
+
+        public static BetterEvolutionAI Procreate(params BetterEvolutionAI[] parents)
+        {
+            // assuming all parents have the same number of weights
+            Weight[] newWeights = new Weight[parents[0].weights.Length];
+
+            for (int i = 0; i < newWeights.Length; i++)
+            {
+                newWeights[i] = parents[random.Next(parents.Length)].weights[i];
+            }
+
+            return new BetterEvolutionAI(newWeights);
+        }
+
+        public void Mutate(double probability, double minRange, double minRangeProportion)
+        {
+            double range, mutation;
+            for (int i = 0; i < weights.Length; i++)
+            {
+                if (random.NextDouble() <= probability)
+                {
+                    range = Math.Max(Math.Abs(weights[i].Value * minRangeProportion), minRange); // max (minimal range, proportional range)
+                    mutation = RandomDouble(-1 * range, range);
+                    weights[i].Value += mutation;
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
 
     public class EvolutionAI : IAI
     {
@@ -429,14 +1055,22 @@ namespace ThebesAI
                 }
             }
 
+
+            // vahaKarty * čas
+
             score += weights.GetWeight(weights.generalKnowledgeCards, player.GeneralKnowledge)
                 + (52 - player.Time.CurrentWeek) * weights.GetWeight(weights.tGeneralKnowledgeCards, player.GeneralKnowledge);
+
             score += weights.GetWeight(weights.shovels, player.Shovels)
                 + (52 - player.Time.CurrentWeek) * weights.GetWeight(weights.tShovels, player.Shovels);
+
             score += weights.GetWeight(weights.assistants, player.Assistants)
                 + (52 - player.Time.CurrentWeek) * weights.GetWeight(weights.tAssistants, player.Assistants);
+
             score += weights.GetWeight(weights.specialPermissions, player.SpecialPermissions);
+
             score += weights.GetWeight(weights.zeppelins, player.Zeppelins);
+
             score += weights.GetWeight(weights.congresses, player.Congresses)
                 + (52 - player.Time.CurrentWeek) * weights.GetWeight(weights.tCongresses, player.Congresses);
 
@@ -461,24 +1095,24 @@ namespace ThebesAI
     {
         public int id;
         public int generation;
-        public EvolutionAI ai;
+        public BetterEvolutionAI ai;
         List<int> scores;
 
         public Individual() { }
 
-        public Individual(Weights? weights = null, int id = -1, int generation = -1)
+        public Individual(BetterEvolutionAI ai = null, int id = -1, int generation = -1)
         {
             this.id = id;
             this.generation = generation;
             scores = new List<int>();
 
-            if (weights == null)
+            if (ai == null)
             {
-                this.ai = new EvolutionAI(null, null);
+                this.ai = new BetterEvolutionAI();
             }
             else
             {
-                this.ai = new EvolutionAI(weights.Value);
+                this.ai = ai;
             }
         }
 
@@ -491,6 +1125,11 @@ namespace ThebesAI
         {
             return scores.Average();
         }
+
+        public void ResetScores()
+        {
+            this.scores.Clear();
+        }
     }
 
     public class Population
@@ -499,16 +1138,16 @@ namespace ThebesAI
         List<Individual> individuals = new List<Individual>();
         int currentGen = 0;
         int currentID = 0;
-        Weights currentBest;
+        BetterEvolutionAI currentBest;
         double currentBestScore = double.MinValue;
+        List<double> averageScores = new List<double>();
 
-        public Population(int count, Weights? seed = null, double mutationProbability = 1, double mutationRange = 1)
+        public Population(int count, Weight[] seed = null)
         {
             Individual individual;
             for (int i = 0; i < count; i++)
             {
-                individual = new Individual(seed, currentID++, currentGen);
-                individual.ai.weights.Mutate(mutationProbability, mutationRange);
+                individual = new Individual(new BetterEvolutionAI(seed), currentID++, currentGen);
                 individuals.Add(individual);
             }
         }
@@ -525,9 +1164,10 @@ namespace ThebesAI
             }
             if (individuals.Count % playerPerGame != 0)
             {
-                throw new ArgumentOutOfRangeException("Number of individual in a population must be divisible by playersPerGame");
+                throw new ArgumentOutOfRangeException("Number of individuals in a population must be divisible by playersPerGame");
             }
 
+            // play required number of matches for every player
             int populationIndex = 0, playersIndex = 0;
             Individual[] players = new Individual[playerPerGame];
             for (int i = 0; i < gamesPerPlayer; i++)
@@ -552,7 +1192,7 @@ namespace ThebesAI
             }
         }
 
-        public void CreateNewGeneration(double survivorRatio, int parentAmount, double mutationProbability = 0.15, double mutationRange = 1)
+        public void CreateNewGeneration(double survivorRatio, int parentAmount, double mutationProbability, double minMutationRange, double mutationProportionalRange)
         {
             currentGen++;
 
@@ -564,11 +1204,11 @@ namespace ThebesAI
             if (bestScore > currentBestScore)
             {
                 currentBestScore = bestScore;
-                currentBest = individuals[0].ai.weights;
+                currentBest = individuals[0].ai;
                 Console.WriteLine($"-------------------- new best score: {bestScore}");
                 
-                using(var tw = new StreamWriter($"currentBest.txt", true))
-                    {
+                using(var tw = new StreamWriter($"currentBestBetterAI4Players.txt", false))
+                {
                     tw.Write(new JavaScriptSerializer().Serialize(currentBest));
                 }
             }
@@ -579,24 +1219,25 @@ namespace ThebesAI
             List<Individual> newPopulation = new List<Individual>();
             for (int i = 0; i < survivorCount; i++)
             {
+                individuals[i].ResetScores();
                 newPopulation.Add(individuals[i]);
             }
 
             // generate the rest of the population
             List<Individual> newGeneration = new List<Individual>();
-            Weights[] parents = new Weights[parentAmount];
+            BetterEvolutionAI[] parents = new BetterEvolutionAI[parentAmount];
             Individual newIndividual;
             for (int i = 0; i < individuals.Count - survivorCount; i++)
             {
                 // choose parents randomly
                 for (int j = 0; j < parentAmount; j++)
                 {
-                    parents[j] = newPopulation[random.Next(newPopulation.Count)].ai.weights;
+                    parents[j] = newPopulation[random.Next(newPopulation.Count)].ai;
                 }
 
                 // add newly created indiviudal to the new generation
-                newIndividual = new Individual(Weights.Crossover(parents), currentID++, currentGen);
-                newIndividual.ai.weights.Mutate(mutationProbability, mutationRange);
+                newIndividual = new Individual(BetterEvolutionAI.Procreate(parents), currentID++, currentGen);
+                newIndividual.ai.Mutate(mutationProbability, minMutationRange, mutationProportionalRange);
                 newGeneration.Add(newIndividual);
             }
 
@@ -614,7 +1255,7 @@ namespace ThebesAI
                 int swapPosition = random.Next(index + 1);
                 Individual i = individuals[swapPosition];
                 individuals[swapPosition] = individuals[index];
-                individuals[index] = i;
+                individuals[index] = i; 
             }
         }
 
@@ -663,28 +1304,98 @@ namespace ThebesAI
             }
         }
 
-        public void Evolve(int playersPerGame , int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.15, double mutationRange = 1)
+        public void Evolve(int playersPerGame , int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.1, double minMutationRange = 0.05, double mutationRelativeRange = 0.3)    
         {
             GameSettings.LoadFromFile(@"thebes_config.thc");
             for (int i = 0; i < generations; i++)
             {
                 TestGeneration(gamesPerPlayer, playersPerGame);
-
-                Console.WriteLine($"Generation {this.currentGen} tested: Best average score: {individuals.Max(x => x.AverageScore())},");
-                // print generation
-                if (false)
-                {
-                    using (var tw = new StreamWriter($"gen_{currentGen}.txt", true))
-                    {
-                        tw.Write(new JavaScriptSerializer().Serialize(individuals));
-                    }
-                }
-
-                CreateNewGeneration(survivorRatio, parentAmount, mutationProbability, mutationRange);
+                ReportProgress();
+                CreateNewGeneration(survivorRatio, parentAmount, mutationProbability, minMutationRange, mutationRelativeRange);
             }
             
         }
 
+        public void ReportProgress()
+        {
+            double averageScore = individuals.Average(x => x.AverageScore());
+            double maxAverageScore = individuals.Max(x => x.AverageScore());
+            averageScores.Add(averageScore);
+            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {AverageSimilarity(individuals, 200)}");
+
+            if (this.currentGen % 20 == 0)
+            {
+                using (var tw = new StreamWriter($"gen_{currentGen}_betterAI.txt", true))
+                {
+                    tw.Write(new JavaScriptSerializer().Serialize(this.averageScores));
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Computes the cosine similarity of two vectors
+        /// </summary>
+        /// <param name="a">first vecotr</param>
+        /// <param name="b">second vector</param>
+        /// <returns>double in range <-1; 1> where 1 is most similar, -1 least similar </returns>
+        private static double CosineSimilarity(Weight[] a, Weight[] b)
+        {
+            double ab = 0.0;
+            double aa = 0.0;
+            double bb = 0.0;
+
+            // compute formula parts
+            for (int i = 0; i < a.Length; ++i)
+            {
+                aa += a[i].Value * a[i].Value;
+                ab += a[i].Value * b[i].Value;
+                bb += b[i].Value * b[i].Value;
+            }
+
+            // edge cases
+            if (aa == 0)
+                return bb == 0 ? 1.0 : 0.0;
+            else if (bb == 0)
+                return 0.0;
+            else
+                return ab / Math.Sqrt(aa) / Math.Sqrt(bb);
+        }
+
+        private static double AverageSimilarity(List<Individual> individuals, int comparisonCount)
+        {
+            int count = 0;
+            double sum = 0;
+            while (true)
+            {
+                for (int i = 0; i < individuals.Count; i++)
+                {
+                    if (count >= comparisonCount)
+                    {
+                        return sum / count;
+                    }
+
+                    sum += CosineSimilarity(individuals[i].ai.weights, individuals[random.Next(individuals.Count)].ai.weights);
+                    count++;
+                }
+            }
+        }
+    }
+
+
+
+    /// <summary>
+    /// AI that plays a random move on every turn
+    /// </summary>
+    public class RandomAI : IAI
+    {
+        Random random = new Random();
+        public IAction TakeAction(IGame gameState)
+        {
+            List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
+
+            return possibleStates[random.Next(possibleStates.Count)].Move;
+        }
     }
 
 
@@ -720,9 +1431,11 @@ namespace ThebesAI
             newGame.ActiveExhibitions = this.ActiveExhibitions.Clone(newGame.Deck.Discard);
 
             newGame.DigsiteInventory = new Dictionary<IDigSite, List<IToken>>();
+            newGame.BonusTokens = new Dictionary<IDigSite, IToken>();
             foreach (KeyValuePair<IDigSite, List<IToken>> digsite_tokenList in this.DigsiteInventory)
             {
                 newGame.DigsiteInventory[digsite_tokenList.Key] = new List<IToken>(this.DigsiteInventory[digsite_tokenList.Key]);
+                newGame.BonusTokens[digsite_tokenList.Key] = this.BonusTokens[digsite_tokenList.Key];
             }
 
 
@@ -738,7 +1451,5 @@ namespace ThebesAI
 
             return newGame;
         }
-
-
     }
 }

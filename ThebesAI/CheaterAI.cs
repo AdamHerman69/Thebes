@@ -272,18 +272,14 @@ namespace ThebesAI
             return childStates;
         }
 
-        /// <summary>
-        /// /////////////////////////////////////////////////////////// TODO Special Permissions se neodečítaj
-        /// </summary>
-        /// <returns></returns>
-
         protected virtual List<IAction> GetAllPossibleActions()
         {
             List<IAction> actions = new List<IAction>();
             IAction action;
+            IPlayer player = Game.ActivePlayer;
 
             //no time left
-            if (Game.ActivePlayer.Time.RemainingWeeks() == 0)
+            if (player.Time.RemainingWeeks() == 0)
             {
                 return actions;
             }
@@ -294,7 +290,7 @@ namespace ThebesAI
                 if (place is ICardChangePlace)
                 {
                     action = new ChangeCardsAction((ICardChangePlace)place);
-                    if (Game.ActivePlayer.IsEnoughTime(action))
+                    if (player.IsEnoughTime(action))
                     {
                         actions.Add(action);
                     }
@@ -308,7 +304,7 @@ namespace ThebesAI
                 if (card == null) continue;
                 
                 action = new TakeCardAction(card);
-                if (Game.ActivePlayer.IsEnoughTime(action))
+                if (player.IsEnoughTime(action))
                 {
                     actions.Add(action);
                 }
@@ -320,10 +316,10 @@ namespace ThebesAI
                 if (exhibition == null) continue;
 
                 action = new ExecuteExhibitionAction(exhibition);
-                if (Game.ActivePlayer.IsEnoughTime(action) && 
+                if (player.IsEnoughTime(action) && 
                     (
-                        (Game.ActivePlayer is SimPlayer && exhibition.CheckRequiredArtifacts(((SimPlayer)Game.ActivePlayer).AssumedArtifacts))
-                        || exhibition.CheckRequiredArtifacts(Game.ActivePlayer.Tokens)
+                        (player is SimPlayer && exhibition.CheckRequiredArtifacts(((SimPlayer)player).AssumedArtifacts))
+                        || exhibition.CheckRequiredArtifacts(player.Tokens)
                     )
                 )
                 {
@@ -334,22 +330,27 @@ namespace ThebesAI
             // dig
             foreach (DigSite digSite in Game.DigsiteInventory.Keys)
             {
-                if (!Game.ActivePlayer.CanIDig(digSite)) continue;
+                if (!player.CanIDig(digSite)) continue;
 
-                for (int weeks = 10; weeks <= 10; weeks++)
+                for (int weeks = 1; weeks <= 12; weeks++)
                 {
-                    // TODO single use cards
-                    action = new DigAction(digSite, weeks, null, null);
-                    if (Game.ActivePlayer.IsEnoughTime(action))
+                    
+                    // add all single use card options
+                    List<ICard> singleUseCards = player.GetUsableSingleUseCards(digSite);
+                    foreach (var subset in GameSettings.Subsets<ICard>(singleUseCards))
                     {
-                        actions.Add(action);
-                    }
+                        action = new DigAction(digSite, weeks, new List<ICard>(subset), null);
+                        if (player.IsEnoughTime(action))
+                        {
+                            actions.Add(action);
+                        }
+                    } 
                 }
             }
 
 
             // use zeppelin
-            if (Game.ActivePlayer.Zeppelins > 0 && !((Player)Game.ActivePlayer).useZeppelin && actions.Count > 0)
+            if (player.Zeppelins > 0 && !((Player)player).useZeppelin && actions.Count > 0)
             {
                 actions.Add(new ZeppelinAction(true));
             }

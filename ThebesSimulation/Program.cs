@@ -40,7 +40,7 @@ namespace ThebesSimulation
             //Console.ReadLine();
 
             Population population = new Population(100);
-            population.Evolve(2, 10000, 7);
+            population.Evolve(4, 10000, 10, 0.3, 4, 0.05, 0.01, 1);
             Console.ReadLine();
         }
     }
