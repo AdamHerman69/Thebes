@@ -18,9 +18,13 @@ namespace ThebesSimulation
             //GameSettings.LoadFromFile(@"thebes_config.thc");
 
             //Individual[] individuals = new Individual[4];
-            //for (int i = 0; i < individuals.Length; i++)
+            //for (int i = 0; i < 2; i++)
             //{
-            //    individuals[i] = new Individual(i);
+            //    individuals[i] = new Individual(new BetterEvolutionAI(null, null));
+            //}
+            //for (int i = 2; i < 4; i++)
+            //{
+            //    individuals[i] = new Individual(new EvolutionAI(null, null));
             //}
 
             //int counter = 10;
@@ -39,9 +43,28 @@ namespace ThebesSimulation
             //}
             //Console.ReadLine();
 
+
+
+
+
+
+
+
             Population population = new Population(100);
-            population.Evolve(4, 10000, 10, 0.3, 4, 0.05, 0.01, 1);
+            population.Evolve(4, 10000, 10, 0.2, 2, 0.04, 0.1, 0);
             Console.ReadLine();
+
+            //Individual individual = new Individual(new BetterEvolutionAI(null, null));
+            //individual.ai.NormalizeValues(-1, 1);
+
+            //foreach (var value in individual.ai.weights)
+            //{
+            //    Console.WriteLine(value.ToString() + ',');
+            //}
+            //Console.ReadLine();
+
+
+
         }
     }
 

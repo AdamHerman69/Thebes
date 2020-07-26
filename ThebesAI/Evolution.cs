@@ -10,6 +10,7 @@ using ThebesCore;
 using System.Web.Script.Serialization;
 using System.IO;
 using System.Xml.Schema;
+using System.Runtime.CompilerServices;
 
 namespace ThebesAI
 {
@@ -382,6 +383,46 @@ namespace ThebesAI
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public class Weight
     {
         public double Value { get; set; }
@@ -390,47 +431,15 @@ namespace ThebesAI
         {
             this.Value = weight;
         }
+
+        public static implicit operator double(Weight w) => w.Value;
+        public static implicit operator Weight(double d) => new Weight(d);
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public abstract class Criterion
     {
@@ -465,9 +474,9 @@ namespace ThebesAI
 
     public class CSpecializedKnowledge : Criterion
     {
-        public override int WeightsNeeded => 13 + 13 * 3;
+        public override int WeightsNeeded => 9 + 9 * 3;
 
-        public CSpecializedKnowledge() : base(13, 3) { }
+        public CSpecializedKnowledge() : base(9, 3) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
@@ -499,9 +508,9 @@ namespace ThebesAI
 
     public class CSingleUseKnowledge : Criterion
     {
-        public override int WeightsNeeded => 13 + 13 * 3;
+        public override int WeightsNeeded => 9 + 9 * 3;
 
-        public CSingleUseKnowledge() : base(13, 3) {}
+        public CSingleUseKnowledge() : base(9, 3) {}
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
@@ -570,9 +579,9 @@ namespace ThebesAI
 
     public class CGeneralKnowledge : Criterion
     {
-        public override int WeightsNeeded => 13 + 13 * 4;
+        public override int WeightsNeeded => 9 + 9 * 4;
 
-        public CGeneralKnowledge() : base(13, 4) { }
+        public CGeneralKnowledge() : base(9, 4) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
@@ -867,6 +876,259 @@ namespace ThebesAI
         public List<Criterion> criteria;
         public Weight[] weights;
 
+        public BetterEvolutionAI(IPlayerData player, IGame game)
+        {
+            criteria = new List<Criterion>()
+            {
+                new CSpecializedKnowledge(),
+                new CSingleUseKnowledge(),
+                new CPermissions(),
+                new CGeneralKnowledge(),
+                new CShovels(),
+                new CAssistants(),
+                new CSpecialPermissions(),
+                new CZeppelins(),
+                new CCongresses(),
+                new CCar(),
+                new CPoints(),
+                new CTime()
+            };
+
+            this.weights = new Weight[]
+            {
+                1.2243084497991237e-71,
+                -3.530436853005161e-50,
+                -8.208852961510335e-82,
+                1.2953884364553836e-91,
+                -4.111744622225419e-86,
+                -3.521632634965802e-44,
+                3.639760356501169e-72,
+                -1.227065307537201e-35,
+                -7.333411945532716e-82,
+                -1.5200341552835515e-70,
+                -1.3900588525232612e-90,
+                7.167940872157079e-88,
+                2.8889238572627056e-70,
+                -2.348278738977676e-61,
+                -2.7309483172827976e-81,
+                5.326159634958654e-71,
+                -2.8491833736882204e-79,
+                -1.18050386644939e-80,
+                -8.644509706740843e-50,
+                1.2224828108642408e-87,
+                -2.677858182840602e-47,
+                2.1190143640728934e-72,
+                -2.398769245534746e-87,
+                -3.459525132851405e-10,
+                9.033685106589897e-82,
+                1.3276268883801298e-89,
+                7.778349229008317e-73,
+                -7.177797998518349e-63,
+                1.5454710949619094e-64,
+                -1.1178362786983964e-79,
+                -1.2544271017304697e-75,
+                7.578275619632956e-60,
+                -2.0531220417869518e-78,
+                -4.334187719334211e-54,
+                -4.945287780620139e-68,
+                -5.396271243462965e-78,
+                1.2063803228737208e-91,
+                -1.0776294009751257e-77,
+                3.9004246444748936e-79,
+                5.819604398734575e-17,
+                -2.3430234803642405e-73,
+                -1.3987506448227614e-77,
+                9.113516994198352e-79,
+                -7.32169595028998e-71,
+                -2.1400371588395845e-55,
+                -3.804296843041148e-22,
+                -9.34289341456395e-87,
+                3.045932704960982e-55,
+                7.778458696316704e-36,
+                1.7415529966839343e-92,
+                -9.01356646967168e-11,
+                1.3548168982616625e-53,
+                -1.1696749848247006e-74,
+                -3.3129230204262105e-78,
+                4.709095482614014e-52,
+                5.015252720735729e-79,
+                -5.573052180087497e-90,
+                -5.617351116200448e-78,
+                2.2703043931460284e-69,
+                -6.953878716679261e-70,
+                9.384087458257445e-58,
+                3.152476336925059e-74,
+                -1.7646455876768747e-55,
+                -1.877788759867031e-72,
+                -1.932499938807948e-58,
+                3.8910133253105e-82,
+                -8.753098001159325e-77,
+                4.019561970478813e-73,
+                -7.29428816401581e-80,
+                3.1313563103435717e-80,
+                -8.945379758004847e-58,
+                -1.0414507213886696e-73,
+                1.776643909731047e-82,
+                -7.909806169497701e-69,
+                8.604429201931234e-83,
+                -5.30588236645631e-88,
+                -6.0174410716735625e-37,
+                -1.3388461609206404e-37,
+                4.135406908294625e-45,
+                9.961264848453039e-87,
+                3.690427952651561e-70,
+                -0.0000039281173175389075,
+                2.5750185201902195e-66,
+                -8.701742624441452e-29,
+                7.1971695477966715e-84,
+                -9.056043028032425e-69,
+                8.675241363522308e-71,
+                -1.5490447664647754e-73,
+                -8.927568868029489e-78,
+                -3.350882474559033e-73,
+                2.436753267309452e-85,
+                -0.000966551556260041,
+                -8.286331828535277e-65,
+                -8.217369934529178e-43,
+                2.4041198999253315e-68,
+                -1.2516281519351828e-77,
+                -8.526580936770401e-70,
+                1.817382823144913e-55,
+                1.1482133825570278e-92,
+                1.4710514970917792e-88,
+                -2.5821882499297065e-87,
+                -5.705783169700445e-68,
+                -4.623259948517564e-83,
+                -2.148285250251597e-79,
+                1.6798900057138798e-48,
+                -2.2620002344323243e-71,
+                1.4987325849367441e-90,
+                -3.19398560853742e-66,
+                4.2579691795752584e-79,
+                6.01077080723869e-71,
+                -1.5102006383858075e-60,
+                1.0380087233752108e-86,
+                1.2115138945935349e-61,
+                8.052998755074214e-65,
+                -3.232253970646156e-68,
+                -5.371197301301626e-27,
+                -3.7445378986705926e-78,
+                -1.2897130944446438e-60,
+                -1.0823945537876856e-75,
+                2.5152494946436868e-65,
+                5.429648533544136e-58,
+                7.037223975270087e-87,
+                3.5390661316177025e-88,
+                3.378095579027258e-78,
+                1.6798841555189277e-85,
+                3.323235085734913e-74,
+                -1.6316953977728203e-82,
+                6.505457097386954e-62,
+                -3.585596973213483e-67,
+                2.398746836665616e-69,
+                -3.0064340643921375e-78,
+                7.13672976245117e-52,
+                8.523961434647718e-89,
+                -5.305027074109728e-78,
+                7.160683001324848e-75,
+                3.6663894010208925e-86,
+                6.076074859161301e-70,
+                3.593238413415383e-68,
+                2.7938652682509055e-82,
+                -3.573131792407269e-56,
+                -6.400362412735803e-59,
+                4.2159683469225124e-61,
+                -8.521321780487519e-45,
+                8.022161241279014e-88,
+                -5.792869524268589e-73,
+                -8.707339230651963e-81,
+                -1.8291474502783196e-51,
+                -7.612334999888518e-8,
+                3.3613670675664953e-78,
+                9.087679381191283e-68,
+                -1.5953741338195885e-75,
+                7.279888411768805e-65,
+                -8.534745620311444e-82,
+                7.472235117401435e-65,
+                1.0417853071121063e-50,
+                -2.1757932773345105e-82,
+                6.367505801334348e-87,
+                7.098346414087372e-68,
+                2.0056018934763585e-87,
+                -4.9756812966934605e-98,
+                -2.2127683910825345e-80,
+                -1.5015260999242632e-72,
+                3.235306115059654e-45,
+                -1.4675554867610345e-9,
+                -3.048289664624658e-72,
+                -0.000003358411238723024,
+                -9.412561528032283e-66,
+                1.8413961482212935e-66,
+                4.387494593079372e-62,
+                -3.4823329405161405e-44,
+                -9.712290624655452e-88,
+                6.159019339033206e-79,
+                1.5951933951624834e-60,
+                8.113708775016778e-84,
+                9.28938040763493e-70,
+                8.670284782470976e-88,
+                3.7511867613227223e-81,
+                -1.563622810039548e-67,
+                -1.1550797100320747e-69,
+                6.232724329279303e-84,
+                -6.837823875087702e-83,
+                -1.534449811674169e-35,
+                1.9246994415858514e-77,
+                1.1034482002072507e-54,
+                -4.015817698595511e-59,
+                7.624780446596304e-77,
+                6.890181966776087e-80,
+                2.4163093500461633e-48,
+                3.455115748625997e-82,
+                -1.9624763255263236e-76,
+                -8.825153922049766e-82,
+                4.876314545323031e-70,
+                4.575611743793934e-75,
+                -1.32428891661484e-74,
+                -7.3263711664671674e-62,
+                -4.734482660136632e-75,
+                1.7749281749653538e-99,
+                -5.0017698590531916e-71,
+                1.7278755692964047e-64,
+                -2.8930765529686636e-73,
+                2.2608736957698019e-69,
+                -0.00044604339140172583,
+                -2.357925468642044e-89,
+                -4.286216665439247e-58,
+                1.4978828359311542e-40,
+                1.7695523969001554e-31,
+                2.0840184249526874e-61,
+                -1.9217479424199257e-74,
+                -4.1938375782580685e-57,
+                2.6501988751676535e-73,
+                -1.1612470965304571e-79,
+                -3.1538658895682697e-74,
+                -1.936322628214626e-30,
+                3.918563134120961e-61,
+                1.2318915445888919e-79,
+                -8.22704951828408e-80,
+                -1.1163218397153994e-84,
+                3.345397911129507e-75,
+                -1.9590321780699372e-88,
+                2.7339166593131477e-60,
+                2.1723250587590266e-73,
+                2.7349226979052956e-71
+            };
+
+            // Provide the criteria with the weights
+            Queue<Weight> weightsQueue = new Queue<Weight>(weights);
+            foreach (Criterion criterion in criteria)
+            {
+                criterion.ReceiveWeights(weightsQueue);
+            }
+        }
+        
+        
         /// <summary>
         /// Creates AI with provided weights if not null. If null the weights will be random
         /// </summary>
@@ -896,7 +1158,7 @@ namespace ThebesAI
 
                 for (int i = 0; i < weightCount; i++)
                 {
-                    weights[i] = new Weight(RandomDouble(-1, 1));
+                    weights[i] = new Weight(RandomDouble(0, 1));
                 }
             }
             else
@@ -951,7 +1213,7 @@ namespace ThebesAI
         }
 
         protected double RandomDouble(double lowerBound, double upperBound)
-        {
+         {
             return random.NextDouble() * (upperBound - lowerBound) + lowerBound;
         }
 
@@ -979,6 +1241,67 @@ namespace ThebesAI
                     mutation = RandomDouble(-1 * range, range);
                     weights[i].Value += mutation;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Mutates randomly selected weights. The weights remain in the <-1; 1> interval
+        /// </summary>
+        /// <param name="probability"></param>
+        /// <param name="range"></param>
+        public void MutateInRange(double probability, double range)
+        {
+            double mutation, minMutation, maxMutation;
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                if (random.NextDouble() <= probability)
+                {
+                    minMutation = Math.Max(-1 * Math.Abs(weights[i] - (- 1)), -1 * range);
+                    maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
+
+                    mutation = RandomDouble(minMutation, maxMutation);
+                    weights[i].Value += mutation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Mutates randomly selected weights. The weights remain in the <0; 1> interval
+        /// </summary>
+        /// <param name="probability"></param>
+        /// <param name="range"></param>
+        public void MutateInRangePositive(double probability, double range)
+        {
+            double mutation, minMutation, maxMutation;
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                if (random.NextDouble() <= probability)
+                {
+                    minMutation = Math.Min(weights[i], range);
+                    maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
+
+                    mutation = RandomDouble(minMutation, maxMutation);
+                    weights[i].Value += mutation;
+                }
+            }
+        }
+
+        public void NormalizeValues(double min, double max)
+        {
+            double[] doubleWeights = new double[this.weights.Length];
+            for (int i = 0; i < doubleWeights.Length; i++)
+            {
+                doubleWeights[i] = this.weights[i];
+            }
+
+            double actualMin = doubleWeights.Min();
+            double actualMax = doubleWeights.Max();
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                weights[i] = (max - min) / (actualMax - actualMin) * (weights[i] - actualMin) + min;
             }
         }
     }
@@ -1141,6 +1464,7 @@ namespace ThebesAI
         BetterEvolutionAI currentBest;
         double currentBestScore = double.MinValue;
         List<double> averageScores = new List<double>();
+        double mutationProbability;
 
         public Population(int count, Weight[] seed = null)
         {
@@ -1151,7 +1475,7 @@ namespace ThebesAI
                 individuals.Add(individual);
             }
         }
-            
+
         public void TestGeneration(int gamesPerPlayer, int playerPerGame)
         {
             if (playerPerGame < 2 || playerPerGame > 4)
@@ -1192,7 +1516,7 @@ namespace ThebesAI
             }
         }
 
-        public void CreateNewGeneration(double survivorRatio, int parentAmount, double mutationProbability, double minMutationRange, double mutationProportionalRange)
+        public void CreateNewGeneration(double survivorRatio, int parentAmount, double minMutationRange, double mutationProportionalRange)
         {
             currentGen++;
 
@@ -1206,8 +1530,8 @@ namespace ThebesAI
                 currentBestScore = bestScore;
                 currentBest = individuals[0].ai;
                 Console.WriteLine($"-------------------- new best score: {bestScore}");
-                
-                using(var tw = new StreamWriter($"currentBestBetterAI4Players.txt", false))
+
+                using (var tw = new StreamWriter($"currentBestBetterAI4Players.txt", false))
                 {
                     tw.Write(new JavaScriptSerializer().Serialize(currentBest));
                 }
@@ -1222,12 +1546,33 @@ namespace ThebesAI
                 individuals[i].ResetScores();
                 newPopulation.Add(individuals[i]);
             }
+            int childrenCount = individuals.Count - survivorCount;
+
+            // adjust if population is too similar
+            int randomIndividualsCount = 0;
+            if (AverageSimilarity(this.individuals, 20) > 0.95)
+            {
+                childrenCount = (int)Math.Round(childrenCount * 0.6);
+                randomIndividualsCount = individuals.Count - survivorCount - childrenCount;
+
+                // raise mutation probability
+                mutationProbability += 0.01;
+            }
+
+            // adjust if population average fell off
+            int bestChildrenCount = 0;
+            if (currentBestScore > bestScore + 12)
+            {
+                childrenCount = (int)Math.Round(childrenCount * 0.6);
+                bestChildrenCount = individuals.Count - survivorCount - childrenCount - randomIndividualsCount;
+            }
+
 
             // generate the rest of the population
             List<Individual> newGeneration = new List<Individual>();
             BetterEvolutionAI[] parents = new BetterEvolutionAI[parentAmount];
             Individual newIndividual;
-            for (int i = 0; i < individuals.Count - survivorCount; i++)
+            for (int i = 0; i < childrenCount; i++)
             {
                 // choose parents randomly
                 for (int j = 0; j < parentAmount; j++)
@@ -1237,8 +1582,23 @@ namespace ThebesAI
 
                 // add newly created indiviudal to the new generation
                 newIndividual = new Individual(BetterEvolutionAI.Procreate(parents), currentID++, currentGen);
-                newIndividual.ai.Mutate(mutationProbability, minMutationRange, mutationProportionalRange);
+                newIndividual.ai.MutateInRangePositive(mutationProbability, minMutationRange);
                 newGeneration.Add(newIndividual);
+            }
+
+            // generate random individuals
+            for (int i = 0; i < randomIndividualsCount; i++)
+            {
+                newGeneration.Add(new Individual(new BetterEvolutionAI(null), currentID++, currentGen));
+            }
+
+            // generate childer of the best individual so far
+            BetterEvolutionAI bestAICopy;
+            for (int i = 0; i < bestChildrenCount; i++)
+            {
+                bestAICopy = new BetterEvolutionAI(currentBest.weights);
+                bestAICopy.MutateInRangePositive(mutationProbability, minMutationRange);
+                newGeneration.Add(new Individual(bestAICopy, currentID++, currentGen));
             }
 
             // merge survirors with children
@@ -1255,7 +1615,7 @@ namespace ThebesAI
                 int swapPosition = random.Next(index + 1);
                 Individual i = individuals[swapPosition];
                 individuals[swapPosition] = individuals[index];
-                individuals[index] = i; 
+                individuals[index] = i;
             }
         }
 
@@ -1304,16 +1664,17 @@ namespace ThebesAI
             }
         }
 
-        public void Evolve(int playersPerGame , int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.1, double minMutationRange = 0.05, double mutationRelativeRange = 0.3)    
+        public void Evolve(int playersPerGame, int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.1, double minMutationRange = 0.05, double mutationRelativeRange = 0.3)
         {
             GameSettings.LoadFromFile(@"thebes_config.thc");
+            this.mutationProbability = mutationProbability;
             for (int i = 0; i < generations; i++)
             {
                 TestGeneration(gamesPerPlayer, playersPerGame);
                 ReportProgress();
-                CreateNewGeneration(survivorRatio, parentAmount, mutationProbability, minMutationRange, mutationRelativeRange);
+                CreateNewGeneration(survivorRatio, parentAmount, minMutationRange, mutationRelativeRange);
             }
-            
+
         }
 
         public void ReportProgress()
@@ -1321,7 +1682,7 @@ namespace ThebesAI
             double averageScore = individuals.Average(x => x.AverageScore());
             double maxAverageScore = individuals.Max(x => x.AverageScore());
             averageScores.Add(averageScore);
-            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {AverageSimilarity(individuals, 200)}");
+            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {AverageSimilarity(individuals, 20)}");
 
             if (this.currentGen % 20 == 0)
             {
@@ -1330,7 +1691,6 @@ namespace ThebesAI
                     tw.Write(new JavaScriptSerializer().Serialize(this.averageScores));
                 }
             }
-
         }
 
         /// <summary>
