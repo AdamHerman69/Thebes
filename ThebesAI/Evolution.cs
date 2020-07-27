@@ -1279,8 +1279,20 @@ namespace ThebesAI
             {
                 if (random.NextDouble() <= probability)
                 {
-                    minMutation = Math.Min(weights[i], range);
-                    maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
+                    if (random.Next(2) == 0)
+                    {
+                        // positive mutation
+                        minMutation = 0;
+                        maxMutation = Math.Min(1 - weights[i], range);
+                    }
+                    else
+                    {
+                        // negative mutation
+                        minMutation = Math.Max(- 1 * weights[i], -1 * range);
+                        maxMutation = 0;
+                    }
+                    //minMutation = Math.Min(weights[i], range);
+                    //maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
 
                     mutation = RandomDouble(minMutation, maxMutation);
                     weights[i].Value += mutation;
@@ -1682,7 +1694,7 @@ namespace ThebesAI
             double averageScore = individuals.Average(x => x.AverageScore());
             double maxAverageScore = individuals.Max(x => x.AverageScore());
             averageScores.Add(averageScore);
-            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {AverageSimilarity(individuals, 20)}");
+            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {AverageSimilarity(individuals, 20)}, mutprob: {mutationProbability}");
 
             if (this.currentGen % 20 == 0)
             {

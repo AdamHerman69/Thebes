@@ -457,7 +457,7 @@ namespace ThebesAI
         public ISimulationState RandomChild()
         {
             Random random = new Random();
-            List<IAction> possibleActions = GetAllPossibleActions();
+            List<IAction> possibleActions = GetAllPossibleActions();    
 
             if (possibleActions.Count == 0)
             {
