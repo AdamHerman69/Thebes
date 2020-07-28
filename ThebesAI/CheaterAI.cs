@@ -356,7 +356,12 @@ namespace ThebesAI
             }
 
             // end year
-            actions.Add(new EndYearAction());
+            // TODO upravit
+            if (actions.Count < 3)
+            {
+                actions.Add(new EndYearAction());
+            }
+            
 
             return actions;
         }
@@ -586,7 +591,7 @@ namespace ThebesAI
             return this.children.Count == 0;
         }
         
-        private void Traverse()
+        private void Traverse() 
         {
             if (IsLeaf())
             {

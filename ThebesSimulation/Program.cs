@@ -50,8 +50,8 @@ namespace ThebesSimulation
 
 
 
-            Population population = new Population(100);
-            population.Evolve(4, 10000, 5, 0.2, 4, 0.15, 0.6, 0);
+            Population population = new Population(99);
+            population.Evolve(3, 10000, 5, 0.2, 2, 0.02, 0.2, 0);
             Console.ReadLine();
 
             //Individual individual = new Individual(new BetterEvolutionAI(null, null));

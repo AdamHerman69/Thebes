@@ -445,12 +445,12 @@ namespace ThebesAI
     {
         public abstract int WeightsNeeded { get; }
         protected Weight[] mainWeights;
-        protected Weight[,] subWeights;
+        protected Weight[] subWeights;
 
         public Criterion(int mainWeightsLength, int subWeightsCount) 
         {
             mainWeights = new Weight[mainWeightsLength];
-            subWeights = new Weight[subWeightsCount, mainWeightsLength];
+            subWeights = new Weight[subWeightsCount];
         }
 
         public void ReceiveWeights(Queue<Weight> allocatedWeights)
@@ -460,12 +460,13 @@ namespace ThebesAI
                 mainWeights[i] = allocatedWeights.Dequeue();
             }
             
-            for (int i = 0; i < subWeights.GetLength(0); i++)
+            for (int i = 0; i < subWeights.Length; i++)
             {
-                for (int j = 0; j < subWeights.GetLength(1); j++)
-                {
-                    subWeights[i, j] = allocatedWeights.Dequeue();
-                }
+                subWeights[i] = allocatedWeights.Dequeue();
+                //for (int j = 0; j < subWeights.GetLength(1); j++)
+                //{
+                //    subWeights[i, j] = allocatedWeights.Dequeue();
+                //}
             }
         }
 
@@ -474,7 +475,7 @@ namespace ThebesAI
 
     public class CSpecializedKnowledge : Criterion
     {
-        public override int WeightsNeeded => 9 + 9 * 3;
+        public override int WeightsNeeded => 9 + 3;
 
         public CSpecializedKnowledge() : base(9, 3) { }
 
@@ -493,13 +494,13 @@ namespace ThebesAI
                 score += mainWeight;
 
                 // remaining weeks in a year
-                score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+                score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
                 // years left
-                score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+                score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
                 // artifact value sum at the dig site
-                score += mainWeight * subWeights[2, weightIndex].Value * (gameState.Game.ArtifactSum(digSite));
+                score += mainWeight * subWeights[2].Value * (gameState.Game.ArtifactSum(digSite));
             }
 
             return score;
@@ -508,7 +509,7 @@ namespace ThebesAI
 
     public class CSingleUseKnowledge : Criterion
     {
-        public override int WeightsNeeded => 9 + 9 * 3;
+        public override int WeightsNeeded => 9 + 3;
 
         public CSingleUseKnowledge() : base(9, 3) {}
 
@@ -527,13 +528,13 @@ namespace ThebesAI
                 score += mainWeight;
 
                 // remaining weeks in a year
-                score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+                score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
                 // years left
-                score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+                score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
                 // artifact value sum at the dig site
-                score += mainWeight * subWeights[2, weightIndex].Value * (gameState.Game.ArtifactSum(digSite));
+                score += mainWeight * subWeights[2].Value * (gameState.Game.ArtifactSum(digSite));
             }
 
             return score;
@@ -542,7 +543,7 @@ namespace ThebesAI
 
     public class CPermissions : Criterion
     {
-        public override int WeightsNeeded => 1 + 1 * 3;
+        public override int WeightsNeeded => 1 + 3;
 
         public CPermissions() : base(1, 3) { }
 
@@ -563,13 +564,13 @@ namespace ThebesAI
                     score += mainWeight;
 
                     // remaining weeks in a year
-                    score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+                    score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
                     // years left
-                    score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+                    score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
                     // artifact value sum at the dig site
-                    score += mainWeight * subWeights[2, weightIndex].Value * (gameState.Game.ArtifactSum(digSite));
+                    score += mainWeight * subWeights[2].Value * (gameState.Game.ArtifactSum(digSite));
                 }
             }
 
@@ -579,7 +580,7 @@ namespace ThebesAI
 
     public class CGeneralKnowledge : Criterion
     {
-        public override int WeightsNeeded => 9 + 9 * 4;
+        public override int WeightsNeeded => 9 + 4;
 
         public CGeneralKnowledge() : base(9, 4) { }
 
@@ -597,16 +598,16 @@ namespace ThebesAI
             score += mainWeight;
 
             // remaining weeks in a year
-            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
             // years left
-            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
             // consider number of assistants
-            score += mainWeight * subWeights[2, weightIndex].Value * player.Assistants;
+            score += mainWeight * subWeights[2].Value * player.Assistants;
 
             // consider number of shovels
-            score += mainWeight * subWeights[3, weightIndex].Value * player.Shovels;
+            score += mainWeight * subWeights[3].Value * player.Shovels;
 
 
             return score;
@@ -615,7 +616,7 @@ namespace ThebesAI
 
     public class CShovels : Criterion
     {
-        public override int WeightsNeeded => 5 + 5 * 4;
+        public override int WeightsNeeded => 5 + 4;
 
         public CShovels() : base(5, 4) { }
 
@@ -633,16 +634,16 @@ namespace ThebesAI
             score += mainWeight;
 
             // remaining weeks in a year
-            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
             // years left
-            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
             // consider number of assistants
-            score += mainWeight * subWeights[2, weightIndex].Value * player.Assistants;
+            score += mainWeight * subWeights[2].Value * player.Assistants;
 
             // consider number of general knowledge
-            score += mainWeight * subWeights[3, weightIndex].Value * player.GeneralKnowledge;
+            score += mainWeight * subWeights[3].Value * player.GeneralKnowledge;
 
             return score;
         }
@@ -650,7 +651,7 @@ namespace ThebesAI
 
     public class CAssistants : Criterion
     {
-        public override int WeightsNeeded => 5 + 5 * 4;
+        public override int WeightsNeeded => 5 + 4;
 
         public CAssistants() : base(5, 4) { }
 
@@ -668,16 +669,16 @@ namespace ThebesAI
             score += mainWeight;
 
             // remaining weeks in a year
-            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
             // years left
-            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
             // consider number of general knowledge
-            score += mainWeight * subWeights[2, weightIndex].Value * player.GeneralKnowledge;
+            score += mainWeight * subWeights[2].Value * player.GeneralKnowledge;
 
             // consider number of shovels
-            score += mainWeight * subWeights[3, weightIndex].Value * player.Shovels;
+            score += mainWeight * subWeights[3].Value * player.Shovels;
 
             return score;
         }
@@ -685,7 +686,7 @@ namespace ThebesAI
 
     public class CSpecialPermissions : Criterion
     {
-        public override int WeightsNeeded => 3 + 3 * 2;
+        public override int WeightsNeeded => 3 + 2;
 
         public CSpecialPermissions() : base(3, 2) { }
 
@@ -703,10 +704,10 @@ namespace ThebesAI
             score += mainWeight;
 
             // remaining weeks in a year
-            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
             // years left
-            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
             return score;
         }
@@ -714,7 +715,7 @@ namespace ThebesAI
 
     public class CZeppelins : Criterion
     {
-        public override int WeightsNeeded => 3 + 3 * 2;
+        public override int WeightsNeeded => 3 + 2;
 
         public CZeppelins() : base(3, 2) { }
 
@@ -732,10 +733,10 @@ namespace ThebesAI
             score += mainWeight;
 
             // remaining weeks in a year
-            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
             // years left
-            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
             return score;
         }
@@ -743,7 +744,7 @@ namespace ThebesAI
 
     public class CCongresses : Criterion
     {
-        public override int WeightsNeeded => 9 + 9 * 2;
+        public override int WeightsNeeded => 9 + 2;
 
         public CCongresses() : base(9, 2) { }
 
@@ -761,10 +762,10 @@ namespace ThebesAI
             score += mainWeight;
 
             // remaining weeks in a year
-            score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
             // years left
-            score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
 
             return score;
         }
@@ -772,7 +773,7 @@ namespace ThebesAI
 
     public class CCar : Criterion
     {
-        public override int WeightsNeeded => 1 + 1 * 2;
+        public override int WeightsNeeded => 1 + 2;
 
         public CCar() : base(1, 2) { }
 
@@ -792,10 +793,10 @@ namespace ThebesAI
                 score += mainWeight;
 
                 // remaining weeks in a year
-                score += mainWeight * subWeights[0, weightIndex].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+                score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
 
                 // years left
-                score += mainWeight * subWeights[1, weightIndex].Value * (Time.finalYear - player.Time.CurrentYear);
+                score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
             }
 
             return score;
@@ -804,7 +805,7 @@ namespace ThebesAI
 
     public class CPoints : Criterion
     {
-        public override int WeightsNeeded => 1 + 1 * 1;
+        public override int WeightsNeeded => 1 + 1;
 
         public CPoints() : base(1, 1) { }
 
@@ -850,7 +851,7 @@ namespace ThebesAI
             score += mainWeight * points;
 
             // points * point weight * time (adjusted for importance of points as game progresses)
-            score += mainWeight * subWeights[0, weightIndex].Value * player.Time.RemainingWeeks();
+            score += mainWeight * subWeights[0].Value * player.Time.RemainingWeeks();
 
             return score;
         }
@@ -1158,7 +1159,7 @@ namespace ThebesAI
 
                 for (int i = 0; i < weightCount; i++)
                 {
-                    weights[i] = new Weight(RandomDouble(0, 1));
+                    weights[i] = new Weight(RandomDouble(-1, 1));
                 }
             }
             else
@@ -1257,11 +1258,31 @@ namespace ThebesAI
             {
                 if (random.NextDouble() <= probability)
                 {
-                    minMutation = Math.Max(-1 * Math.Abs(weights[i] - (- 1)), -1 * range);
-                    maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
+                    //minMutation = Math.Max(-1 * Math.Abs(weights[i] - (- 1)), -1 * range);
+                    //maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
 
-                    mutation = RandomDouble(minMutation, maxMutation);
-                    weights[i].Value += mutation;
+                    //mutation = RandomDouble(minMutation, maxMutation);
+                    //weights[i].Value += mutation;
+
+
+                    if (random.NextDouble() <= probability)
+                    {
+                        if (random.Next(2) == 0)
+                        {
+                            // positive mutation
+                            minMutation = 0;
+                            maxMutation = Math.Min(Math.Abs(weights[i] - 1), range);
+                        }
+                        else
+                        {
+                            // negative mutation
+                            minMutation = Math.Max(-1 * Math.Abs(weights[i] - (-1)), -1 * range);
+                            maxMutation = 0;
+                        }
+
+                        mutation = RandomDouble(minMutation, maxMutation);
+                        weights[i].Value += mutation;
+                    }
                 }
             }
         }
@@ -1568,7 +1589,8 @@ namespace ThebesAI
                 randomIndividualsCount = individuals.Count - survivorCount - childrenCount;
 
                 // raise mutation probability
-                mutationProbability += 0.01;
+                //mutationProbability += 0.01;
+                //mutationProbability = 0.05;
             }
 
             // adjust if population average fell off
@@ -1594,7 +1616,7 @@ namespace ThebesAI
 
                 // add newly created indiviudal to the new generation
                 newIndividual = new Individual(BetterEvolutionAI.Procreate(parents), currentID++, currentGen);
-                newIndividual.ai.MutateInRangePositive(mutationProbability, minMutationRange);
+                newIndividual.ai.MutateInRange(mutationProbability, minMutationRange);
                 newGeneration.Add(newIndividual);
             }
 
@@ -1609,7 +1631,7 @@ namespace ThebesAI
             for (int i = 0; i < bestChildrenCount; i++)
             {
                 bestAICopy = new BetterEvolutionAI(currentBest.weights);
-                bestAICopy.MutateInRangePositive(mutationProbability, minMutationRange);
+                bestAICopy.MutateInRange(mutationProbability, minMutationRange);
                 newGeneration.Add(new Individual(bestAICopy, currentID++, currentGen));
             }
 
