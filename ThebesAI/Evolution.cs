@@ -35,11 +35,11 @@ namespace ThebesAI
      */
 
 
-    public class Weights    : IEnumerable<double>
+    public class Weights : IEnumerable<double>
     {
         static Random random = new Random();
         List<double[]> weightArrays;
-        
+
         public double[] knowledgeCards;
         public double[] tKnowledgeCards;
 
@@ -69,7 +69,7 @@ namespace ThebesAI
         public double[] timeLeftMultiplier;
         public double[] pointsMultiplier;
 
-        public Weights(string nothing) 
+        public Weights(string nothing)
         {
             knowledgeCards = new double[13]
             {   0,
@@ -87,7 +87,7 @@ namespace ThebesAI
                 2.2143612949910419E-11,
             };
 
-            tKnowledgeCards = new double[13] 
+            tKnowledgeCards = new double[13]
             {
                 1.0368319512336537E-08,
                 3.9386212264555813E-12,
@@ -104,7 +104,7 @@ namespace ThebesAI
                 2.1729795519247193E-13,
             };
 
-            singleUseKnowledgeCards = new double[6] 
+            singleUseKnowledgeCards = new double[6]
             {
                0,
                 3.2976480072428905E-09,
@@ -114,7 +114,7 @@ namespace ThebesAI
                 2.1433102880505741E-08,
             };
 
-            generalKnowledgeCards = new double[13] 
+            generalKnowledgeCards = new double[13]
             {
                 0,
                 2.1695869158524315E-10,
@@ -130,7 +130,7 @@ namespace ThebesAI
                 1.2601777282966746E-09,
                 1.1336155855371867E-11,
             };
-            tGeneralKnowledgeCards = new double[13] 
+            tGeneralKnowledgeCards = new double[13]
             {
                 1.1488553890876533E-08,
                 1.2085783026623123E-09,
@@ -147,7 +147,7 @@ namespace ThebesAI
                 0.0014233278594004983,
             };
 
-            shovels = new double[5] 
+            shovels = new double[5]
             {
                 0,
                 2.5944420135446523E-06,
@@ -156,7 +156,7 @@ namespace ThebesAI
                 0,
             };
 
-            tShovels = new double[5] 
+            tShovels = new double[5]
             {
                 1.3489069041461626E-11,
                 1.3030632524437439E-10,
@@ -165,7 +165,7 @@ namespace ThebesAI
                 2.1331920813508376E-14,
             };
 
-            assistants = new double[5] 
+            assistants = new double[5]
             {
                 0,
                 4.0791929713811216E-09,
@@ -173,7 +173,7 @@ namespace ThebesAI
                 4.6001911910408103E-10,
                 0,
             };
-            tAssistants = new double[5] 
+            tAssistants = new double[5]
             {
                 1.5870023582001166E-09,
                 7.0431022582841274E-07,
@@ -182,7 +182,7 @@ namespace ThebesAI
                 1.8329104522116111E-10,
             };
 
-            specialPermissions = new double[4] 
+            specialPermissions = new double[4]
             {
                 0,
                 9.78667358195109E-15,
@@ -190,7 +190,7 @@ namespace ThebesAI
                 0.013682068960582895,
             };
 
-            zeppelins = new double[6] 
+            zeppelins = new double[6]
             {
                 0,
                 0.010545284784401376,
@@ -200,7 +200,7 @@ namespace ThebesAI
                 0.0011842056593770517,
             };
 
-            congresses = new double[9] 
+            congresses = new double[9]
             {
                 0,
                 4.17734108212371E-09,
@@ -212,7 +212,7 @@ namespace ThebesAI
                 1.4241895187725792E-07,
                 0,
             };
-            tCongresses = new double[9] 
+            tCongresses = new double[9]
             {
                 7.8834647914570634E-09,
                 1.0519365856000629E-14,
@@ -272,7 +272,7 @@ namespace ThebesAI
         public static Weights Procreate(params Weights[] parents)
         {
             Weights child = new Weights("useless parameter");
-            
+
             // get an enumerator for each parent
             IEnumerator<double>[] enums = new IEnumerator<double>[parents.Length];
             for (int i = 0; i < parents.Length; i++)
@@ -284,7 +284,7 @@ namespace ThebesAI
             WeightsEnum childEnum = (WeightsEnum)child.GetEnumerator();
             while (childEnum.MoveNext())
             {
-                
+
                 foreach (IEnumerator enumerator in enums)
                 {
                     enumerator.MoveNext();
@@ -303,7 +303,7 @@ namespace ThebesAI
         /// <param name="rangeProportion">the 'severity' of the mutation, the max possible change that can occur, represented as a proportion of the weight</param>
         public void Mutate(double probability, double rangeProportion)
         {
-            WeightsEnum enumerator = (WeightsEnum) this.GetEnumerator();
+            WeightsEnum enumerator = (WeightsEnum)this.GetEnumerator();
 
             while (enumerator.MoveNext())
             {
@@ -447,7 +447,7 @@ namespace ThebesAI
         protected Weight[] mainWeights;
         protected Weight[] subWeights;
 
-        public Criterion(int mainWeightsLength, int subWeightsCount) 
+        public Criterion(int mainWeightsLength, int subWeightsCount)
         {
             mainWeights = new Weight[mainWeightsLength];
             subWeights = new Weight[subWeightsCount];
@@ -459,7 +459,7 @@ namespace ThebesAI
             {
                 mainWeights[i] = allocatedWeights.Dequeue();
             }
-            
+
             for (int i = 0; i < subWeights.Length; i++)
             {
                 subWeights[i] = allocatedWeights.Dequeue();
@@ -511,7 +511,7 @@ namespace ThebesAI
     {
         public override int WeightsNeeded => 9 + 3;
 
-        public CSingleUseKnowledge() : base(9, 3) {}
+        public CSingleUseKnowledge() : base(9, 3) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
@@ -861,7 +861,7 @@ namespace ThebesAI
     {
         public override int WeightsNeeded => 1;
 
-        public CTime() : base(1, 0){}
+        public CTime() : base(1, 0) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
@@ -1128,8 +1128,8 @@ namespace ThebesAI
                 criterion.ReceiveWeights(weightsQueue);
             }
         }
-        
-        
+
+
         /// <summary>
         /// Creates AI with provided weights if not null. If null the weights will be random
         /// </summary>
@@ -1214,7 +1214,7 @@ namespace ThebesAI
         }
 
         protected double RandomDouble(double lowerBound, double upperBound)
-         {
+        {
             return random.NextDouble() * (upperBound - lowerBound) + lowerBound;
         }
 
@@ -1309,7 +1309,7 @@ namespace ThebesAI
                     else
                     {
                         // negative mutation
-                        minMutation = Math.Max(- 1 * weights[i], -1 * range);
+                        minMutation = Math.Max(-1 * weights[i], -1 * range);
                         maxMutation = 0;
                     }
                     //minMutation = Math.Min(weights[i], range);
@@ -1391,7 +1391,7 @@ namespace ThebesAI
         protected virtual double EvalScore(ISimulationState state, IPlayer player)
         {
             double score = 0;
-            
+
             // digsite dependent points
             foreach (IDigSite digSite in state.Game.DigsiteInventory.Keys)
             {
@@ -1403,7 +1403,7 @@ namespace ThebesAI
                 //single use knowledge
                 score += weights.GetWeight(weights.singleUseKnowledgeCards, player.SingleUseKnowledge[digSite])
                     * state.Game.ArtifactSum(digSite);
-                
+
                 // permissions
                 if (player.Permissions[digSite])
                 {
@@ -1498,6 +1498,7 @@ namespace ThebesAI
         double currentBestScore = double.MinValue;
         List<double> averageScores = new List<double>();
         double mutationProbability;
+        StreamWriter sw;
 
         public Population(int count, Weight[] seed = null)
         {
@@ -1564,7 +1565,7 @@ namespace ThebesAI
                 currentBest = individuals[0].ai;
                 Console.WriteLine($"-------------------- new best score: {bestScore}");
 
-                using (var tw = new StreamWriter($"currentBestBetterAI4Players.txt", false))
+                using (var tw = new StreamWriter($"BEST_4_150_5_{survivorRatio}_{parentAmount}_{mutationProbability}_{minMutationRange}.txt", true))
                 {
                     tw.Write(new JavaScriptSerializer().Serialize(currentBest));
                 }
@@ -1701,6 +1702,9 @@ namespace ThebesAI
         public void Evolve(int playersPerGame, int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.1, double minMutationRange = 0.05, double mutationRelativeRange = 0.3)
         {
             GameSettings.LoadFromFile(@"thebes_config.thc");
+
+            sw = new StreamWriter($"TEST_{playersPerGame}_{generations}_{gamesPerPlayer}_{survivorRatio}_{parentAmount}_{mutationProbability}_{minMutationRange}.txt", true);
+
             this.mutationProbability = mutationProbability;
             for (int i = 0; i < generations; i++)
             {
@@ -1716,15 +1720,18 @@ namespace ThebesAI
             double averageScore = individuals.Average(x => x.AverageScore());
             double maxAverageScore = individuals.Max(x => x.AverageScore());
             averageScores.Add(averageScore);
-            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {AverageSimilarity(individuals, 20)}, mutprob: {mutationProbability}");
+            double averageSimilarity = AverageSimilarity(individuals, 20);
+            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {averageSimilarity}");
 
-            if (this.currentGen % 20 == 0)
-            {
-                using (var tw = new StreamWriter($"gen_{currentGen}_betterAI.txt", true))
-                {
-                    tw.Write(new JavaScriptSerializer().Serialize(this.averageScores));
-                }
-            }
+            sw.Write($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {averageSimilarity}\n");
+
+            //if (this.currentGen % 20 == 0)
+            //{
+            //    using (var tw = new StreamWriter($"gen_{currentGen}_betterAI.txt", true))
+            //    {
+            //        tw.Write(new JavaScriptSerializer().Serialize(this.averageScores));
+            //    }
+            //}
         }
 
         /// <summary>

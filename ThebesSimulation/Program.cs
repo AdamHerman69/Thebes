@@ -46,12 +46,28 @@ namespace ThebesSimulation
 
 
 
+            Population population;
+            // number of parents
+            for (int i = 2; i < 5; i += 2)
+            {
+                // survivor ratio
+                for (double j = 0.1; j <= 0.4; j += 0.1)
+                {
+                    // mutation probability
+                    for (double k = 0.01; k < 0.2; k += 0.06)
+                    {
+                        // mutation range
+                        for (double l = 0.05; l < 0.5; l *= 2)
+                        {
+                            population = new Population(100);
+                            population.Evolve(4, 150, 5, j, i, k, l, 0);
+                        }
+                    }
+                }
+            }
 
-
-
-
-            Population population = new Population(99);
-            population.Evolve(3, 10000, 5, 0.2, 2, 0.02, 0.2, 0);
+            Population population = new Population(100);
+            population.Evolve(4, 10000, 10, 0.2, 2, 0.04, 0.1, 0);
             Console.ReadLine();
 
             //Individual individual = new Individual(new BetterEvolutionAI(null, null));
