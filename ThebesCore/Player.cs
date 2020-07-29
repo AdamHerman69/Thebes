@@ -488,8 +488,6 @@ namespace ThebesCore
             Permissions[digSite] = false;
             Time.SpendWeeks(weeks);
 
-            // get bonus token
-
             // get token amount
             GetDigStats(digSite, singleUseCards, out int knowledge, out int tokenBonus);
             int tokenAmount = GameSettings.DugTokenCount(knowledge, weeks) + tokenBonus;

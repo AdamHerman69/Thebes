@@ -27,16 +27,24 @@ namespace ThebesAI
                 this.DigsiteInventory[digsite_tokenList.Key] = new List<IToken>(game.DigsiteInventory[digsite_tokenList.Key]);
             }
 
+            this.BonusTokens = new Dictionary<IDigSite, IToken>(game.BonusTokens);
 
-            this.Players = game.Players.Select(p => p.Clone(
-                null,
-                this.AvailableCards.ChangeDisplayedCards,
-                this.AvailableCards.GiveCard,
-                this.Deck.Discard,
-                this.ActiveExhibitions.GiveExhibition,
-                this.DrawTokens,
-                this.PlayersOnWeek
-                )).ToList();
+            this.Players = new List<IPlayer>();
+            foreach (IPlayer player in game.Players)
+            {
+                this.Players.Add(new DeterministicPlayer(this, (Player)player));
+            }
+
+
+            //this.Players = game.Players.Select(p => p.Clone(
+            //    null,
+            //    this.AvailableCards.ChangeDisplayedCards,
+            //    this.AvailableCards.GiveCard,
+            //    this.Deck.Discard,
+            //    this.ActiveExhibitions.GiveExhibition,
+            //    this.DrawTokens,
+            //    this.PlayersOnWeek
+            //    )).ToList();
 
             // SimGame Specifics
             assumedArtifactSum = new Dictionary<IDigSite, double>();
@@ -68,30 +76,40 @@ namespace ThebesAI
 
         public double ExpectedValueOfToken(IDigSite digSite)
         {
-            return assumedArtifactSum[digSite] / (assumedArtifactCount[digSite] + 16);
+            int bonusToken = 0;
+            if (this.BonusTokens[digSite] != null)
+            {
+                bonusToken = 1;
+            }
+            return assumedArtifactSum[digSite] / (assumedArtifactCount[digSite] + 16) + bonusToken;
         }
 
         public double ExpectedNumberOfTokens(IDigSite digSite)
         {
-            return assumedArtifactCount[digSite] / (assumedArtifactCount[digSite] + 16);
+            int bonusToken = 0;
+            if (this.BonusTokens[digSite] != null)
+            {
+                bonusToken = 1;
+            }
+            return assumedArtifactCount[digSite] / (assumedArtifactCount[digSite] + 16) + bonusToken;
         }
 
-        public new DeterministicGame Clone()
+        public override IGame Clone()
         {
             return new DeterministicGame(this);
         }
 
     }
 
-    class SimPlayer : Player
+    class DeterministicPlayer : Player
     {
         DeterministicGame game;
         double assumedPoints;
         Dictionary<IDigSite, double> assumedArtifacts;
 
-        public SimPlayer() { }
+        public DeterministicPlayer() { }
         
-        public SimPlayer(DeterministicGame game, Player player)
+        public DeterministicPlayer(DeterministicGame game, Player player)
         {
             this.Name = player.Name;
             this.CurrentPlace = player.CurrentPlace;
@@ -108,7 +126,7 @@ namespace ThebesAI
 
             this.GeneralKnowledge = player.GeneralKnowledge;
             this.Zeppelins = player.Zeppelins;
-            this.useZeppelin = ((SimPlayer)player).useZeppelin;
+            this.useZeppelin = player.useZeppelin;
             this.SpecialPermissions = player.SpecialPermissions;
             this.Congresses = player.Congresses;
             this.Assistants = player.Assistants;
@@ -120,10 +138,10 @@ namespace ThebesAI
             this.LastRoundChange = player.LastRoundChange;
 
             // Collections 
-            this.Permissions = new Dictionary<IDigSite, bool>(Permissions);
-            this.SpecializedKnowledge = new Dictionary<IDigSite, int>(SpecializedKnowledge);
-            this.SingleUseKnowledge = new Dictionary<IDigSite, int>(SingleUseKnowledge);
-            this.Cards = new List<ICard>(Cards);
+            this.Permissions = new Dictionary<IDigSite, bool>(player.Permissions);
+            this.SpecializedKnowledge = new Dictionary<IDigSite, int>(player.SpecializedKnowledge);
+            this.SingleUseKnowledge = new Dictionary<IDigSite, int>(player.SingleUseKnowledge);
+            this.Cards = new List<ICard>(player.Cards);
 
             this.Tokens = new Dictionary<IDigSite, List<IToken>>();
             foreach (KeyValuePair<IDigSite, List<IToken>> digSite_tokenList in player.Tokens)
@@ -134,7 +152,7 @@ namespace ThebesAI
             /////////////////////////////////////////////////
 
             this.game = game;
-            this.assumedPoints = this.Points;
+            this.assumedPoints = player.Points;
 
             assumedArtifacts = new Dictionary<IDigSite, double>();
             foreach (var digSite_tokenList in Tokens)
@@ -196,25 +214,25 @@ namespace ThebesAI
             game.assumedArtifactSum[digSite] -= valueDrawn;
             game.assumedArtifactCount[digSite] -= tokenCountDrawn;
 
-            // TODO actually use single use cards
-            //// discard single-use cards used
-            //if (singleUseCards != null)
-            //{
-            //    foreach (ICard card in singleUseCards)
-            //    {
-            //        Cards.Remove(card);
-            //        discardCard(card);
-            //    }
-            //}
-            //UpdateStats();
+
+            // discard single-use cards used
+            if (singleUseCards != null)
+            {
+                foreach (ICard card in singleUseCards)
+                {
+                    Cards.Remove(card);
+                    discardCard(card);
+                }
+            }
+            UpdateStats();
 
             return null;
         }
 
 
-        public SimPlayer Clone(DeterministicGame game)
+        public DeterministicPlayer Clone(DeterministicGame game)
         {
-            SimPlayer clone = new SimPlayer(game, this);
+            DeterministicPlayer clone = new DeterministicPlayer(game, this);
 
             clone.assumedPoints = this.assumedPoints;
 
@@ -318,7 +336,7 @@ namespace ThebesAI
                 action = new ExecuteExhibitionAction(exhibition);
                 if (player.IsEnoughTime(action) && 
                     (
-                        (player is SimPlayer && exhibition.CheckRequiredArtifacts(((SimPlayer)player).AssumedArtifacts))
+                        (player is DeterministicPlayer && exhibition.CheckRequiredArtifacts(((DeterministicPlayer)player).AssumedArtifacts))
                         || exhibition.CheckRequiredArtifacts(player.Tokens)
                     )
                 )
@@ -470,13 +488,13 @@ namespace ThebesAI
             }
 
             return new SimulationState(Game, possibleActions[random.Next(0, possibleActions.Count)]);
-        }
+        }   
     }
 
 
     public class CheaterAI : IAI
     {
-        public CheaterAI(IPlayerData player, IGame game) { }
+        public CheaterAI(int playerCount) { }
         public IAction TakeAction(IGame gameState)
         {
             MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null);
@@ -486,7 +504,7 @@ namespace ThebesAI
 
     public class HeuristicCheaterAI : IAI
     {
-        public HeuristicCheaterAI(IPlayerData player, IGame game) { }
+        public HeuristicCheaterAI(int playerCount) { }
         public IAction TakeAction(IGame gameState)
         {
             MCTSNodeCutoff mctsNode = new MCTSNodeCutoff(new SimulationState(gameState), null);
@@ -496,7 +514,7 @@ namespace ThebesAI
 
     public class SimCheaterAI : IAI
     {
-        public SimCheaterAI(IPlayerData player, IGame game) { }
+        public SimCheaterAI(int playerCount) { }
         public IAction TakeAction(IGame gameState)
         {
             MCTSNode mctsNode = new MCTSNodeCutoff(new SimulationState(new DeterministicGame((Game)gameState)), null);
@@ -506,7 +524,7 @@ namespace ThebesAI
 
     public class FirstYearDFSAI : IAI
     {
-        public FirstYearDFSAI(IPlayerData player, IGame game) { }
+        public FirstYearDFSAI(int playerCount) { }
         DFSNode head;
         public IAction TakeAction(IGame gameState)
         {
@@ -544,7 +562,7 @@ namespace ThebesAI
 
         public override string ToString()
         {
-            return $"{state.Move}, UCB: {UCB1("cheater", 0)}, visits: {visits}";
+            return $"{state.Move}, UCT: {UCT("cheater", 0)}, visits: {visits}";
         }
 
         private void UpdateScore(Dictionary<string, double> newScores)
@@ -555,7 +573,7 @@ namespace ThebesAI
             }
         }
 
-        public double UCB1(string playerName, double explorationConstant)
+        public double UCT(string playerName, double explorationConstant)
         {
             if (visits == 0)
             {
@@ -591,7 +609,7 @@ namespace ThebesAI
             return this.children.Count == 0;
         }
         
-        private void Traverse() 
+        protected virtual void Traverse() 
         {
             if (IsLeaf())
             {
@@ -622,16 +640,16 @@ namespace ThebesAI
         protected virtual MCTSNode pickBestChild(double explorationConstant)
         {
             MCTSNode bestChild = null;
-            double maxUCB1 = double.MinValue;
+            double maxUCT = double.MinValue;
             double score;
             foreach (MCTSNode node in children)
             {
-                if ((score = node.UCB1(this.state.ActivePlayer.Name, explorationConstant)) > maxUCB1)
+                if ((score = node.UCT(this.state.ActivePlayer.Name, explorationConstant)) > maxUCT)
                 {
                     bestChild = node;
-                    maxUCB1 = score;
+                    maxUCT = score;
 
-                    if (maxUCB1 == double.MaxValue) break; // no need to go through the others
+                    if (maxUCT == double.MaxValue) break; // no need to go through the others
                 }
             }
             return bestChild;
