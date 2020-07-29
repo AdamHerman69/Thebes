@@ -100,10 +100,10 @@ namespace ThebesUI
                 return;
             }
 
-            // check for empty names
-            if (AnyEmptyNames())
+            // check for invalid namess
+            if (AnyInvalidNames())
             {
-                MessageBox.Show("All players have to have names");
+                MessageBox.Show("Each player has to have a distinct name");
                 return;
             }
 
@@ -150,7 +150,7 @@ namespace ThebesUI
                             game.PlayersOnWeek
                             );
 
-                        IAI ai = (IAI)playerInput.Type.Assembly.CreateInstance(playerInput.Type.FullName, false, 0, null, new object[] { player, game }, null, null);
+                        IAI ai = (IAI)playerInput.Type.Assembly.CreateInstance(playerInput.Type.FullName, false, 0, null, new object[] { playerCount }, null, null);
                         ((AIPlayer)player).Init(ai);
                     }
                     
@@ -176,13 +176,23 @@ namespace ThebesUI
             this.Close();
         }
 
-        private bool AnyEmptyNames()
+        /// <summary>
+        /// Checks the names for validity
+        /// </summary>
+        /// <returns>True if there's an invalid name, False if OK</returns>
+        private bool AnyInvalidNames()
         {
-            foreach (PlayerInput playerInput in playerInputs)
+            for (int i = 0; i < playerInputs.Length; i++)
             {
-                if (playerInput.Selected() && playerInput.Name.Equals(""))
+                for (int j = 0; j < playerInputs.Length; j++)
                 {
-                    return true;
+                    if (i != j && playerInputs[i].Selected() && playerInputs[j].Selected())
+                    {
+                        if (playerInputs[i].PlayerName().Equals("") || playerInputs[j].PlayerName().Equals("") || playerInputs[i].PlayerName().Equals(playerInputs[j].PlayerName()))
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
 
