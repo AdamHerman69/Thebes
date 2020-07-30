@@ -16,6 +16,26 @@ namespace ThebesSimulation
     {
         static void Main(string[] args)
         {
+            /*
+             * This project is used to run any random snippet you should choose
+             * 
+             * 
+             * 
+             * Don't worry about the mess here, the mess here prevents mess in other places 
+             * 
+             * 
+             * 
+             * Some of these snippets are quite useful when testing AI or running evolution
+             * 
+             * 
+             * 
+             * 
+             * 
+             * 
+             */
+            
+            
+            
             //string[] filepaths = Directory.GetFiles(@"C:\Users\admhe\Desktop\Statistics\200728", "TEST*", SearchOption.TopDirectoryOnly);
 
             //string fileContents;
@@ -104,7 +124,7 @@ namespace ThebesSimulation
             Dictionary<string, Tester> testers = new Dictionary<string, Tester>();
 
             EvolutionA evoAI = new EvolutionA(2);
-            testers.Add("mctsevo", new Tester("mctsevo", new MCTSEvolutionAI(evoAI, 5000, 1.8)));
+            testers.Add("mctsevo", new Tester("mctsevo", new MCTSIR(evoAI, 5000, 1.8)));
 
 
             testers.Add("simpleEvo", new Tester("simpleEvo", new EvolutionA(2)));

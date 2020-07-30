@@ -8,21 +8,25 @@ using ThebesCore;
 
 namespace ThebesAI
 {
-    
+    /// <summary>
+    /// First AI developed, surprisingly not that bad
+    /// </summary>
     [Serializable]
     public class TestAI : IAI
     {
         IPlayerData player;
         IGame game;
 
-        public TestAI(IPlayerData player, IGame game)
+        public TestAI(int playerCount)
         {
-            this.player = player;
-            this.game = game;
+
         }
         
         public IAction TakeAction(IGame gameState)
         {
+            this.game = gameState;
+            this.player = gameState.ActivePlayer;
+            
             IExhibitionCard exhibition;
             if (player.Time.RemainingWeeks() > 10 && (exhibition = CanIExhibit()) != null)
             {

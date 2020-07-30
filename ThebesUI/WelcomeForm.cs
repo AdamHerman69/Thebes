@@ -41,11 +41,10 @@ namespace ThebesUI
             {
                 playerInput.AddDefaultAI(typeof(TestAI));
                 playerInput.AddAI(typeof(MCTSAI));
-                playerInput.AddAI(typeof(HeuristicCheaterAI));
-                playerInput.AddAI(typeof(SimCheaterAI));
-                playerInput.AddAI(typeof(FirstYearDFSAI));
-                playerInput.AddAI(typeof(DumbEvolutionAI));
                 playerInput.AddAI(typeof(EvolutionA));
+                playerInput.AddAI(typeof(EvolutionB));
+                playerInput.AddAI(typeof(MCTSIR));
+
             }
         }
 
@@ -151,6 +150,9 @@ namespace ThebesUI
                             );
 
                         IAI ai = (IAI)playerInput.Type.Assembly.CreateInstance(playerInput.Type.FullName, false, 0, null, new object[] { playerCount }, null, null);
+
+                        
+
                         ((AIPlayer)player).Init(ai);
                     }
                     

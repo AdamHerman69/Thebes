@@ -158,21 +158,24 @@ namespace ThebesUI
             bonusTokens = new Dictionary<IDigSite, TransparentPictureBox>();
             foreach (KeyValuePair<IDigSite, IToken> kvp  in game.BonusTokens)
             {
-                ITokenView tokenView = UIGame.ToView(kvp.Value);
-
-                pbDims = layout.Places[kvp.Key.Name];
-                bonusTokens.Add(kvp.Key, new TransparentPictureBox()
+                if (kvp.Value != null)
                 {
-                    Location = pbDims.RectanglePositionCenter(45, 45),
-                    Width = 45,
-                    Height = 45,
-                    Visible = true,
-                    SizeMode = PictureBoxSizeMode.StretchImage,
-                    BackColor = Color.Transparent,
-                    Image = Image.FromFile(UIConfig.IMG_FOLDER + tokenView.FileName)
-                });
-                bonusTokens[kvp.Key].Click += new EventHandler(pBoard_Click); // to enable click through
-                pBoard.Controls.Add(bonusTokens[kvp.Key]);
+                    ITokenView tokenView = UIGame.ToView(kvp.Value);
+
+                    pbDims = layout.Places[kvp.Key.Name];
+                    bonusTokens.Add(kvp.Key, new TransparentPictureBox()
+                    {
+                        Location = pbDims.RectanglePositionCenter(45, 45),
+                        Width = 45,
+                        Height = 45,
+                        Visible = true,
+                        SizeMode = PictureBoxSizeMode.StretchImage,
+                        BackColor = Color.Transparent,
+                        Image = Image.FromFile(UIConfig.IMG_FOLDER + tokenView.FileName)
+                    });
+                    bonusTokens[kvp.Key].Click += new EventHandler(pBoard_Click); // to enable click through
+                    pBoard.Controls.Add(bonusTokens[kvp.Key]);
+                }
             }
 
             // year counter
@@ -507,7 +510,6 @@ namespace ThebesUI
         {
             if (cbUseZeppelin.Checked)
             {
-                //ExecuteAction(new ZeppelinAction(true));
                 ExecuteActionAsync(new ZeppelinAction(true));
             }
             else

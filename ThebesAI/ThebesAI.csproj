@@ -43,11 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AIPlayer.cs" />
-    <Compile Include="BetterAI.cs" />
     <Compile Include="MCTSAI.cs" />
     <Compile Include="EvolutionA.cs" />
     <Compile Include="Evolution.cs" />
-    <Compile Include="SimpleAI.cs" />
+    <Compile Include="TestAI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

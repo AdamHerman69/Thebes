@@ -7,6 +7,10 @@ using ThebesCore;
 
 namespace ThebesAI
 {
+    /// <summary>
+    /// Criterion used by EvolutionA 
+    /// </summary>
+    [Serializable]
     public abstract class ComplexCriterion
     {
         public abstract int WeightsNeeded { get; }
@@ -64,6 +68,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CSpecializedKnowledge : ComplexCriterion
     {
         public override int WeightsNeeded => 9 + 3;
@@ -98,6 +103,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CSingleUseKnowledge : ComplexCriterion
     {
         public override int WeightsNeeded => 9 + 3; // Could be changed to 1 instead of 9 since there is only one card in the game
@@ -132,6 +138,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CPermissions : ComplexCriterion
     {
         public override int WeightsNeeded => 1 + 3;
@@ -169,6 +176,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CGeneralKnowledge : ComplexCriterion
     {
         public override int WeightsNeeded => 9 + 4;
@@ -205,6 +213,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CShovels : ComplexCriterion
     {
         public override int WeightsNeeded => 5 + 4;
@@ -240,6 +249,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CAssistants : ComplexCriterion
     {
         public override int WeightsNeeded => 5 + 4;
@@ -275,6 +285,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CSpecialPermissions : ComplexCriterion
     {
         public override int WeightsNeeded => 3 + 2;
@@ -304,6 +315,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CZeppelins : ComplexCriterion
     {
         public override int WeightsNeeded => 3 + 2;
@@ -333,6 +345,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CCongresses : ComplexCriterion
     {
         public override int WeightsNeeded => 9 + 2;
@@ -362,6 +375,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CCar : ComplexCriterion
     {
         public override int WeightsNeeded => 1 + 2;
@@ -394,6 +408,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CPoints : ComplexCriterion
     {
         public override int WeightsNeeded => 1 + 1;
@@ -448,6 +463,7 @@ namespace ThebesAI
         }
     }
 
+    [Serializable]
     public class CTime : ComplexCriterion
     {
         public override int WeightsNeeded => 1;
@@ -461,6 +477,11 @@ namespace ThebesAI
         }
     }
 
+    /// <summary>
+    /// The AI using our A version of the rating function
+    /// </summary>
+
+    [Serializable]
     public class EvolutionA : EvolutionAI
     {
         public List<ComplexCriterion> criteria;
@@ -674,17 +695,98 @@ namespace ThebesAI
                 // weights for 2 players
                 this.weights = new Weight[]
                 {
-
+                    -0.70743528087969643,
+                    -0.73992875951338966,
+                    0.57976142593182689,
+                    0.043953856939428437,
+                    -0.33561445283033625,
+                    -0.39841987350882024,
+                    -0.88129798224256284,
+                    -0.892902487839061,
+                    0.68420271223140994,
+                    -0.41201055022515853,
+                    -0.47662568347371448,
+                    -0.66868095457026777,
+                    0.31865383094113975,
+                    0.41622066656882906,
+                    0.32706816183732279,
+                    0.81626515268174238,
+                    -0.709380774623426,
+                    -0.58344133909951956,
+                    0.58364456593228708,
+                    -0.13921714720279776,
+                    -0.28765153949505251,
+                    0.16662417592789236,
+                    0.016845424294865331,
+                    -0.11364110331686261,
+                    0.56792736778404906,
+                    -0.021702718465450577,
+                    0.83156589969599892,
+                    0.44251379172434746,
+                    -0.83108238551350422,
+                    -0.40935625387791374,
+                    -0.19620346147390244,
+                    0.70969934841138294,
+                    0.86846544308050788,
+                    0.98906165267762813,
+                    0.057735660605940708,
+                    -0.90704732614431871,
+                    -0.891146294721936,
+                    0.19805865697472291,
+                    0.17198304670023876,
+                    -0.4964681302646492,
+                    -0.51876125369163284,
+                    -0.81775986581005156,
+                    -0.70228519120825694,
+                    -0.79883747806252792,
+                    0.43016352664221236,
+                    0.94377913602803787,
+                    -0.78763643176650466,
+                    -0.9354743351859387,
+                    -0.92467063103088676,
+                    0.755814853010613,
+                    0.46387373072275606,
+                    -0.88152869785275711,
+                    0.2249844880890961,
+                    -0.59567437488384289,
+                    -0.3064288614813373,
+                    -0.43493309311332795,
+                    -0.025987853773863923,
+                    0.38109319099741679,
+                    -0.52162269294337493,
+                    0.27825722996064339,
+                    -0.267268902001562,
+                    0.40716095706781408,
+                    0.13383804873276417,
+                    0.34151940948400616,
+                    0.75536799605720129,
+                    -0.059079820783380366,
+                    -0.012560426729060881,
+                    -0.58241537100747942,
+                    0.2403693772574744,
+                    0.27450152825308094,
+                    -0.35630087897009255,
+                    -0.90603797971552147,
+                    -0.60971601661747132,
+                    0.080112696196936284,
+                    -0.12877565022966619,
+                    -0.34821348420726761,
+                    -0.2327493799304354,
+                    0.74806653510223442,
+                    -0.94917459411042493,
+                    -0.92257564325005548,
+                    -0.90583573370512371,
+                    -0.82469310696455334,
+                    -0.87215809145577161,
+                    0.081921862010807756,
+                    0.53407115374415692,
+                    0.97761922789268962
                 };
             }
             else
             {
                 throw new ArgumentOutOfRangeException("Invalid number of players");
             }
-
-
-
-
             
 
             // Provide the criteria with the weights
@@ -742,6 +844,12 @@ namespace ThebesAI
         }
 
 
+        /// <summary>
+        /// Evaluates the score of the given game state from the perspective of the given player
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <param name="player"></param>
+        /// <returns></returns>
         protected virtual double EvalScore(ISimulationState gameState, IPlayer player)
         {
             double score = 0;
@@ -754,6 +862,11 @@ namespace ThebesAI
             return score;
         }
 
+        /// <summary>
+        /// Returns the best possible action to play from the specifeid state
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <returns></returns>
         public override IAction TakeAction(IGame gameState)
         {
             string playerName = gameState.ActivePlayer.Name;
@@ -781,7 +894,11 @@ namespace ThebesAI
             return bestState.Move;
         }
 
-
+        /// <summary>
+        /// Performs a crossover from the parents specified
+        /// </summary>
+        /// <param name="parents"></param>
+        /// <returns></returns>
         public static EvolutionA Procreate(params EvolutionAI[] parents)
         {
             // assuming all parents have the same number of weights
@@ -793,23 +910,6 @@ namespace ThebesAI
             }
 
             return new EvolutionA(newWeights);
-        }
-
-        public void NormalizeValues(double min, double max)
-        {
-            double[] doubleWeights = new double[this.weights.Length];
-            for (int i = 0; i < doubleWeights.Length; i++)
-            {
-                doubleWeights[i] = this.weights[i];
-            }
-
-            double actualMin = doubleWeights.Min();
-            double actualMax = doubleWeights.Max();
-
-            for (int i = 0; i < weights.Length; i++)
-            {
-                weights[i] = (max - min) / (actualMax - actualMin) * (weights[i] - actualMin) + min;
-            }
         }
     }
 

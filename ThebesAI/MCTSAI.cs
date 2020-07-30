@@ -15,6 +15,10 @@ namespace ThebesAI
         public Dictionary<IDigSite, double> assumedArtifactSum;
         public Dictionary<IDigSite, double> assumedArtifactCount;
 
+        /// <summary>
+        /// Creates an instance of DeterministicGame from a normal one
+        /// </summary>
+        /// <param name="game">game to make a new instance from</param>
         public DeterministicGame(Game game)
         {
             this.Deck = game.Deck.Clone();
@@ -63,6 +67,11 @@ namespace ThebesAI
             }
         }
 
+        /// <summary>
+        /// Computes the expected value of digging one token
+        /// </summary>
+        /// <param name="digSite">where to dig</param>
+        /// <returns>the expected value</returns>
         public double ExpectedValueOfToken(IDigSite digSite)
         {
             int bonusToken = 0;
@@ -73,6 +82,11 @@ namespace ThebesAI
             return assumedArtifactSum[digSite] / (assumedArtifactCount[digSite] + 16) + bonusToken;
         }
 
+        /// <summary>
+        /// Computes the expected number of tokens drawn
+        /// </summary>
+        /// <param name="digSite">where to dig</param>
+        /// <returns>the expected value</returns>
         public double ExpectedNumberOfTokens(IDigSite digSite)
         {
             int bonusToken = 0;
@@ -83,6 +97,10 @@ namespace ThebesAI
             return assumedArtifactCount[digSite] / (assumedArtifactCount[digSite] + 16) + bonusToken;
         }
 
+        /// <summary>
+        /// Clones this instance
+        /// </summary>
+        /// <returns></returns>
         public override IGame Clone()
         {
             return new DeterministicGame(this);
@@ -90,6 +108,9 @@ namespace ThebesAI
 
     }
 
+    /// <summary>
+    /// A part of the deterministic game
+    /// </summary>
     class DeterministicPlayer : Player
     {
         DeterministicGame game;
@@ -236,12 +257,40 @@ namespace ThebesAI
 
     }
 
+
+    /// <summary>
+    /// Represents a state of the game in a simulation
+    /// </summary>
     public interface ISimulationState
     {
+        /// <summary>
+        /// Returns the state that is the result of the move specified
+        /// </summary>
+        /// <param name="move">Move to take </param>
+        /// <returns>New state</returns>
         ISimulationState NextState(IAction move);
+        
+        /// <summary>
+        /// Returns all possible child states
+        /// </summary>
+        /// <returns>list of child states</returns>
         List<ISimulationState> GetAllChildStates();
+
+        /// <summary>
+        /// The player who's turn it is
+        /// </summary>
         IPlayer ActivePlayer { get; }
+
+        /// <summary>
+        /// Returns a random child of the current state
+        /// </summary>
+        /// <returns>random child</returns>
         ISimulationState RandomChild();
+
+        /// <summary>
+        /// Retrieves the scores of the players in the current state
+        /// </summary>
+        /// <returns>Dictionary of <playerName, score></returns>
         Dictionary<string, double> GetScores();
         Dictionary<string, double> GetExpectedScores();
         IAction Move { get; }
@@ -249,6 +298,9 @@ namespace ThebesAI
 
     }
 
+    /// <summary>
+    /// Represents one state of the game in a simulation
+    /// </summary>
     public class SimulationState : ISimulationState
     {
         public IGame Game { get; private set; }
@@ -480,7 +532,10 @@ namespace ThebesAI
         }   
     }
 
-
+    /// <summary>
+    /// AI agent using the basic MCTS
+    /// </summary>
+    [Serializable]
     public class MCTSAI : IAI
     {
         int ms = 5000;
@@ -499,64 +554,40 @@ namespace ThebesAI
         }
     }
 
-    public class HeuristicCheaterAI : IAI
-    {
-        public HeuristicCheaterAI(int playerCount) { }
-        public IAction TakeAction(IGame gameState)
-        {
-            MCTSNodeCutoff mctsNode = new MCTSNodeCutoff(new SimulationState(gameState), null);
-            return mctsNode.Run(5000);
-        }
-    }
 
-    public class SimCheaterAI : IAI
-    {
-        public SimCheaterAI(int playerCount) { }
-        public IAction TakeAction(IGame gameState)
-        {
-            MCTSNode mctsNode = new MCTSNodeCutoff(new SimulationState(new DeterministicGame((Game)gameState)), null);
-            return mctsNode.Run(5000);
-        }
-    }
-
-    public class FirstYearDFSAI : IAI
-    {
-        public FirstYearDFSAI(int playerCount) { }
-        DFSNode head;
-        public IAction TakeAction(IGame gameState)
-        {
-            DFSNode dfsNode = new DFSNode(new SimulationState(new DeterministicGame((Game)gameState)), null);
-            head = dfsNode;
-            return dfsNode.Run();
-        }
-    }
-
-    public class MCTSEvolutionAI : IAI
+    /// <summary>
+    /// AI agent using MCTS-IR (informed rollouts), uses the given AI as a guide through the rollout
+    /// </summary>
+    [Serializable]
+    public class MCTSIR : IAI
     {
         IAI fastAI;
         int ms = 5000;
         static double explorationConstant = 2;
 
-        public MCTSEvolutionAI(int playerCount)
+        public MCTSIR(int playerCount)
         {
-            this.fastAI = new EvolutionA(playerCount);
+            this.fastAI = new EvolutionB(playerCount);
         }
 
-        public MCTSEvolutionAI(IAI fastAI, int ms, double explorationConstant)
+        public MCTSIR(IAI fastAI, int ms, double explorationConstant)
         {
             this.fastAI = fastAI;
             this.ms = ms;
-            MCTSEvolutionAI.explorationConstant = explorationConstant;
+            MCTSIR.explorationConstant = explorationConstant;
         }
 
         public IAction TakeAction(IGame gameState)
         {
-            MCTSNodeInformedRollout mctsNode = new MCTSNodeInformedRollout(fastAI, new SimulationState(gameState), null, MCTSEvolutionAI.explorationConstant);
+            MCTSNodeInformedRollout mctsNode = new MCTSNodeInformedRollout(fastAI, new SimulationState(gameState), null, MCTSIR.explorationConstant);
             return mctsNode.Run(ms);
         }
     }
 
 
+    /// <summary>
+    /// Represents a node in the game tree, implements the MCTS functionality
+    /// </summary>
     public class MCTSNode
     {
         protected Dictionary<string, double> scores; // string is player name
@@ -596,6 +627,12 @@ namespace ThebesAI
             }
         }
 
+        /// <summary>
+        /// Computes the UCT value for the player specified
+        /// </summary>
+        /// <param name="playerName">name of the player who's perspective to take</param>
+        /// <param name="explorationConstant">exploration constant</param>
+        /// <returns></returns>
         public double UCT(string playerName, double explorationConstant)
         {
             if (visits == 0)
@@ -608,6 +645,11 @@ namespace ThebesAI
             }
         }
 
+        /// <summary>
+        /// The entry point to the simulation, builds the game tree with this node as the root
+        /// </summary>
+        /// <param name="miliseconds">how long to search for</param>
+        /// <returns>The best move it could find in the time specified</returns>
         public IAction Run(int miliseconds)
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -619,6 +661,9 @@ namespace ThebesAI
             return pickBestChild(0).state.Move;
         }
 
+        /// <summary>
+        /// Creates a child node for all descendants of this state
+        /// </summary>
         private void Expand()
         {
             foreach (ISimulationState state in state.GetAllChildStates())
@@ -627,11 +672,18 @@ namespace ThebesAI
             }
         }
         
+        /// <summary>
+        /// Chcecks if this node is a leaf
+        /// </summary>
+        /// <returns>True if leaf</returns>
         private bool IsLeaf()
         {
             return this.children.Count == 0;
         }
         
+        /// <summary>
+        /// Every new MCTS iteration entry point, finds the best leaf according to the UCT
+        /// </summary>
         protected virtual void Traverse() 
         {
             if (IsLeaf())
@@ -660,6 +712,11 @@ namespace ThebesAI
             }
         }
 
+        /// <summary>
+        /// Picks the best child of the current state according to the UCT
+        /// </summary>
+        /// <param name="explorationConstant"></param>
+        /// <returns>The chosen child</returns>
         protected virtual MCTSNode pickBestChild(double explorationConstant)
         {
             MCTSNode bestChild = null;
@@ -678,6 +735,10 @@ namespace ThebesAI
             return bestChild;
         }
 
+        /// <summary>
+        /// Performs an uninformed rollout (random simulation till the end of the game)
+        /// </summary>
+        /// <returns>The scores at the end of the simulated game</returns>
         protected virtual Dictionary<string, double> Rollout()
         {
             ISimulationState randomChild, currentState = this.state;
@@ -688,6 +749,10 @@ namespace ThebesAI
             return currentState.GetScores();
         }
 
+        /// <summary>
+        /// Climbs up the tree back to the root altering the nodes along the way with the scores specified
+        /// </summary>
+        /// <param name="newScores">scores to backpropagate</param>
         private void Backpropagate(Dictionary<string, double> newScores)
         {
             MCTSNode current = this;
@@ -701,6 +766,9 @@ namespace ThebesAI
         }
     }
 
+    /// <summary>
+    /// MCTS variant performing an heurisitic evaluation instead of a rollout. Could be replaced with some of our other AI's  (the heurisitc)
+    /// </summary>
     class MCTSNodeCutoff : MCTSNode
     {
         public MCTSNodeCutoff(ISimulationState state, MCTSNode parent) : base(state, parent)
@@ -715,6 +783,9 @@ namespace ThebesAI
 
     }
 
+    /// <summary>
+    /// MCTS-IR variant, performs a rollout with the specified AI
+    /// </summary>
     public class MCTSNodeInformedRollout : MCTSNode
     {
         IAI ai;
@@ -733,58 +804,5 @@ namespace ThebesAI
             }
             return currentState.GetScores();
         }
-    }
-
-
-    class DFSNode
-    {
-        protected ISimulationState state;
-        //protected List<DFSNode> children;
-        protected DFSNode parent;
-        protected DFSNode bestChild;
-        protected int score;
-
-        public DFSNode(ISimulationState state, DFSNode parent)
-        {
-            score = 0;
-            //children = new List<DFSNode>();
-            this.state = state;
-            this.parent = parent;
-            
-        }
-
-        public double Eval()
-        {
-            if (this.IsTerminal())
-            {
-                return this.state.ActivePlayer.Points;
-            }
-            
-            double maxScore = double.MinValue;
-            double childScore;
-            foreach (ISimulationState state in state.GetAllChildStates())
-            {
-                DFSNode child = new DFSNode(state, this);
-                if ((childScore = child.Eval()) > maxScore)
-                {
-                    maxScore = childScore;
-                    bestChild = child;
-                }
-            }
-            return maxScore;
-        }
-
-        public IAction Run()
-        {
-            this.Eval();
-            return this.bestChild.state.Move;
-        }
-
-        protected bool IsTerminal()
-        {
-            // TODO needs an actual end condition this won't work past the first year
-            return this.state.ActivePlayer.Time.CurrentYear > Time.firstYear;
-        }
-
     }
 }
