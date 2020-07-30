@@ -14,27 +14,9 @@ using System.Runtime.CompilerServices;
 
 namespace ThebesAI
 {
-    /*
-     * Zkusit zohlednit:
-     * 
-     * vemu knihu když jich můžu mít nejvíc
-     * 
-     * 
-     * 
-     */
-
-    /*
-     * POZNAMKY DO BP
-     * 
-     * lineárnost a nelineárnost různejch proměnejch (počet knih - nelineární, čas - lineární)
-     * 
-     * zmínit normalizace vs nenormalizace (v pocketu odkaz na paper v něm jsou odkazy hned v úvodu)
-     * 
-     * náš model nám neumožňuje použít zeppelin správně
-     * 
-     */
-
-
+    /// <summary>
+    /// Legacy class, works with 
+    /// </summary>
     public class Weights : IEnumerable<double>
     {
         static Random random = new Random();
@@ -441,136 +423,83 @@ namespace ThebesAI
         }
     }
 
-    public abstract class Criterion
+    public abstract class SimpleCriterion
     {
         public abstract int WeightsNeeded { get; }
-        protected Weight[] mainWeights;
-        protected Weight[] subWeights;
+        protected Weight[,] mainWeights;
+        protected static int yearsPlayed;
 
-        public Criterion(int mainWeightsLength, int subWeightsCount)
+        public SimpleCriterion(int mainWeightsLength, int subWeightsCount, int yearsPlayed)
         {
-            mainWeights = new Weight[mainWeightsLength];
-            subWeights = new Weight[subWeightsCount];
+            SimpleCriterion.yearsPlayed = yearsPlayed;
+            mainWeights = new Weight[mainWeightsLength, yearsPlayed];
         }
 
         public void ReceiveWeights(Queue<Weight> allocatedWeights)
         {
-            for (int i = 0; i < mainWeights.Length; i++)
+            for (int i = 0; i < mainWeights.GetLength(0); i++)
             {
-                mainWeights[i] = allocatedWeights.Dequeue();
-            }
-
-            for (int i = 0; i < subWeights.Length; i++)
-            {
-                subWeights[i] = allocatedWeights.Dequeue();
-                //for (int j = 0; j < subWeights.GetLength(1); j++)
-                //{
-                //    subWeights[i, j] = allocatedWeights.Dequeue();
-                //}
+                for (int j = 0; j < mainWeights.GetLength(1); j++)
+                {
+                    mainWeights[i, j] = allocatedWeights.Dequeue();
+                }
             }
         }
 
         public abstract double GetScore(ISimulationState gameState, IPlayer player);
-    }
 
-    public class CSpecializedKnowledge : Criterion
-    {
-        public override int WeightsNeeded => 9 + 3;
-
-        public CSpecializedKnowledge() : base(9, 3) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
+        protected static int GetYearIndex(ITime time)
         {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
+            int index = time.CurrentYear - Time.firstYear;
+            if (time.CurrentYear == 1904)
             {
-                weightIndex = Math.Min(mainWeights.Length - 1, player.SpecializedKnowledge[digSite]);
-
-                mainWeight = mainWeights[weightIndex].Value;
-
-                score += mainWeight;
-
-                // remaining weeks in a year
-                score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-                // years left
-                score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-                // artifact value sum at the dig site
-                score += mainWeight * subWeights[2].Value * (gameState.Game.ArtifactSum(digSite));
+                index--;
             }
-
-            return score;
+            return index;
         }
     }
 
-    public class CSingleUseKnowledge : Criterion
+    public class SCSpecializedKnowledge : SimpleCriterion
     {
-        public override int WeightsNeeded => 9 + 3;
+        public override int WeightsNeeded => 8 * yearsPlayed;
 
-        public CSingleUseKnowledge() : base(9, 3) { }
+        public SCSpecializedKnowledge(int years) : base(8, 0, years) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
             double score = 0;
-            double mainWeight;
             int weightIndex;
 
             foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
             {
-                weightIndex = Math.Min(mainWeights.Length - 1, player.SingleUseKnowledge[digSite]);
-
-                mainWeight = mainWeights[weightIndex].Value;
-
-                score += mainWeight;
-
-                // remaining weeks in a year
-                score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-                // years left
-                score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-                // artifact value sum at the dig site
-                score += mainWeight * subWeights[2].Value * (gameState.Game.ArtifactSum(digSite));
-            }
-
-            return score;
-        }
-    }
-
-    public class CPermissions : Criterion
-    {
-        public override int WeightsNeeded => 1 + 3;
-
-        public CPermissions() : base(1, 3) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
-            {
-                weightIndex = 0;
-
-                mainWeight = mainWeights[weightIndex].Value;
-
-                if (player.Permissions[digSite])
+                if (player.SpecializedKnowledge[digSite] > 0)
                 {
-                    score += mainWeight;
+                    weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.SpecializedKnowledge[digSite] - 1);
 
-                    // remaining weeks in a year
-                    score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
+                    score += mainWeights[weightIndex, GetYearIndex(player.Time)].Value;
+                } 
+            }
 
-                    // years left
-                    score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
+            return score;
+        }
+    }
 
-                    // artifact value sum at the dig site
-                    score += mainWeight * subWeights[2].Value * (gameState.Game.ArtifactSum(digSite));
+    public class SCSingleUseKnowledge : SimpleCriterion
+    {
+        public override int WeightsNeeded => 1 * yearsPlayed;
+
+        public SCSingleUseKnowledge(int years) : base(1, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+
+            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
+            {
+                // player can only have 2 or 0 singleUseKnowledge
+                if (player.SingleUseKnowledge[digSite] == 2)
+                {
+                    score += mainWeights[0, GetYearIndex(player.Time)];
                 }
             }
 
@@ -578,243 +507,191 @@ namespace ThebesAI
         }
     }
 
-    public class CGeneralKnowledge : Criterion
+    public class SCPermissions : SimpleCriterion
     {
-        public override int WeightsNeeded => 9 + 4;
+        public override int WeightsNeeded => 1 * yearsPlayed;
 
-        public CGeneralKnowledge() : base(9, 4) { }
+        public SCPermissions(int years) : base(1, 0, years) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
             double score = 0;
             double mainWeight;
-            int weightIndex;
 
-
-            weightIndex = Math.Min(mainWeights.Length - 1, player.GeneralKnowledge);
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            score += mainWeight;
-
-            // remaining weeks in a year
-            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-            // years left
-            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-            // consider number of assistants
-            score += mainWeight * subWeights[2].Value * player.Assistants;
-
-            // consider number of shovels
-            score += mainWeight * subWeights[3].Value * player.Shovels;
-
-
-            return score;
-        }
-    }
-
-    public class CShovels : Criterion
-    {
-        public override int WeightsNeeded => 5 + 4;
-
-        public CShovels() : base(5, 4) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-
-            weightIndex = Math.Min(mainWeights.Length - 1, player.Shovels);
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            score += mainWeight;
-
-            // remaining weeks in a year
-            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-            // years left
-            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-            // consider number of assistants
-            score += mainWeight * subWeights[2].Value * player.Assistants;
-
-            // consider number of general knowledge
-            score += mainWeight * subWeights[3].Value * player.GeneralKnowledge;
-
-            return score;
-        }
-    }
-
-    public class CAssistants : Criterion
-    {
-        public override int WeightsNeeded => 5 + 4;
-
-        public CAssistants() : base(5, 4) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-
-            weightIndex = Math.Min(mainWeights.Length - 1, player.Assistants);
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            score += mainWeight;
-
-            // remaining weeks in a year
-            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-            // years left
-            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-            // consider number of general knowledge
-            score += mainWeight * subWeights[2].Value * player.GeneralKnowledge;
-
-            // consider number of shovels
-            score += mainWeight * subWeights[3].Value * player.Shovels;
-
-            return score;
-        }
-    }
-
-    public class CSpecialPermissions : Criterion
-    {
-        public override int WeightsNeeded => 3 + 2;
-
-        public CSpecialPermissions() : base(3, 2) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-
-            weightIndex = Math.Min(mainWeights.Length - 1, player.SpecialPermissions);
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            score += mainWeight;
-
-            // remaining weeks in a year
-            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-            // years left
-            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-            return score;
-        }
-    }
-
-    public class CZeppelins : Criterion
-    {
-        public override int WeightsNeeded => 3 + 2;
-
-        public CZeppelins() : base(3, 2) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-
-            weightIndex = Math.Min(mainWeights.Length - 1, player.Zeppelins);
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            score += mainWeight;
-
-            // remaining weeks in a year
-            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-            // years left
-            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-            return score;
-        }
-    }
-
-    public class CCongresses : Criterion
-    {
-        public override int WeightsNeeded => 9 + 2;
-
-        public CCongresses() : base(9, 2) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-
-            weightIndex = Math.Min(mainWeights.Length - 1, player.Congresses);
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            score += mainWeight;
-
-            // remaining weeks in a year
-            score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-            // years left
-            score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
-
-            return score;
-        }
-    }
-
-    public class CCar : Criterion
-    {
-        public override int WeightsNeeded => 1 + 2;
-
-        public CCar() : base(1, 2) { }
-
-        public override double GetScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-            double mainWeight;
-            int weightIndex;
-
-
-            weightIndex = 0;
-
-            mainWeight = mainWeights[weightIndex].Value;
-
-            if (player.Cars > 0)
+            mainWeight = mainWeights[0, GetYearIndex(player.Time)].Value;
+            foreach (IDigSite digSite in gameState.Game.DigsiteInventory.Keys)
             {
-                score += mainWeight;
-
-                // remaining weeks in a year
-                score += mainWeight * subWeights[0].Value * (Time.weeksInAYear - player.Time.CurrentWeek);
-
-                // years left
-                score += mainWeight * subWeights[1].Value * (Time.finalYear - player.Time.CurrentYear);
+                if (player.Permissions[digSite])
+                {
+                    score += mainWeight;
+                }
             }
 
             return score;
         }
     }
 
-    public class CPoints : Criterion
+    public class SCGeneralKnowledge : SimpleCriterion
     {
-        public override int WeightsNeeded => 1 + 1;
+        public override int WeightsNeeded => 8 * yearsPlayed;
 
-        public CPoints() : base(1, 1) { }
+        public SCGeneralKnowledge(int years) : base(8, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            int weightIndex;
+
+            if (player.GeneralKnowledge > 0)
+            {
+                weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.GeneralKnowledge - 1);
+                score += mainWeights[weightIndex, GetYearIndex(player.Time)].Value;
+            }
+
+
+            return score;
+        }
+    }
+
+    public class SCShovels : SimpleCriterion
+    {
+        public override int WeightsNeeded => 4 * yearsPlayed;
+
+        public SCShovels(int years) : base(4, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            int weightIndex;
+
+            if (player.Shovels > 0)
+            {
+                weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.Shovels - 1);
+                score += mainWeights[weightIndex, GetYearIndex(player.Time)];
+            }
+
+            return score;
+        }
+    }
+
+    public class SCAssistants : SimpleCriterion
+    {
+        public override int WeightsNeeded => 4 * yearsPlayed;
+
+        public SCAssistants(int years) : base(4, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            int weightIndex;
+
+            if (player.Assistants > 0)
+            {
+                weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.Assistants - 1);
+                score += mainWeights[weightIndex, GetYearIndex(player.Time)];
+            }
+
+            return score;
+        }
+    }
+
+    public class SCSpecialPermissions : SimpleCriterion
+    {
+        public override int WeightsNeeded => 2 * yearsPlayed;
+
+        public SCSpecialPermissions(int years) : base(2, 0, years) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
             double score = 0;
             double mainWeight;
             int weightIndex;
-            int points = player.Points;
+
+            if (player.SpecialPermissions > 0)
+            {
+                weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.SpecialPermissions - 1);
+                score += mainWeights[weightIndex, GetYearIndex(player.Time)];
+            }
+            
+            return score;
+        }
+    }
+
+    public class SCZeppelins : SimpleCriterion
+    {
+        public override int WeightsNeeded => 2 * yearsPlayed;
+
+        public SCZeppelins(int years) : base(2, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+
+            if (player.Zeppelins > 0)
+            {
+                weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.Zeppelins - 1);
+                score += mainWeights[weightIndex, 0];
+            }
+
+            return score;
+        }
+    }
+
+    public class SCCongresses : SimpleCriterion
+    {
+        public override int WeightsNeeded => 8 * yearsPlayed;
+
+        public SCCongresses(int years) : base(8, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            int weightIndex;
+
+            if (player.Congresses > 0)
+            {
+                weightIndex = Math.Min(mainWeights.GetLength(0) - 1, player.Congresses - 1);
+
+                score += mainWeights[weightIndex, GetYearIndex(player.Time)].Value;
+            }
+
+            return score;
+        }
+    }
+
+    public class SCCar : SimpleCriterion
+    {
+        public override int WeightsNeeded => 1 * yearsPlayed;
+
+        public SCCar(int years) : base(1, 0, years) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+
+            if (player.Cars > 0)
+            {
+                score += mainWeights[0, GetYearIndex(player.Time)];
+            }
+
+            return score;
+        }
+    }
+
+    public class SCPoints : SimpleCriterion
+    {
+        public override int WeightsNeeded => 2 * yearsPlayed;
+
+        public SCPoints(int year) : base(2, 0, year) { }
+
+        public override double GetScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+            double mainWeight;
+            int weightIndex;
+            double points = player.Points;
 
             // add end game points for most knowledge
 
@@ -826,7 +703,7 @@ namespace ThebesAI
                 // our player has the most of this knowledge (5 points)
                 if (sortedPlayers[0] == player && sortedPlayers[0].SpecializedKnowledge[digSite] > 0 && sortedPlayers[0].SpecializedKnowledge[digSite] > sortedPlayers[1].SpecializedKnowledge[digSite])
                 {
-                    points += 5;
+                    points += 5 * mainWeights[1, GetYearIndex(player.Time)];
                 }
 
                 // our player shares the first place with another (3 points)
@@ -836,721 +713,43 @@ namespace ThebesAI
                     {
                         if (p == player && p.SpecializedKnowledge[digSite] == sortedPlayers[0].SpecializedKnowledge[digSite])
                         {
-                            points += 3;
+                            points += 3 * mainWeights[1, GetYearIndex(player.Time)];
                         }
                     }
                 }
             }
 
 
-            weightIndex = 0;
-
-            mainWeight = mainWeights[weightIndex].Value;
-
             // points * point weight
-            score += mainWeight * points;
-
-            // points * point weight * time (adjusted for importance of points as game progresses)
-            score += mainWeight * subWeights[0].Value * player.Time.RemainingWeeks();
+            score += mainWeights[0, GetYearIndex(player.Time)] * points;
 
             return score;
         }
     }
 
-    public class CTime : Criterion
+    public class SCTime : SimpleCriterion
     {
-        public override int WeightsNeeded => 1;
+        public override int WeightsNeeded => 1 * yearsPlayed;
 
-        public CTime() : base(1, 0) { }
+        public SCTime(int years) : base(1, 0, years) { }
 
         public override double GetScore(ISimulationState gameState, IPlayer player)
         {
             // weeks left * weight
-            return mainWeights[0].Value * player.Time.RemainingWeeks();
+            return mainWeights[0, 0].Value * player.Time.RemainingWeeks();
         }
     }
 
-    public class BetterEvolutionAI : IAI
+    public abstract class EvolutionAI : IAI
     {
         protected static Random random = new Random();
-
-        public List<Criterion> criteria;
         public Weight[] weights;
 
-        public BetterEvolutionAI(int playerCount)
-        {
-            criteria = new List<Criterion>()
-            {
-                new CSpecializedKnowledge(),
-                new CSingleUseKnowledge(),
-                new CPermissions(),
-                new CGeneralKnowledge(),
-                new CShovels(),
-                new CAssistants(),
-                new CSpecialPermissions(),
-                new CZeppelins(),
-                new CCongresses(),
-                new CCar(),
-                new CPoints(),
-                new CTime()
-            };
-
-            if (playerCount == 4)
-            {
-                // weights for 4 players
-                this.weights = new Weight[]
-                {
-                    // specialized knowledge
-                    0.42004296892324611,
-                    -0.818461915393575,
-                    -0.54748546990914515,
-                    0.83807727817978017,
-                    0.15084000544195986,
-                    -0.99874596676066185,
-                    -0.58703298847518537,
-                    0.463045426394346,
-                    -0.86260575841302323,
-                    
-                    // weeks
-                    0.28679804414827292,
-                    // years
-                    0.79360022361098714,
-                    // artifact sum
-                    0.075872685143664853,
-
-                    // single use knowledge
-                    0.87755356305990206,
-                    -0.535265872038559,
-                    0.99902306910725558,
-                    -0.95844962073417828,
-                    0.5149794649609325,
-                    -0.90484993825892446,
-                    0.3874039985180851,
-                    0.37813316657120977,
-                    -0.66637607182673,
-
-                    // weeks
-                    -0.63361976757024674,
-                    // years
-                    -0.3725473116955475,
-                    // artifact sum
-                    0.60073583871160452,
-
-                    // permissions
-                    -0.37595237045360375,
-                    // weeks
-                    0.27603217376211292,
-                    // years
-                    0.51401554733236121,
-                    // artifact sum
-                    -0.9365770159922332,
-
-                    // general knowledge
-                    0.45221705932739054,
-                    0.90186378075828011,
-                    0.81131576318794862,
-                    -0.29125959625991965,
-                    0.20680804355387014,
-                    -0.93272548352029427,
-                    -0.66890348739405325,
-                    -0.35518575653209628,
-                    -0.49826974882663677,
-
-                    // weeks
-                    -0.3651672798046689,
-                    // years
-                    0.98805166873524519,
-
-                    // assistants
-                    0.52038567611965625,
-
-                    // shovels (general knowledge)
-                    0.72742714449523938,
-
-                    // shovels
-                    0.11979749171053872,
-                    0.47059414995396237,
-                    -0.58989587071812521,
-                    0.95649356500015192,
-                    -0.11476395359019,
-
-
-                    -0.390811438388569,
-                    0.28648738026921039,
-                    0.30220084139248393,
-                    0.12119391622077391,
-                    -0.33934856175414685,
-                    0.822659646521672,
-                    0.9708634436926169,
-                    0.61543741771228277,
-                    0.059203204726429204,
-                    0.99726961234634126,
-                    -0.19914564667229798,
-                    0.9968041684645611,
-                    -0.26287332627124776,
-
-                    // special permissions
-                    0.32278357563669968,
-                    0.95226414183365649,
-                    -0.95472040054993623,
-                    0.028524281004687957,
-                    -0.12759176927040875,
-                    0.17491003944301517,
-                    -0.49996727687870329,
-                    -0.71896863641169317,
-                    0.98724060539573766,
-                    0.93632007145923757,
-                    0.50653673219798923,
-                    0.35933402877269971,
-                    -0.31541888756464187,
-                    -0.73814792639489657,
-                    0.66578906469966781,
-                    0.30607861713789331,
-                    0.57812387765297846,
-                    0.004417104276091384,
-                    -0.60692855753327191,
-                    -0.060101471683057711,
-                    -0.56773675306129112,
-                    0.10703382739193458,
-                    -0.58801435129455482,
-                    0.982136293440222,
-                    0.43515717072186866,
-                    0.6852884224305712,
-                    -0.66338062580243828
-                };
-            }
-            else if (playerCount == 3)
-            {
-                // weights for 3 players
-                this.weights = new Weight[]
-                {
-                    -0.18522094031107647,
-                    0.89581203187881941,
-                    -0.80386954900057506,
-                    0.64303676301754875,
-                    -0.26214708791214381,
-                    0.7372193486137405,
-                    0.51218219060086756,
-                    -0.28765585370718316,
-                    0.22469345211269956,
-                    0.048992483247533691,
-                    -0.98378923720856626,
-                    -0.925193685535681,
-                    0.87355069879137859,
-                    -0.48868354302304035,
-                    0.865731937655123,
-                    -0.64614974233664213,
-                    -0.73144844683420285,
-                    0.34801499049552476,
-                    0.76922551699412323,
-                    0.98996158428504355,
-                    -0.26192852149807316,
-                    -0.30694608842346172,
-                    -0.293328895556428,
-                    0.38196157244125462,
-                    -0.292281087996569,
-                    0.264745065600027,
-                    -0.98674763691988776,
-                    -0.38750331624760448,
-                    -0.535479565573724,
-                    0.54380230286335685,
-                    -0.1696249422475811,
-                    0.03827630488121718,
-                    0.02482243991681473,
-                    -0.84057064840596662,
-                    0.57648476444952423,
-                    0.10202538766992528,
-                    -0.79505149852391577,
-                    0.118372205234306,
-                    -0.55010363401384266,
-                    0.0032522416688746392,
-                    0.89615847014764838,
-                    -0.99987681812763274,
-                    0.27352601255920073,
-                    -0.80470501063610667,
-                    -0.16362328043376251,
-                    -0.30511196148819841,
-                    -0.8398675058222691,
-                    0.1195098215339285,
-                    0.48622028412587021,
-                    -0.98448986504329372,
-                    0.10238309935777588,
-                    0.954608530702664,
-                    -0.6565630456696091,
-                    -0.908717741849949,
-                    -0.25317381101342562,
-                    -0.26688948323339662,
-                    0.71568354428586323,
-                    0.52823634591337121,
-                    0.69076365869993506,
-                    0.90146879484014064,
-                    -0.29926244881901076,
-                    -0.0549768807268583,
-                    -0.46185517472301391,
-                    -0.71717999452070236,
-                    0.79566414081774539,
-                    -0.75848037179488714,
-                    -0.17089281732723713,
-                    0.6023666321310992,
-                    0.12482507392988784,
-                    0.49849453116697012,
-                    -0.42255877397142305,
-                    -0.93169190647624989,
-                    -0.2713185741898223,
-                    -0.26502732544440177,
-                    -0.64635322803927275,
-                    0.01872636779152162,
-                    -0.57011255266615768,
-                    0.3071111812755053,
-                    -0.72523419974615533,
-                    -0.44166864838528846,
-                    0.37518007949701526,
-                    -0.9420852304623597,
-                    -0.46425153811660214,
-                    0.8037225285562325,
-                    0.83141913554779856,
-                    -0.70126896291098983
-                };
-            }
-            else if (playerCount == 2)
-            {
-                // weights for 2 players
-                this.weights = new Weight[]
-                {
-                    0.41134740328944625,
-                    0.46290454532155045,
-                    -0.034025889464666143,
-                    -0.99831479100270915,
-                    -0.01693038531436114,
-                    -0.87419995457292354,
-                    0.602526585293248,
-                    0.11318096682111786,
-                    -0.025248216104343663,
-                    0.41108761719013,
-                    0.346756369423155,
-                    -0.59595866101385475,
-                    0.051530609117602377,
-                    0.17360262315368166,
-                    0.11822697693399466,
-                    0.839896370768499,
-                    -0.61311124020047092,
-                    0.794201902133286,
-                    0.73621486347332588,
-                    -0.27887204693577805,
-                    0.5107488920496539,
-                    0.71480022143330446,
-                    0.16304664032675625,
-                    -0.59078236380162763,
-                    0.21515035629977963,
-                    0.30659354538963812,
-                    -0.30259161205151663,
-                    0.306719309897051,
-                    -0.24432600142635685,
-                    -0.70096216513820087,
-                    -0.98489538297245338,
-                    -0.80963769546227438,
-                    0.58297507007744853,
-                    -0.44860063570020764,
-                    -0.83548744863076674,
-                    0.52694221886402537,
-                    0.81857053596970453,
-                    -0.59197645317389469,
-                    0.053402122321260195,
-                    -0.81852979763559885,
-                    -0.90504709381665682,
-                    -0.52694723435069757,
-                    -0.093910759731154286,
-                    -0.99719524531550519,
-                    0.24860271674050138,
-                    -0.91676096970588028,
-                    -0.12016331018887616,
-                    -0.35628890681839032,
-                    -0.35901964111082907,
-                    -0.9554909886789078,
-                    -0.95721553815308091,
-                    -0.48567207049842553,
-                    0.25553860021324815,
-                    0.5768292078640449,
-                    -0.91516482723510317,
-                    0.75775365082442481,
-                    0.46375568222358382,
-                    -0.48767631784438908,
-                    -0.49147212975261362,
-                    0.94469157390253977,
-                    -0.863762956549951,
-                    0.59043841165976518,
-                    0.676834295914287,
-                    0.71818005550568009,
-                    -0.83554368635432041,
-                    0.22551479936834179,
-                    0.47286925626586629,
-                    -0.98611975029783872,
-                    -0.73972558013150747,
-                    0.37342424465968477,
-                    -0.14114864400641478,
-                    -0.00801276369393461,
-                    0.55965152604489177,
-                    -0.33836467933764897,
-                    -0.86828014568364975,
-                    -0.19742864407479221,
-                    -0.10331513774735622,
-                    -0.075158732512573823,
-                    0.25691794234184462,
-                    0.18436680854501528,
-                    -0.64802510945500114,
-                    0.41431705868538338,
-                    0.9986806247326443,
-                    0.79426169534877944,
-                    -0.46931187075996378,
-                    0.15053798637843582
-                };
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException("Invalid number of players");
-            }
-
-            //this.weights = new Weight[]
-            //{
-            //    1.2243084497991237e-71,
-            //    -3.530436853005161e-50,
-            //    -8.208852961510335e-82,
-            //    1.2953884364553836e-91,
-            //    -4.111744622225419e-86,
-            //    -3.521632634965802e-44,
-            //    3.639760356501169e-72,
-            //    -1.227065307537201e-35,
-            //    -7.333411945532716e-82,
-            //    -1.5200341552835515e-70,
-            //    -1.3900588525232612e-90,
-            //    7.167940872157079e-88,
-            //    2.8889238572627056e-70,
-            //    -2.348278738977676e-61,
-            //    -2.7309483172827976e-81,
-            //    5.326159634958654e-71,
-            //    -2.8491833736882204e-79,
-            //    -1.18050386644939e-80,
-            //    -8.644509706740843e-50,
-            //    1.2224828108642408e-87,
-            //    -2.677858182840602e-47,
-            //    2.1190143640728934e-72,
-            //    -2.398769245534746e-87,
-            //    -3.459525132851405e-10,
-            //    9.033685106589897e-82,
-            //    1.3276268883801298e-89,
-            //    7.778349229008317e-73,
-            //    -7.177797998518349e-63,
-            //    1.5454710949619094e-64,
-            //    -1.1178362786983964e-79,
-            //    -1.2544271017304697e-75,
-            //    7.578275619632956e-60,
-            //    -2.0531220417869518e-78,
-            //    -4.334187719334211e-54,
-            //    -4.945287780620139e-68,
-            //    -5.396271243462965e-78,
-            //    1.2063803228737208e-91,
-            //    -1.0776294009751257e-77,
-            //    3.9004246444748936e-79,
-            //    5.819604398734575e-17,
-            //    -2.3430234803642405e-73,
-            //    -1.3987506448227614e-77,
-            //    9.113516994198352e-79,
-            //    -7.32169595028998e-71,
-            //    -2.1400371588395845e-55,
-            //    -3.804296843041148e-22,
-            //    -9.34289341456395e-87,
-            //    3.045932704960982e-55,
-            //    7.778458696316704e-36,
-            //    1.7415529966839343e-92,
-            //    -9.01356646967168e-11,
-            //    1.3548168982616625e-53,
-            //    -1.1696749848247006e-74,
-            //    -3.3129230204262105e-78,
-            //    4.709095482614014e-52,
-            //    5.015252720735729e-79,
-            //    -5.573052180087497e-90,
-            //    -5.617351116200448e-78,
-            //    2.2703043931460284e-69,
-            //    -6.953878716679261e-70,
-            //    9.384087458257445e-58,
-            //    3.152476336925059e-74,
-            //    -1.7646455876768747e-55,
-            //    -1.877788759867031e-72,
-            //    -1.932499938807948e-58,
-            //    3.8910133253105e-82,
-            //    -8.753098001159325e-77,
-            //    4.019561970478813e-73,
-            //    -7.29428816401581e-80,
-            //    3.1313563103435717e-80,
-            //    -8.945379758004847e-58,
-            //    -1.0414507213886696e-73,
-            //    1.776643909731047e-82,
-            //    -7.909806169497701e-69,
-            //    8.604429201931234e-83,
-            //    -5.30588236645631e-88,
-            //    -6.0174410716735625e-37,
-            //    -1.3388461609206404e-37,
-            //    4.135406908294625e-45,
-            //    9.961264848453039e-87,
-            //    3.690427952651561e-70,
-            //    -0.0000039281173175389075,
-            //    2.5750185201902195e-66,
-            //    -8.701742624441452e-29,
-            //    7.1971695477966715e-84,
-            //    -9.056043028032425e-69,
-            //    8.675241363522308e-71,
-            //    -1.5490447664647754e-73,
-            //    -8.927568868029489e-78,
-            //    -3.350882474559033e-73,
-            //    2.436753267309452e-85,
-            //    -0.000966551556260041,
-            //    -8.286331828535277e-65,
-            //    -8.217369934529178e-43,
-            //    2.4041198999253315e-68,
-            //    -1.2516281519351828e-77,
-            //    -8.526580936770401e-70,
-            //    1.817382823144913e-55,
-            //    1.1482133825570278e-92,
-            //    1.4710514970917792e-88,
-            //    -2.5821882499297065e-87,
-            //    -5.705783169700445e-68,
-            //    -4.623259948517564e-83,
-            //    -2.148285250251597e-79,
-            //    1.6798900057138798e-48,
-            //    -2.2620002344323243e-71,
-            //    1.4987325849367441e-90,
-            //    -3.19398560853742e-66,
-            //    4.2579691795752584e-79,
-            //    6.01077080723869e-71,
-            //    -1.5102006383858075e-60,
-            //    1.0380087233752108e-86,
-            //    1.2115138945935349e-61,
-            //    8.052998755074214e-65,
-            //    -3.232253970646156e-68,
-            //    -5.371197301301626e-27,
-            //    -3.7445378986705926e-78,
-            //    -1.2897130944446438e-60,
-            //    -1.0823945537876856e-75,
-            //    2.5152494946436868e-65,
-            //    5.429648533544136e-58,
-            //    7.037223975270087e-87,
-            //    3.5390661316177025e-88,
-            //    3.378095579027258e-78,
-            //    1.6798841555189277e-85,
-            //    3.323235085734913e-74,
-            //    -1.6316953977728203e-82,
-            //    6.505457097386954e-62,
-            //    -3.585596973213483e-67,
-            //    2.398746836665616e-69,
-            //    -3.0064340643921375e-78,
-            //    7.13672976245117e-52,
-            //    8.523961434647718e-89,
-            //    -5.305027074109728e-78,
-            //    7.160683001324848e-75,
-            //    3.6663894010208925e-86,
-            //    6.076074859161301e-70,
-            //    3.593238413415383e-68,
-            //    2.7938652682509055e-82,
-            //    -3.573131792407269e-56,
-            //    -6.400362412735803e-59,
-            //    4.2159683469225124e-61,
-            //    -8.521321780487519e-45,
-            //    8.022161241279014e-88,
-            //    -5.792869524268589e-73,
-            //    -8.707339230651963e-81,
-            //    -1.8291474502783196e-51,
-            //    -7.612334999888518e-8,
-            //    3.3613670675664953e-78,
-            //    9.087679381191283e-68,
-            //    -1.5953741338195885e-75,
-            //    7.279888411768805e-65,
-            //    -8.534745620311444e-82,
-            //    7.472235117401435e-65,
-            //    1.0417853071121063e-50,
-            //    -2.1757932773345105e-82,
-            //    6.367505801334348e-87,
-            //    7.098346414087372e-68,
-            //    2.0056018934763585e-87,
-            //    -4.9756812966934605e-98,
-            //    -2.2127683910825345e-80,
-            //    -1.5015260999242632e-72,
-            //    3.235306115059654e-45,
-            //    -1.4675554867610345e-9,
-            //    -3.048289664624658e-72,
-            //    -0.000003358411238723024,
-            //    -9.412561528032283e-66,
-            //    1.8413961482212935e-66,
-            //    4.387494593079372e-62,
-            //    -3.4823329405161405e-44,
-            //    -9.712290624655452e-88,
-            //    6.159019339033206e-79,
-            //    1.5951933951624834e-60,
-            //    8.113708775016778e-84,
-            //    9.28938040763493e-70,
-            //    8.670284782470976e-88,
-            //    3.7511867613227223e-81,
-            //    -1.563622810039548e-67,
-            //    -1.1550797100320747e-69,
-            //    6.232724329279303e-84,
-            //    -6.837823875087702e-83,
-            //    -1.534449811674169e-35,
-            //    1.9246994415858514e-77,
-            //    1.1034482002072507e-54,
-            //    -4.015817698595511e-59,
-            //    7.624780446596304e-77,
-            //    6.890181966776087e-80,
-            //    2.4163093500461633e-48,
-            //    3.455115748625997e-82,
-            //    -1.9624763255263236e-76,
-            //    -8.825153922049766e-82,
-            //    4.876314545323031e-70,
-            //    4.575611743793934e-75,
-            //    -1.32428891661484e-74,
-            //    -7.3263711664671674e-62,
-            //    -4.734482660136632e-75,
-            //    1.7749281749653538e-99,
-            //    -5.0017698590531916e-71,
-            //    1.7278755692964047e-64,
-            //    -2.8930765529686636e-73,
-            //    2.2608736957698019e-69,
-            //    -0.00044604339140172583,
-            //    -2.357925468642044e-89,
-            //    -4.286216665439247e-58,
-            //    1.4978828359311542e-40,
-            //    1.7695523969001554e-31,
-            //    2.0840184249526874e-61,
-            //    -1.9217479424199257e-74,
-            //    -4.1938375782580685e-57,
-            //    2.6501988751676535e-73,
-            //    -1.1612470965304571e-79,
-            //    -3.1538658895682697e-74,
-            //    -1.936322628214626e-30,
-            //    3.918563134120961e-61,
-            //    1.2318915445888919e-79,
-            //    -8.22704951828408e-80,
-            //    -1.1163218397153994e-84,
-            //    3.345397911129507e-75,
-            //    -1.9590321780699372e-88,
-            //    2.7339166593131477e-60,
-            //    2.1723250587590266e-73,
-            //    2.7349226979052956e-71
-            //};
-
-            // Provide the criteria with the weights
-            Queue<Weight> weightsQueue = new Queue<Weight>(weights);
-            foreach (Criterion criterion in criteria)
-            {
-                criterion.ReceiveWeights(weightsQueue);
-            }
-        }
-
-
-        /// <summary>
-        /// Creates AI with provided weights if not null. If null the weights will be random
-        /// </summary>
-        /// <param name="weights">weights to create the AI with</param>
-        public BetterEvolutionAI(Weight[] assignedWeights = null)
-        {
-            criteria = new List<Criterion>()
-            {
-                new CSpecializedKnowledge(),
-                new CSingleUseKnowledge(),
-                new CPermissions(),
-                new CGeneralKnowledge(),
-                new CShovels(),
-                new CAssistants(),
-                new CSpecialPermissions(),
-                new CZeppelins(),
-                new CCongresses(),
-                new CCar(),
-                new CPoints(),
-                new CTime()
-            };
-
-            if (assignedWeights == null)
-            {
-                int weightCount = criteria.Sum(c => c.WeightsNeeded);
-                weights = new Weight[weightCount];
-
-                for (int i = 0; i < weightCount; i++)
-                {
-                    weights[i] = new Weight(RandomDouble(0, 1));
-                }
-            }
-            else
-            {
-                this.weights = assignedWeights;
-            }
-
-            // Provide the criteria with the weights
-            Queue<Weight> weightsQueue = new Queue<Weight>(weights);
-            foreach (Criterion criterion in criteria)
-            {
-                criterion.ReceiveWeights(weightsQueue);
-            }
-        }
-
-
-        protected virtual double EvalScore(ISimulationState gameState, IPlayer player)
-        {
-            double score = 0;
-
-            foreach (Criterion criterion in criteria)
-            {
-                score += criterion.GetScore(gameState, player);
-            }
-
-            return score;
-        }
-
-        public IAction TakeAction(IGame gameState)
-        {
-            string playerName = gameState.ActivePlayer.Name;
-
-            // generate all possible moves and their resulting game states
-            List<ISimulationState> possibleStates = new SimulationState(new DeterministicGame((Game)gameState)).GetAllChildStates();
-
-            double bestScore = double.MinValue;
-            SimulationState bestState = null;
-
-            // TODO debugging
-            Dictionary<IAction, double> moveScores = new Dictionary<IAction, double>();
-
-
-            // Evaluate all child states and pick the best one
-            double score;
-            foreach (SimulationState state in possibleStates)   
-            {
-                score = EvalScore(state, state.Game.Players.First(p => p.Name.Equals(playerName)));
-                // TODO debugging
-                moveScores[state.Move] = score;
-
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestState = state;
-                }
-            }
-
-            return bestState.Move;
-        }
+        public abstract IAction TakeAction(IGame gameState);
 
         protected static double RandomDouble(double lowerBound, double upperBound)
         {
             return random.NextDouble() * (upperBound - lowerBound) + lowerBound;
-        }
-
-        public static BetterEvolutionAI Procreate(params BetterEvolutionAI[] parents)
-        {
-            // assuming all parents have the same number of weights
-            Weight[] newWeights = new Weight[parents[0].weights.Length];
-
-            for (int i = 0; i < newWeights.Length; i++)
-            {
-                newWeights[i] = parents[random.Next(parents.Length)].weights[i];
-            }
-
-            return new BetterEvolutionAI(newWeights);
         }
 
         public void Mutate(double probability, double minRange, double minRangeProportion)
@@ -1642,6 +841,522 @@ namespace ThebesAI
                 }
             }
         }
+    }
+
+    public class EvolutionB : EvolutionAI
+    {
+        
+
+        public List<SimpleCriterion> criteria;
+
+        public EvolutionB(int playerCount)
+        {
+            int yearsPlayed = 3;
+            if (playerCount == 4)
+            {
+                yearsPlayed = 2;
+            }
+            criteria = new List<SimpleCriterion>()
+            {
+                new SCSpecializedKnowledge(yearsPlayed),
+                new SCSingleUseKnowledge(yearsPlayed),
+                new SCPermissions(yearsPlayed),
+                new SCGeneralKnowledge(yearsPlayed),
+                new SCShovels(yearsPlayed),
+                new SCAssistants(yearsPlayed),
+                new SCSpecialPermissions(yearsPlayed),
+                new SCZeppelins(yearsPlayed),
+                new SCCongresses(yearsPlayed),
+                new SCCar(yearsPlayed),
+                new SCPoints(yearsPlayed),
+                new SCTime(yearsPlayed)
+            };
+
+            if (playerCount == 4)
+            {
+                // weights for 4 players
+                this.weights = new Weight[]
+                {
+                    0.16386060932776517,
+                    0.20306987203800567,
+                    0.0030143131268541641,
+                    0.11042700578012829,
+                    0.64895792191334,
+                    0.59872672588039466,
+                    0.58312370741419672,
+                    0.64127919508203846,
+                    0.0910220714011333,
+                    0.45888388420403187,
+                    0.093351691904432432,
+                    0.26252489507315913,
+                    0.66712724332524753,
+                    0.71767350326649548,
+                    0.58472637512475545,
+                    0.82853642468272548,
+                    0.73196238632405286,
+                    0.09039282121923084,
+                    0.66000869290903619,
+                    0.673887286299787,
+                    0.48818674189419803,
+                    0.66173535019050833,
+                    0.73984211382448772,
+                    0.55893560387610253,
+                    0.12875431099848556,
+                    0.67362661281303793,
+                    0.041211182810907784,
+                    0.79047894093257232,
+                    0.00777092581721461,
+                    0.69680630490035089,
+                    0.87306500585892477,
+                    0.68147991217276072,
+                    0.99580782067109241,
+                    0.77477228830977285,
+                    0.7552557108482606,
+                    0.17450057085292289,
+                    0.05951313863485732,
+                    0.48166995715893363,
+                    0.41177598555189382,
+                    0.40195991314589574,
+                    0.015574676817043297,
+                    0.20253476996558475,
+                    0.35264992506832343,
+                    0.71071119767646862,
+                    0.92336300344678357,
+                    0.26755731049010589,
+                    0.79758384871155164,
+                    0.24617274647866039,
+                    0.47000594850164168,
+                    0.27085260389805832,
+                    0.99863335214321358,
+                    0.30719928802326285,
+                    0.4414100541926036,
+                    0.03198764194558909,
+                    0.17764855761902809,
+                    0.12304834380071159,
+                    0.24953554333166017,
+                    0.69314245079724446,
+                    0.1643351044245526,
+                    0.4445872250220681,
+                    0.35663378506742111,
+                    0.46050733484351386,
+                    0.90183319670699247,
+                    0.25580304621523409,
+                    0.829046250307621,
+                    0.17289941524860536,
+                    0.50057434332583772,
+                    0.23708211515894262,
+                    0.726563513547444,
+                    0.99916803617837524,
+                    0.13307556409066337,
+                    0.63541280805850986,
+                    0.2010761700342765,
+                    0.87007265153201052,
+                    0.01537503745156915,
+                    0.29928317021245376,
+                    0.34814485565207193,
+                    0.54662416924099633,
+                    0.0926606122036842,
+                    0.88235844910195382,
+                    0.90200667726894357,
+                    0.084878455551966214,
+                    0.045493253404194994,
+                    0.96825536317493022
+                };
+            }
+            else if (playerCount == 3)
+            {
+                // weights for 3 players
+                this.weights = new Weight[]
+                {
+                    0.10118056815172573,
+                    0.076279876118309276,
+                    0.91207603917553814,
+                    0.6099335625813963,
+                    0.024810186224577244,
+                    0.94084573691461459,
+                    0.8113607464178284,
+                    0.31200293680280583,
+                    0.580410538185579,
+                    0.75654880511070277,
+                    0.8557360625509477,
+                    0.1603315491743067,
+                    0.75012418616103194,
+                    0.30733956420204583,
+                    0.32993886367415021,
+                    0.61602847008780981,
+                    0.2765620317433784,
+                    0.54656514450747751,
+                    0.44113742548094004,
+                    0.52666598664441433,
+                    0.86775039286247946,
+                    0.56646331405102424,
+                    0.42028397131724471,
+                    0.57723306078800607,
+                    0.10618762746741403,
+                    0.86481057329279254,
+                    0.47811340199695579,
+                    0.65976975462854393,
+                    0.67866076125235364,
+                    0.27358074131122828,
+                    0.98575983992171423,
+                    0.8112100118590565,
+                    0.59853652594542894,
+                    0.023855774421937904,
+                    0.43580397899998546,
+                    0.8495092194991708,
+                    0.82970018044642113,
+                    0.68614319848648453,
+                    0.24285086460544297,
+                    0.88247367119321518,
+                    0.90350251071892906,
+                    0.66933477438023992,
+                    0.73456855247941222,
+                    0.36393446953506314,
+                    0.089211643336359114,
+                    0.54592733464479781,
+                    0.18802237139323375,
+                    0.13038877888084832,
+                    0.094029995493604773,
+                    0.55985291984856733,
+                    0.46026028674573655,
+                    0.84398010507733146,
+                    0.82800507534214152,
+                    0.35954542113912547,
+                    0.90203445629880041,
+                    0.975157132724463,
+                    0.57567308634783732,
+                    0.85721523287110746,
+                    0.0057602503805794722,
+                    0.32202831160837242,
+                    0.27322121158857882,
+                    0.33947775412326558,
+                    0.32803337102664332,
+                    0.268818362438501,
+                    0.67411683191271321,
+                    0.14665491420154225,
+                    0.00054531159975068882,
+                    0.37018045043581194,
+                    2.3821262482845837E-05,
+                    0.91887692544533051,
+                    0.02395499764433244,
+                    0.25138218971033688,
+                    0.19033100932851949,
+                    0.41365171848500687,
+                    0.87419805546486662,
+                    0.7276841324184482,
+                    0.082179688769003292,
+                    0.2987174944480499,
+                    0.88986294649856124,
+                    0.87000412519796866,
+                    0.3448250144695979,
+                    0.11333475618778477,
+                    0.0095614898121942557,
+                    0.56112815565947816,
+                    0.87715060006694479,
+                    0.51950071976496881,
+                    0.91958260918948,
+                    0.64330986649417732,
+                    0.72720816271715261,
+                    0.024153320757076741,
+                    0.90514270525346974,
+                    0.74772298321953179,
+                    0.88579617670938415,
+                    0.87864781647190859,
+                    0.99445370214254925,
+                    0.45851652794914161,
+                    0.9436072435281605,
+                    0.43146166032248245,
+                    0.53568969046961945,
+                    0.780824629265193,
+                    0.84949258288810614,
+                    0.70726513651072287,
+                    0.29645138815811445,
+                    0.41377216880851064,
+                    0.13481097446512941,
+                    0.491194523634014,
+                    0.19554269158663853,
+                    0.74477747491723134,
+                    0.38590918406187991,
+                    0.99991224937485312,
+                    0.028646499960446908,
+                    0.64815908931110022,
+                    0.799974111118342,
+                    0.7429124575308117,
+                    0.59402978608572365,
+                    0.61389362170076633,
+                    0.76444407563809857,
+                    0.43525005364103708,
+                    0.25955641989575529,
+                    0.48507183098004758,
+                    0.72212006794947936,
+                    0.785746054416325,
+                    0.29540107159195517,
+                    0.3705373846090107,
+                    0.93213791366308008,
+                    0.74664244602743646
+                };
+            }
+            else if (playerCount == 2)
+            {
+                // weights for 2 players
+                this.weights = new Weight[]
+                {
+                    0.10772292665565521,
+                    0.7568847753139607,
+                    0.74631516339551429,
+                    0.48422212767611361,
+                    0.6904421048892857,
+                    0.5638831437630033,
+                    0.92751435948420058,
+                    0.11517178503105967,
+                    0.73141940153735663,
+                    0.080500113025808756,
+                    0.2792686570106393,
+                    0.48644287387674812,
+                    0.82613329180801909,
+                    0.43936299797583511,
+                    0.60968136177849086,
+                    0.57248039474826329,
+                    0.18924283037858214,
+                    0.68709403464435315,
+                    0.16412713765824544,
+                    0.922583390852708,
+                    0.64309565205736807,
+                    0.81671887543830957,
+                    0.91617429795031169,
+                    0.61241034453847,
+                    0.35780636517228853,
+                    0.6238802657806688,
+                    0.79255218822162221,
+                    0.70989934867708915,
+                    0.18803045874835481,
+                    0.286052742477531,
+                    0.76064842909604713,
+                    0.45001016936731064,
+                    0.73109669330580929,
+                    0.42193991386887614,
+                    0.61249398419749623,
+                    0.3697377791021661,
+                    0.96211453610961661,
+                    0.95373598390659375,
+                    0.45749338234658044,
+                    0.51007718758661169,
+                    0.53072096040971628,
+                    0.88570951581267132,
+                    0.54078058085440683,
+                    0.032582360861624193,
+                    0.99860538550352518,
+                    0.925730366667607,
+                    0.46704319839693753,
+                    0.9907799637584267,
+                    0.47184547291688878,
+                    0.60509634900609788,
+                    0.45023372108127624,
+                    0.33474675865599274,
+                    0.4644525567602612,
+                    0.27093972043178033,
+                    0.25944109550185557,
+                    0.31924239677341765,
+                    0.62114454362129068,
+                    0.9655833078727486,
+                    0.38164135607967209,
+                    0.26135486413787812,
+                    0.04766920122675096,
+                    0.9876389942510051,
+                    0.8705903114614032,
+                    0.79465070592456055,
+                    0.24544539721470579,
+                    0.26200166359171351,
+                    0.063534421378567379,
+                    0.68054673787231867,
+                    0.52852707848815572,
+                    0.83093081946993752,
+                    0.37600639507919853,
+                    0.16639153564646447,
+                    0.52078435934185252,
+                    0.5111772827390475,
+                    0.53798279817587824,
+                    0.712534388579677,
+                    0.81813607605553051,
+                    0.61135987532854075,
+                    0.13833448984116992,
+                    0.17292112692860939,
+                    0.43032710779473515,
+                    0.630235472777968,
+                    0.64270482491362135,
+                    0.83622870453923415,
+                    0.55135714430425187,
+                    0.083735655123146444,
+                    0.26680164177287446,
+                    0.24129558491580913,
+                    0.343688098175306,
+                    0.46714263414831025,
+                    0.31457978601780712,
+                    0.22724254982417569,
+                    0.18147895793965035,
+                    0.64586532553465348,
+                    0.0215015263396788,
+                    0.57306267915901832,
+                    0.29812336410308415,
+                    0.091270815181206361,
+                    0.74228235142877441,
+                    0.96545397670262212,
+                    0.46566309268384376,
+                    0.77102167882072814,
+                    0.44907003492073627,
+                    0.36989022778342018,
+                    0.57970048469943025,
+                    0.4983978745752935,
+                    0.55170745020811784,
+                    0.922489740570686,
+                    0.41556133062837708,
+                    0.729099832046358,
+                    0.31756847978922004,
+                    0.65190549248452556,
+                    0.0018197459325073,
+                    0.41450251984153991,
+                    0.38987789151253088,
+                    0.63939463076619185,
+                    0.43057403752141354,
+                    0.0076865458800822357,
+                    0.17509300227979807,
+                    0.28830572836487822,
+                    0.71150372666842476,
+                    0.88695861843272994,
+                    0.067309790159254243,
+                    0.27861013434762605,
+                    0.21176778493065748,
+                    0.50546630467542741
+                };
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Invalid number of players");
+            }
+
+            
+
+            // Provide the criteria with the weights
+            Queue<Weight> weightsQueue = new Queue<Weight>(weights);
+            foreach (SimpleCriterion criterion in criteria)
+            {
+                criterion.ReceiveWeights(weightsQueue);
+            }
+        }
+
+
+        /// <summary>
+        /// Creates AI with provided weights if not null. If null the weights will be random
+        /// </summary>
+        /// <param name="weights">weights to create the AI with</param>
+        public EvolutionB(int playerCount, Weight[] assignedWeights = null)
+        {
+            int yearsPlayed = 3;
+            if (playerCount == 4)
+            {
+                yearsPlayed = 2;
+            }
+            criteria = new List<SimpleCriterion>()
+            {
+                new SCSpecializedKnowledge(yearsPlayed),
+                new SCSingleUseKnowledge(yearsPlayed),
+                new SCPermissions(yearsPlayed),
+                new SCGeneralKnowledge(yearsPlayed),
+                new SCShovels(yearsPlayed),
+                new SCAssistants(yearsPlayed),
+                new SCSpecialPermissions(yearsPlayed),
+                new SCZeppelins(yearsPlayed),
+                new SCCongresses(yearsPlayed),
+                new SCCar(yearsPlayed),
+                new SCPoints(yearsPlayed),
+                new SCTime(yearsPlayed)
+            };
+
+            if (assignedWeights == null)
+            {
+                int weightCount = criteria.Sum(c => c.WeightsNeeded);
+                weights = new Weight[weightCount];
+
+                for (int i = 0; i < weightCount; i++)
+                {
+                    weights[i] = new Weight(RandomDouble(0, 1));
+                }
+            }
+            else
+            {
+                this.weights = assignedWeights;
+            }
+
+            // Provide the criteria with the weights
+            Queue<Weight> weightsQueue = new Queue<Weight>(weights);
+            foreach (SimpleCriterion criterion in criteria)
+            {
+                criterion.ReceiveWeights(weightsQueue);
+            }
+        }
+
+
+        protected virtual double EvalScore(ISimulationState gameState, IPlayer player)
+        {
+            double score = 0;
+
+            foreach (SimpleCriterion criterion in criteria)
+            {
+                score += criterion.GetScore(gameState, player);
+            }
+
+            return score;
+        }
+
+        public override IAction TakeAction(IGame gameState)
+        {
+            string playerName = gameState.ActivePlayer.Name;
+
+            // generate all possible moves and their resulting game states
+            // TODO can be changed to deterministic, but not for evolution
+            List<ISimulationState> possibleStates = new SimulationState(new DeterministicGame((Game)gameState)).GetAllChildStates();
+
+            //List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
+
+            double bestScore = double.MinValue;
+            SimulationState bestState = null;
+
+            // TODO debugging
+            Dictionary<IAction, double> moveScores = new Dictionary<IAction, double>();
+
+
+            // Evaluate all child states and pick the best one
+            double score;
+            foreach (SimulationState state in possibleStates)   
+            {
+                score = EvalScore(state, state.Game.Players.First(p => p.Name.Equals(playerName)));
+                // TODO debugging
+                moveScores[state.Move] = score;
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestState = state;
+                }
+            }
+
+            return bestState.Move;
+        }
+
+        public static EvolutionB Procreate(int playerCount, params EvolutionAI[] parents)
+        {
+            // assuming all parents have the same number of weights
+            Weight[] newWeights = new Weight[parents[0].weights.Length];
+
+            for (int i = 0; i < newWeights.Length; i++)
+            {
+                newWeights[i] = parents[random.Next(parents.Length)].weights[i];
+            }
+
+            return new EvolutionB(playerCount, newWeights);
+        }
+
+
 
         public void NormalizeValues(double min, double max)
         {
@@ -1669,18 +1384,18 @@ namespace ThebesAI
 
 
 
-    public class EvolutionAI : IAI
+    public class DumbEvolutionAI : IAI
     {
         public Weights weights;
 
-        public EvolutionAI() { }
+        public DumbEvolutionAI() { }
 
-        public EvolutionAI(int playerCount)
+        public DumbEvolutionAI(int playerCount)
         {
             weights = new Weights("useless parameter");
         }
 
-        public EvolutionAI(Weights weights)
+        public DumbEvolutionAI(Weights weights)
         {
             this.weights = weights;
         }
@@ -1690,7 +1405,8 @@ namespace ThebesAI
             string playerName = gameState.ActivePlayer.Name;
 
             // generate all possible moves and their resulting game states
-            List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
+            //List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
+            List<ISimulationState> possibleStates = new SimulationState(new DeterministicGame((Game)gameState)).GetAllChildStates();
 
             double bestScore = double.MinValue;
             SimulationState bestState = null;
@@ -1773,12 +1489,12 @@ namespace ThebesAI
     {
         public int id;
         public int generation;
-        public IAI ai;
+        public EvolutionAI ai;
         List<int> scores;
 
         public Individual() { }
 
-        public Individual(IAI ai = null, int id = -1, int generation = -1)
+        public Individual(int playerCount, EvolutionAI ai = null, int id = -1, int generation = -1)
         {
             this.id = id;
             this.generation = generation;
@@ -1786,7 +1502,7 @@ namespace ThebesAI
 
             if (ai == null)
             {
-                this.ai = new BetterEvolutionAI();
+                this.ai = new EvolutionB(playerCount);
             }
             else
             {
@@ -1816,8 +1532,9 @@ namespace ThebesAI
         List<Individual> individuals = new List<Individual>();
         int currentGen = 0;
         int currentID = 0;
+        int playersPerGame;
 
-        BetterEvolutionAI currentBest;
+        EvolutionAI currentBest;
         double currentBestScore = double.MinValue;
 
         List<double> averageScores = new List<double>();
@@ -1825,159 +1542,161 @@ namespace ThebesAI
 
         StreamWriter sw;
 
-        public Population(int count, Weight[] seed = null)
+        public Population(int playersPerGame, int count, Weight[] seed = null)
         {
+            this.playersPerGame = playersPerGame;
+
             Individual individual;
             for (int i = 0; i < count; i++)
             {
-                individual = new Individual(new BetterEvolutionAI(seed), currentID++, currentGen);
+                individual = new Individual(playersPerGame, new EvolutionA(seed), currentID++, currentGen);
                 individuals.Add(individual);
             }
         }
 
-        //public void TestGeneration(int gamesPerPlayer, int playerPerGame)
-        //{
-        //    if (playerPerGame < 2 || playerPerGame > 4)
-        //    {
-        //        throw new ArgumentOutOfRangeException("Game only supports 2 - 4 players");
-        //    }
-        //    if (gamesPerPlayer < 1)
-        //    {
-        //        throw new ArgumentOutOfRangeException("You have to play at least one game to test the players");
-        //    }
-        //    if (individuals.Count % playerPerGame != 0)
-        //    {
-        //        throw new ArgumentOutOfRangeException("Number of individuals in a population must be divisible by playersPerGame");
-        //    }
+        public void TestGeneration(int gamesPerPlayer, int playerPerGame)
+        {
+            if (playerPerGame < 2 || playerPerGame > 4)
+            {
+                throw new ArgumentOutOfRangeException("Game only supports 2 - 4 players");
+            }
+            if (gamesPerPlayer < 1)
+            {
+                throw new ArgumentOutOfRangeException("You have to play at least one game to test the players");
+            }
+            if (individuals.Count % playerPerGame != 0)
+            {
+                throw new ArgumentOutOfRangeException("Number of individuals in a population must be divisible by playersPerGame");
+            }
 
-        //    // play required number of matches for every player
-        //    int populationIndex = 0, playersIndex = 0;
-        //    Individual[] players = new Individual[playerPerGame];
-        //    for (int i = 0; i < gamesPerPlayer; i++)
-        //    {
-        //        while (populationIndex < individuals.Count)
-        //        {
-        //            players[playersIndex] = individuals[populationIndex];
-        //            if (playersIndex == playerPerGame - 1)
-        //            {
-        //                PlayMatch(players);
-        //                playersIndex = -1;
-        //            }
+            // play required number of matches for every player
+            int populationIndex = 0, playersIndex = 0;
+            Individual[] players = new Individual[playerPerGame];
+            for (int i = 0; i < gamesPerPlayer; i++)
+            {
+                while (populationIndex < individuals.Count)
+                {
+                    players[playersIndex] = individuals[populationIndex];
+                    if (playersIndex == playerPerGame - 1)
+                    {
+                        PlayMatch(players);
+                        playersIndex = -1;
+                    }
 
-        //            playersIndex++;
-        //            populationIndex++;
-        //        }
+                    playersIndex++;
+                    populationIndex++;
+                }
 
-        //        populationIndex = 0;
-        //        playersIndex = 0;
+                populationIndex = 0;
+                playersIndex = 0;
 
-        //        ShufflePopulation();
-        //    }
-        //}
+                ShufflePopulation();
+            }
+        }
 
-        //public void CreateNewGeneration(double survivorRatio, int parentAmount, double minMutationRange, double mutationProportionalRange)
-        //{
-        //    currentGen++;
+        public void CreateNewGeneration(double survivorRatio, int parentAmount, double minMutationRange, double mutationProportionalRange)
+        {
+            currentGen++;
 
-        //    // sort by average score descending
-        //    individuals.Sort((x, y) => y.AverageScore().CompareTo(x.AverageScore()));
+            // sort by average score descending
+            individuals.Sort((x, y) => y.AverageScore().CompareTo(x.AverageScore()));
 
-        //    // report a new best score
-        //    double bestScore = individuals[0].AverageScore();
-        //    if (bestScore > currentBestScore)
-        //    {
-        //        currentBestScore = bestScore;
-        //        currentBest = individuals[0].ai;
-        //        Console.WriteLine($"-------------------- new best score: {bestScore}");
+            // report a new best score
+            double bestScore = individuals[0].AverageScore();
+            if (bestScore > currentBestScore)
+            {
+                currentBestScore = bestScore;
+                currentBest = individuals[0].ai;
+                Console.WriteLine($"-------------------- new best score: {bestScore}");
 
-        //        using (var tw = new StreamWriter($"POSITIVEBEST_4_150_5_{survivorRatio}_{parentAmount}_{mutationProbability}_{minMutationRange}.txt", true))
-        //        {
-        //            tw.Write(new JavaScriptSerializer().Serialize(currentBest));
-        //        }
-        //    }
+                using (var tw = new StreamWriter($"ComplexBEST_{playersPerGame}_150_5_{survivorRatio}_{parentAmount}_{mutationProbability}_{minMutationRange}.txt", true))
+                {
+                    tw.Write(new JavaScriptSerializer().Serialize(currentBest));
+                }
+            }
 
-        //    int survivorCount = (int)Math.Round(individuals.Count * survivorRatio);
+            int survivorCount = (int)Math.Round(individuals.Count * survivorRatio);
 
-        //    // select survivors
-        //    List<Individual> newPopulation = new List<Individual>();
-        //    for (int i = 0; i < survivorCount; i++)
-        //    {
-        //        individuals[i].ResetScores();
-        //        newPopulation.Add(individuals[i]);
-        //    }
-        //    int childrenCount = individuals.Count - survivorCount;
+            // select survivors
+            List<Individual> newPopulation = new List<Individual>();
+            for (int i = 0; i < survivorCount; i++)
+            {
+                individuals[i].ResetScores();
+                newPopulation.Add(individuals[i]);
+            }
+            int childrenCount = individuals.Count - survivorCount;
 
-        //    // adjust if population is too similar
-        //    int randomIndividualsCount = 0;
-        //    if (AverageSimilarity(this.individuals, 20) > 0.95)
-        //    {
-        //        childrenCount = (int)Math.Round(childrenCount * 0.6);
-        //        randomIndividualsCount = individuals.Count - survivorCount - childrenCount;
+            // adjust if population is too similar
+            int randomIndividualsCount = 0;
+            if (AverageSimilarity(this.individuals, 20) > 0.95)
+            {
+                childrenCount = (int)Math.Round(childrenCount * 0.6);
+                randomIndividualsCount = individuals.Count - survivorCount - childrenCount;
 
-        //        // raise mutation probability
-        //        //mutationProbability += 0.01;
-        //        //mutationProbability = 0.05;
-        //    }
+                // raise mutation probability
+                //mutationProbability += 0.01;
+                //mutationProbability = 0.05;
+            }
 
-        //    // adjust if population average fell off
-        //    int bestChildrenCount = 0;
-        //    if (currentBestScore > bestScore + 12)
-        //    {
-        //        childrenCount = (int)Math.Round(childrenCount * 0.6);
-        //        bestChildrenCount = individuals.Count - survivorCount - childrenCount - randomIndividualsCount;
-        //    }
+            // adjust if population average fell off
+            int bestChildrenCount = 0;
+            if (currentBestScore > bestScore + 12)
+            {
+                childrenCount = (int)Math.Round(childrenCount * 0.6);
+                bestChildrenCount = individuals.Count - survivorCount - childrenCount - randomIndividualsCount;
+            }
 
 
-        //    // generate the rest of the population
-        //    List<Individual> newGeneration = new List<Individual>();
-        //    BetterEvolutionAI[] parents = new BetterEvolutionAI[parentAmount];
-        //    Individual newIndividual;
-        //    for (int i = 0; i < childrenCount; i++)
-        //    {
-        //        // choose parents randomly
-        //        for (int j = 0; j < parentAmount; j++)
-        //        {
-        //            parents[j] = newPopulation[random.Next(newPopulation.Count)].ai;
-        //        }
+            // generate the rest of the population
+            List<Individual> newGeneration = new List<Individual>();
+            EvolutionAI[] parents = new EvolutionAI[parentAmount];
+            Individual newIndividual;
+            for (int i = 0; i < childrenCount; i++)
+            {
+                // choose parents randomly
+                for (int j = 0; j < parentAmount; j++)
+                {
+                    parents[j] = newPopulation[random.Next(newPopulation.Count)].ai;
+                }
 
-        //        // add newly created indiviudal to the new generation
-        //        newIndividual = new Individual(BetterEvolutionAI.Procreate(parents), currentID++, currentGen);
-        //        newIndividual.ai.MutateInRangePositive(mutationProbability, minMutationRange);
-        //        newGeneration.Add(newIndividual);
-        //    }
+                // add newly created indiviudal to the new generation
+                newIndividual = new Individual(playersPerGame, EvolutionA.Procreate(parents), currentID++, currentGen);
+                newIndividual.ai.MutateInRange(mutationProbability, minMutationRange);
+                newGeneration.Add(newIndividual);
+            }
 
-        //    // generate random individuals
-        //    for (int i = 0; i < randomIndividualsCount; i++)
-        //    {
-        //        newGeneration.Add(new Individual(new BetterEvolutionAI(null), currentID++, currentGen));
-        //    }
+            // generate random individuals
+            for (int i = 0; i < randomIndividualsCount; i++)
+            {
+                newGeneration.Add(new Individual(playersPerGame, new EvolutionA(null), currentID++, currentGen));
+            }
 
-        //    // generate childer of the best individual so far
-        //    BetterEvolutionAI bestAICopy;
-        //    for (int i = 0; i < bestChildrenCount; i++)
-        //    {
-        //        bestAICopy = new BetterEvolutionAI(currentBest.weights);
-        //        bestAICopy.MutateInRangePositive(mutationProbability, minMutationRange);
-        //        newGeneration.Add(new Individual(bestAICopy, currentID++, currentGen));
-        //    }
+            // generate childer of the best individual so far
+            EvolutionA bestAICopy;
+            for (int i = 0; i < bestChildrenCount; i++)
+            {
+                bestAICopy = new EvolutionA(currentBest.weights);
+                bestAICopy.MutateInRange(mutationProbability, minMutationRange);
+                newGeneration.Add(new Individual(playersPerGame, bestAICopy, currentID++, currentGen));
+            }
 
-        //    // merge survirors with children
-        //    newPopulation.AddRange(newGeneration);
-        //    this.individuals = newPopulation;
-        //}
+            // merge survirors with children
+            newPopulation.AddRange(newGeneration);
+            this.individuals = newPopulation;
+        }
 
-        //private void ShufflePopulation()
-        //{
-        //    int index = individuals.Count;
-        //    while (index > 1)
-        //    {
-        //        index--;
-        //        int swapPosition = random.Next(index + 1);
-        //        Individual i = individuals[swapPosition];
-        //        individuals[swapPosition] = individuals[index];
-        //        individuals[index] = i;
-        //    }
-        //}
+        private void ShufflePopulation()
+        {
+            int index = individuals.Count;
+            while (index > 1)
+            {
+                index--;
+                int swapPosition = random.Next(index + 1);
+                Individual i = individuals[swapPosition];
+                individuals[swapPosition] = individuals[index];
+                individuals[index] = i;
+            }
+        }
 
         public static void PlayMatch(Individual[] individuals)
         {
@@ -2024,88 +1743,93 @@ namespace ThebesAI
             }
         }
 
-        //public void Evolve(int playersPerGame, int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.1, double minMutationRange = 0.05, double mutationRelativeRange = 0.3)
-        //{
-        //    GameSettings.LoadFromFile(@"thebes_config.thc");
+        public void Evolve(int generations, int gamesPerPlayer, double survivorRatio = 0.3, int parentAmount = 4, double mutationProbability = 0.1, double minMutationRange = 0.05, double mutationRelativeRange = 0.3)
+        {
+            GameSettings.LoadFromFile(@"thebes_config.thc");
 
-        //    sw = new StreamWriter($"POSITIVE_TEST{playersPerGame}_{generations}_{gamesPerPlayer}_{survivorRatio}_{parentAmount}_{mutationProbability}_{minMutationRange}.txt", true);
+            sw = new StreamWriter($"Complex_TEST{playersPerGame}_{generations}_{gamesPerPlayer}_{survivorRatio}_{parentAmount}_{mutationProbability}_{minMutationRange}.txt", true);
 
-        //    this.mutationProbability = mutationProbability;
-        //    for (int i = 0; i < generations; i++)
-        //    {
-        //        TestGeneration(gamesPerPlayer, playersPerGame);
-        //        ReportProgress();
-        //        CreateNewGeneration(survivorRatio, parentAmount, minMutationRange, mutationRelativeRange);
-        //    }
+            this.mutationProbability = mutationProbability;
+            for (int i = 0; i < generations; i++)
+            {
+                TestGeneration(gamesPerPlayer, playersPerGame);
+                ReportProgress();
+                CreateNewGeneration(survivorRatio, parentAmount, minMutationRange, mutationRelativeRange);
+            }
 
-        //}
+        }
 
-        //public void ReportProgress()
-        //{
-        //    double averageScore = individuals.Average(x => x.AverageScore());
-        //    double maxAverageScore = individuals.Max(x => x.AverageScore());
-        //    averageScores.Add(averageScore);
-        //    double averageSimilarity = AverageSimilarity(individuals, 20);
-        //    Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {averageSimilarity}");
+        public void ReportProgress()
+        {
+            double averageScore = individuals.Average(x => x.AverageScore());
+            double maxAverageScore = individuals.Max(x => x.AverageScore());
+            averageScores.Add(averageScore);
+            double averageSimilarity = AverageSimilarity(individuals, 20);
+            Console.WriteLine($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {averageSimilarity}");
 
-        //    sw.Write($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {averageSimilarity}\n");
+            sw.Write($"Generation {this.currentGen} : Best avg: {maxAverageScore}, Total avg: {averageScore}, avg similarity: {averageSimilarity}\n");
 
-        //    //if (this.currentGen % 20 == 0)
-        //    //{
-        //    //    using (var tw = new StreamWriter($"gen_{currentGen}_betterAI.txt", true))
-        //    //    {
-        //    //        tw.Write(new JavaScriptSerializer().Serialize(this.averageScores));
-        //    //    }
-        //    //}
-        //}
+            //if (this.currentGen % 20 == 0)
+            //{
+            //    using (var tw = new StreamWriter($"gen_{currentGen}_betterAI.txt", true))
+            //    {
+            //        tw.Write(new JavaScriptSerializer().Serialize(this.averageScores));
+            //    }
+            //}
+        }
 
-        ///// <summary>
-        ///// Computes the cosine similarity of two vectors
-        ///// </summary>
-        ///// <param name="a">first vecotr</param>
-        ///// <param name="b">second vector</param>
-        ///// <returns>double in range <-1; 1> where 1 is most similar, -1 least similar </returns>
-        //private static double CosineSimilarity(Weight[] a, Weight[] b)
-        //{
-        //    double ab = 0.0;
-        //    double aa = 0.0;
-        //    double bb = 0.0;
+        /// <summary>
+        /// Computes the cosine similarity of two vectors
+        /// </summary>
+        /// <param name="a">first vecotr</param>
+        /// <param name="b">second vector</param>
+        /// <returns>double in range <-1; 1> where 1 is most similar, -1 least similar </returns>
+        private static double CosineSimilarity(Weight[] a, Weight[] b)
+        {
+            double ab = 0.0;
+            double aa = 0.0;
+            double bb = 0.0;
 
-        //    // compute formula parts
-        //    for (int i = 0; i < a.Length; ++i)
-        //    {
-        //        aa += a[i].Value * a[i].Value;
-        //        ab += a[i].Value * b[i].Value;
-        //        bb += b[i].Value * b[i].Value;
-        //    }
+            // compute formula parts
+            for (int i = 0; i < a.Length; ++i)
+            {
+                aa += a[i].Value * a[i].Value;
+                ab += a[i].Value * b[i].Value;
+                bb += b[i].Value * b[i].Value;
+            }
 
-        //    // edge cases
-        //    if (aa == 0)
-        //        return bb == 0 ? 1.0 : 0.0;
-        //    else if (bb == 0)
-        //        return 0.0;
-        //    else
-        //        return ab / Math.Sqrt(aa) / Math.Sqrt(bb);
-        //}
+            // edge cases
+            if (aa == 0)
+                return bb == 0 ? 1.0 : 0.0;
+            else if (bb == 0)
+                return 0.0;
+            else
+                return ab / Math.Sqrt(aa) / Math.Sqrt(bb);
+        }
 
-        //private static double AverageSimilarity(List<Individual> individuals, int comparisonCount)
-        //{
-        //    int count = 0;
-        //    double sum = 0;
-        //    while (true)
-        //    {
-        //        for (int i = 0; i < individuals.Count; i++)
-        //        {
-        //            if (count >= comparisonCount)
-        //            {
-        //                return sum / count;
-        //            }
+        private static double AverageSimilarity(List<Individual> individuals, int comparisonCount)
+        {
+            int count = 0;
+            double sum = 0;
+            while (true)
+            {
+                for (int i = 0; i < individuals.Count; i++)
+                {
+                    if (count >= comparisonCount)
+                    {
+                        return sum / count;
+                    }
 
-        //            sum += CosineSimilarity(individuals[i].ai.weights, individuals[random.Next(individuals.Count)].ai.weights);
-        //            count++;
-        //        }
-        //    }
-        //}
+                    Individual randomIndividual = individuals[random.Next(individuals.Count)];
+                    if (randomIndividual.ai.weights.Length != individuals[i].ai.weights.Length)
+                    {
+                        continue;
+                    }
+                    sum += CosineSimilarity(individuals[i].ai.weights, randomIndividual.ai.weights);
+                    count++;
+                }
+            }
+        }
     }
 
 
@@ -2116,16 +1840,79 @@ namespace ThebesAI
     public class RandomAI : IAI
     {
         Random random = new Random();
+            
         public IAction TakeAction(IGame gameState)
         {
             List<ISimulationState> possibleStates = new SimulationState(gameState).GetAllChildStates();
 
-            return possibleStates[random.Next(possibleStates.Count)].Move;
+            List<ISimulationState> filteredStates;
+
+            if (possibleStates.Count < 2)
+            {
+                return possibleStates[random.Next(possibleStates.Count)].Move;
+            }
+            while (true)
+            {
+                switch (random.Next(5))
+                {
+                    // take a card
+                    case 0:
+                        filteredStates = possibleStates.Where(x => x.Move is TakeCardAction).ToList();
+                        if (filteredStates.Count != 0)
+                        {
+                            return filteredStates[random.Next(filteredStates.Count)].Move;
+                        }
+                        break;
+
+                    // dig
+                    case 1:
+                        filteredStates = possibleStates.Where(x => x.Move is DigAction).ToList();
+                        if (filteredStates.Count != 0)
+                        {
+                            return filteredStates[random.Next(filteredStates.Count)].Move;
+                        }
+                        break;
+
+                    // exhibition
+                    case 2:
+                        filteredStates = possibleStates.Where(x => x.Move is ExecuteExhibitionAction).ToList();
+                        if (filteredStates.Count != 0)
+                        {
+                            return filteredStates[random.Next(filteredStates.Count)].Move;
+                        }
+                        break;
+
+                    // change cards
+                    case 3:
+                        filteredStates = possibleStates.Where(x => x.Move is ChangeCardsAction).ToList();
+                        if (filteredStates.Count != 0)
+                        {
+                            return filteredStates[random.Next(filteredStates.Count)].Move;
+                        }
+                        break;
+
+                    // use zeppelin
+                    case 4:
+                        filteredStates = possibleStates.Where(x => x.Move is ZeppelinAction).ToList();
+                        if (filteredStates.Count != 0)
+                        {
+                            return filteredStates[random.Next(filteredStates.Count)].Move;
+                        }
+                        break;
+
+                    default:
+                        break;
+                } 
+            }
+
+            
+
+            
         }
     }
 
 
-    class SimulationGame : Game
+    public class SimulationGame : Game
     {
         public SimulationGame(int playerCount) : base(playerCount) { }
 

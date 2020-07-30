@@ -58,6 +58,7 @@ namespace ThebesCore
         /// <param name="digSite">Specified dig site</param>
         /// <returns>Sum of artifact values</returns>
         int ArtifactSum(IDigSite digSite);
+        bool AreAllPlayersDone();
     }
     
     [Serializable]
@@ -166,7 +167,7 @@ namespace ThebesCore
         /// Check if there's at least one player who has some time left
         /// </summary>
         /// <returns></returns>
-        protected bool AreAllPlayersDone()
+        public bool AreAllPlayersDone()
         {
             foreach (IPlayer player in Players)
             {

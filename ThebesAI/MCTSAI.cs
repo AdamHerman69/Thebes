@@ -35,17 +35,6 @@ namespace ThebesAI
                 this.Players.Add(new DeterministicPlayer(this, (Player)player));
             }
 
-
-            //this.Players = game.Players.Select(p => p.Clone(
-            //    null,
-            //    this.AvailableCards.ChangeDisplayedCards,
-            //    this.AvailableCards.GiveCard,
-            //    this.Deck.Discard,
-            //    this.ActiveExhibitions.GiveExhibition,
-            //    this.DrawTokens,
-            //    this.PlayersOnWeek
-            //    )).ToList();
-
             // SimGame Specifics
             assumedArtifactSum = new Dictionary<IDigSite, double>();
             assumedArtifactCount = new Dictionary<IDigSite, double>();
@@ -336,8 +325,8 @@ namespace ThebesAI
                 action = new ExecuteExhibitionAction(exhibition);
                 if (player.IsEnoughTime(action) && 
                     (
-                        (player is DeterministicPlayer && exhibition.CheckRequiredArtifacts(((DeterministicPlayer)player).AssumedArtifacts))
-                        || exhibition.CheckRequiredArtifacts(player.Tokens)
+                        // (player is DeterministicPlayer && exhibition.CheckRequiredArtifacts(((DeterministicPlayer)player).AssumedArtifacts)) ||
+                        exhibition.CheckRequiredArtifacts(player.Tokens)
                     )
                 )
                 {
@@ -492,13 +481,21 @@ namespace ThebesAI
     }
 
 
-    public class CheaterAI : IAI
+    public class MCTSAI : IAI
     {
-        public CheaterAI(int playerCount) { }
+        int ms = 5000;
+        double explorationConstant;
+        public MCTSAI(int playerCount) { }
+        public MCTSAI(int playerCount, int ms, double explorationConstant = 150)
+        {
+            this.ms = ms;
+            this.explorationConstant = explorationConstant;
+        }
+
         public IAction TakeAction(IGame gameState)
         {
-            MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null);
-            return mctsNode.Run(5000);
+            MCTSNode mctsNode = new MCTSNode(new SimulationState(gameState), null, this.explorationConstant);
+            return mctsNode.Run(ms);
         }
     }
 
@@ -534,19 +531,45 @@ namespace ThebesAI
         }
     }
 
+    public class MCTSEvolutionAI : IAI
+    {
+        IAI fastAI;
+        int ms = 5000;
+        static double explorationConstant = 2;
 
-    class MCTSNode
+        public MCTSEvolutionAI(int playerCount)
+        {
+            this.fastAI = new EvolutionA(playerCount);
+        }
+
+        public MCTSEvolutionAI(IAI fastAI, int ms, double explorationConstant)
+        {
+            this.fastAI = fastAI;
+            this.ms = ms;
+            MCTSEvolutionAI.explorationConstant = explorationConstant;
+        }
+
+        public IAction TakeAction(IGame gameState)
+        {
+            MCTSNodeInformedRollout mctsNode = new MCTSNodeInformedRollout(fastAI, new SimulationState(gameState), null, MCTSEvolutionAI.explorationConstant);
+            return mctsNode.Run(ms);
+        }
+    }
+
+
+    public class MCTSNode
     {
         protected Dictionary<string, double> scores; // string is player name
         protected int visits;
-        static double explorationConstant = 150;
+        static double explorationConstant;
 
         protected ISimulationState state;
         protected List<MCTSNode> children;
         protected MCTSNode parent;
 
-        public MCTSNode(ISimulationState state, MCTSNode parent)
+        public MCTSNode(ISimulationState state, MCTSNode parent, double explorationConstant = 150)
         {
+            MCTSNode.explorationConstant = explorationConstant;
             scores = null;
             visits = 0;
             children = new List<MCTSNode>();
@@ -690,6 +713,26 @@ namespace ThebesAI
             return this.state.GetExpectedScores();
         }
 
+    }
+
+    public class MCTSNodeInformedRollout : MCTSNode
+    {
+        IAI ai;
+
+        public MCTSNodeInformedRollout(IAI ai, ISimulationState state, MCTSNodeInformedRollout parent, double explorationConstant) : base(state, parent, explorationConstant)
+        {
+            this.ai = ai;
+        }
+
+        protected override Dictionary<string, double> Rollout()
+        {
+            ISimulationState currentState = this.state;
+            while (!currentState.Game.AreAllPlayersDone())
+            {
+                currentState = new SimulationState(currentState.Game, ai.TakeAction(currentState.Game));
+            }
+            return currentState.GetScores();
+        }
     }
 
 

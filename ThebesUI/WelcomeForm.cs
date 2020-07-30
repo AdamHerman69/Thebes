@@ -40,12 +40,12 @@ namespace ThebesUI
             foreach (PlayerInput playerInput in playerInputs)
             {
                 playerInput.AddDefaultAI(typeof(TestAI));
-                playerInput.AddAI(typeof(CheaterAI));
+                playerInput.AddAI(typeof(MCTSAI));
                 playerInput.AddAI(typeof(HeuristicCheaterAI));
                 playerInput.AddAI(typeof(SimCheaterAI));
                 playerInput.AddAI(typeof(FirstYearDFSAI));
-                playerInput.AddAI(typeof(EvolutionAI));
-                playerInput.AddAI(typeof(BetterEvolutionAI));
+                playerInput.AddAI(typeof(DumbEvolutionAI));
+                playerInput.AddAI(typeof(EvolutionA));
             }
         }
 
