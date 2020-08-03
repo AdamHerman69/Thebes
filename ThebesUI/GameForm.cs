@@ -203,8 +203,9 @@ namespace ThebesUI
         public void UpdateBoard()
         {
             // zeppelin button
-            if (game.ActivePlayer.Zeppelins > 0)
+            if (game.ActivePlayer.Zeppelins > 0 && !(game.ActivePlayer is IAIPlayer))
             {
+                cbUseZeppelin.Checked = false;
                 cbUseZeppelin.Visible = true;
             }
             else
@@ -510,12 +511,27 @@ namespace ThebesUI
         {
             if (cbUseZeppelin.Checked)
             {
-                ExecuteActionAsync(new ZeppelinAction(true));
+                IPlayer activePlayer = this.game.ActivePlayer;
+                if (!(activePlayer is IAIPlayer))
+                {
+                    activePlayer.ToggleZeppelin(true);
+                }
+                else
+                {
+                    throw new Exception("Shouldn't happen for an AI Player");
+                }
             }
             else
             {
-                //ExecuteAction(new ZeppelinAction(false));
-                ExecuteActionAsync(new ZeppelinAction(false));
+                IPlayer activePlayer = this.game.ActivePlayer;
+                if (!(activePlayer is IAIPlayer))
+                {
+                    activePlayer.ToggleZeppelin(false);
+                }
+                else
+                {
+                    throw new Exception("Shouldn't happen for an AI Player");
+                }
             }
         }
 

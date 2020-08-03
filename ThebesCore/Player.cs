@@ -380,6 +380,19 @@ namespace ThebesCore
                 if (this.Zeppelins > 0)
                 {
                     this.Zeppelins--;
+
+                    // delete the zeppelin from cards
+                    for (int i = 0; i < this.Cards.Count; i++)
+                    {
+                        if (Cards[i] is IZeppelinCard)
+                        {
+                            discardCard(Cards[i]);
+                            Cards.RemoveAt(i);
+                            break;
+                        }
+                    }
+
+
                     useZeppelin = false;
                 }
                 else
