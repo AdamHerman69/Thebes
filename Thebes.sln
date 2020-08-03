@@ -7,13 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesCore", "ThebesCore\Th
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesUI", "ThebesUI\ThebesUI.csproj", "{DED5F64B-502F-470D-A025-8E785CD88AD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesConsole", "ThebesConsole\ThebesConsole.csproj", "{23976FE6-7877-4A38-86F8-75D5105AB7B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesAI", "ThebesAI\ThebesAI.csproj", "{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ThebesSetup", "Setup\Setup.vdproj", "{45AC5EB3-50DE-4A9D-8D98-A29D314C05EF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThebesSimulation", "ThebesSimulation\ThebesSimulation.csproj", "{865D6468-0493-419C-B57D-6F0190242C68}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ThebesSetup", "ThebesSetup\ThebesSetup.vdproj", "{E970D21E-ACBE-467B-9CEF-ED76FA83D32A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,20 +27,16 @@ Global
 		{DED5F64B-502F-470D-A025-8E785CD88AD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DED5F64B-502F-470D-A025-8E785CD88AD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DED5F64B-502F-470D-A025-8E785CD88AD9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23976FE6-7877-4A38-86F8-75D5105AB7B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3DE1301-FA3E-440B-8A7B-0A8EF7DF599D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45AC5EB3-50DE-4A9D-8D98-A29D314C05EF}.Debug|Any CPU.ActiveCfg = Debug
-		{45AC5EB3-50DE-4A9D-8D98-A29D314C05EF}.Release|Any CPU.ActiveCfg = Release
 		{865D6468-0493-419C-B57D-6F0190242C68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{865D6468-0493-419C-B57D-6F0190242C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{865D6468-0493-419C-B57D-6F0190242C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{865D6468-0493-419C-B57D-6F0190242C68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E970D21E-ACBE-467B-9CEF-ED76FA83D32A}.Debug|Any CPU.ActiveCfg = Debug
+		{E970D21E-ACBE-467B-9CEF-ED76FA83D32A}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
